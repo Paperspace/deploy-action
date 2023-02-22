@@ -1,0 +1,15 @@
+name: 'Container Deployment'
+description: 'Greet someone and record the time'
+inputs:
+  apiKey:
+    description: 'Paperspace API Key'
+    required: true
+  deploymentId:
+    description: 'Container deployment ID'
+    required: true
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'node16'
+  main: 'index.js'
