@@ -1,10 +1,13 @@
 import fs from 'fs';
-import { exec } from 'child_process';
 import YAML from 'yaml'
+import path from 'path';
+import dayjs from 'dayjs';
 import hash from 'object-hash';
 import * as core from '@actions/core'
-import path from 'path';
-import { getDeployment, updateDeployment } from './service';
+
+import { getDeployment, getDeploymentWithDetails, updateDeployment } from './service';
+
+const TIMEOUT_IN_MINUTES = 15;
 
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
@@ -22,6 +25,8 @@ const validateParams = () => {
     throw new Error('inputs.deploymentId is not set');
   }
 }
+
+const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 
 const ensureFile = () => {
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
@@ -68,7 +73,31 @@ async function syncDeployment(deploymentId: string, yaml: any) {
     spec: yaml,
   });
 
-  console.log('res', res);
+  if (!res.updateDeployment) {
+    throw new Error('Deployment update failed');
+  }
+
+  const start = dayjs();
+
+  let isDeploymentUpdated = false;
+
+  while (!isDeploymentUpdated) {
+    core.info('Waiting for deployment to be healthy...');
+
+    if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes`);
+    }
+
+    const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
+  
+    if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
+      core.info('Deployment sync complete. Deployment is healthy.');
+
+      isDeploymentUpdated = true;
+    }
+
+    await sleep(1500);
+  }
 }
 
 async function run(): Promise<void> {
