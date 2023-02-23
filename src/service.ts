@@ -24,7 +24,7 @@ const getBaseDeploymentQuery = gql`
 `
 
 const getPolledDeploymentQuery = gql`
-   query Deployment($deploymentId: UUID!) {
+  query Deployment($deploymentId: UUID!) {
   deployment(id: $deploymentId) {
     id
     latestSpecHash   
@@ -43,8 +43,9 @@ const getPolledDeploymentQuery = gql`
           }
         }
       }
-    } 
+    }
   }
+}
 `
 
 const client = new GraphQLClient(API_HOST, {

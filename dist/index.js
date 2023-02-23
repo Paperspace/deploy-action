@@ -196,7 +196,7 @@ const getBaseDeploymentQuery = (0, graphql_request_1.gql) `
 }
 `;
 const getPolledDeploymentQuery = (0, graphql_request_1.gql) `
-   query Deployment($deploymentId: UUID!) {
+  query Deployment($deploymentId: UUID!) {
   deployment(id: $deploymentId) {
     id
     latestSpecHash   
@@ -215,8 +215,9 @@ const getPolledDeploymentQuery = (0, graphql_request_1.gql) `
           }
         }
       }
-    } 
+    }
   }
+}
 `;
 const client = new graphql_request_1.GraphQLClient(API_HOST, {
     headers: {
