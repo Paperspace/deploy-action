@@ -10,7 +10,7 @@ const deploymentId = core.getInput('deploymentId');
 
 const filePath = path.join(__dirname, '..', '.paperspace', 'spec.yaml');
 
-console.log('checking process', process.env);
+core.info('checking process', process.env);
 
 const validateParams = () => {
   core.info(`Validating input paramters...`)
