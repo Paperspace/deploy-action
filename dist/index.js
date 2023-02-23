@@ -73,11 +73,12 @@ function maybeSyncDeployment() {
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
         const deployment = yield (0, service_1.getDeployment)(deploymentId);
+        console.log('!!!', deployment);
         core.info(`Deployment: ${deployment.id}`);
         const specHash = (0, object_hash_1.default)(parsed, {
             algorithm: 'md5',
         });
-        core.info(`Deployment: ${specHash}`);
+        core.info(`Spec hash: ${specHash}`);
     });
 }
 function run() {

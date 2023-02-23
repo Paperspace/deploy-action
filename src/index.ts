@@ -39,13 +39,15 @@ async function maybeSyncDeployment() {
 
   const deployment = await getDeployment(deploymentId);
 
+  console.log('!!!', deployment);
+
   core.info(`Deployment: ${deployment.id}`);
 
   const specHash = hash(parsed, {
     algorithm: 'md5',
   })
 
-  core.info(`Deployment: ${specHash}`);
+  core.info(`Spec hash: ${specHash}`);
 }
 
 async function run(): Promise<void> {
