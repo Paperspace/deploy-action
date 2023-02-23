@@ -8,7 +8,7 @@ import { getDeployment } from './service';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
 
-const filePath = path.join(process.env.GITHUB_WORKSPACE ?? '', '.paperspace', 'spec.yaml');
+const filePath = path.join(process.env.GITHUB_WORKSPACE ?? '', '..', '.paperspace', 'spec.yaml');
 
 const validateParams = () => {
   core.info(`Validating input paramters...`)
@@ -23,7 +23,6 @@ const validateParams = () => {
 }
 
 const ensureFile = () => {
-  core.info(`Current workspace: ${process.env.GITHUB_WORKSPACE}`)
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
   
   if (!fs.existsSync(filePath)) {

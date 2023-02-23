@@ -51,7 +51,7 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const service_1 = __nccwpck_require__(1209);
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
-const filePath = path_1.default.join((_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '', '.paperspace', 'spec.yaml');
+const filePath = path_1.default.join((_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '', '..', '.paperspace', 'spec.yaml');
 const validateParams = () => {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
@@ -62,7 +62,6 @@ const validateParams = () => {
     }
 };
 const ensureFile = () => {
-    core.info(`Current workspace: ${process.env.GITHUB_WORKSPACE}`);
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
