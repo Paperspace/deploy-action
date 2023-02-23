@@ -10,8 +10,6 @@ const deploymentId = core.getInput('deploymentId');
 
 const filePath = path.join(__dirname, '..', '.paperspace', 'spec.yaml');
 
-core.info('checking process', process.env);
-
 const validateParams = () => {
   core.info(`Validating input paramters...`)
 
@@ -25,6 +23,8 @@ const validateParams = () => {
 }
 
 const ensureFile = () => {
+  core.info(JSON.stringify(process.env));
+
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
   
   if (!fs.existsSync(filePath)) {
