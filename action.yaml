@@ -1,9 +1,9 @@
-name: 'Container Deployment'
-description: 'Greet someone and record the time'
+name: 'Paperspace Deploy'
+description: 'Creates a new paperspace deployment'
 inputs:
-  apiKey:
+  paperspaceApiKey:
     description: 'Paperspace API Key'
-    required: true
+    required: false
   deploymentId:
     description: 'Container deployment ID'
     required: true

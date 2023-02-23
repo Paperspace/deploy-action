@@ -1,8 +1,8 @@
 {
 	"author": "Brodey Newman <brodey@paperspace.com>",
 	"name": "@paperspace/container-deploy",
-  "version": "0.0.0",
-  "description": "Paperspace Container Deployment Action",
+	"version": "0.0.0",
+	"description": "Paperspace Container Deployment Action",
 	"scripts": {
 		"package": "ncc build lib --license licenses.txt",
 		"build": "tsc",
@@ -24,6 +24,9 @@
 	"dependencies": {
 		"@actions/core": "^1.10.0",
 		"@actions/github": "^5.1.1",
-		"install": "^0.13.0"
+		"graphql": "^16.6.0",
+		"graphql-request": "^5.1.0",
+		"install": "^0.13.0",
+		"yaml": "^2.2.1"
 	}
 }

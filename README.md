@@ -26,7 +26,7 @@ The time the deployment was updated
 ## Example usage
 
 ```yaml
-uses: paperspace/container-deployment@v1.1
+uses: paperspace/deploy@v1.0
 with:
   apiKey: <someApiKey>
   deploymentId: b0e779e5-365f-450f-bd4d-bfeddfbf45b1
