@@ -44,6 +44,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const child_process_1 = __nccwpck_require__(2081);
 const yaml_1 = __importDefault(__nccwpck_require__(3277));
 const object_hash_1 = __importDefault(__nccwpck_require__(5265));
 const core = __importStar(__nccwpck_require__(7733));
@@ -51,7 +52,7 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const service_1 = __nccwpck_require__(1209);
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
-const filePath = path_1.default.join((_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '', '..', '.paperspace', 'spec.yaml');
+const filePath = path_1.default.join((_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '', '.paperspace', 'spec.yaml');
 const validateParams = () => {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
@@ -63,6 +64,9 @@ const validateParams = () => {
 };
 const ensureFile = () => {
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
+    (0, child_process_1.exec)('ls -la', (err, stdout, stderr) => {
+        console.log('files:', stdout);
+    });
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
@@ -33316,6 +33320,14 @@ module.exports = eval("require")("encoding");
 
 "use strict";
 module.exports = require("assert");
+
+/***/ }),
+
+/***/ 2081:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 

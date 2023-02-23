@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { exec } from 'child_process';
 import YAML from 'yaml'
 import hash from 'object-hash';
 import * as core from '@actions/core'
@@ -8,7 +9,7 @@ import { getDeployment } from './service';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
 
-const filePath = path.join(process.env.GITHUB_WORKSPACE ?? '', '..', '.paperspace', 'spec.yaml');
+const filePath = path.join(process.env.GITHUB_WORKSPACE ?? '', '.paperspace', 'spec.yaml');
 
 const validateParams = () => {
   core.info(`Validating input paramters...`)
@@ -24,6 +25,10 @@ const validateParams = () => {
 
 const ensureFile = () => {
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
+
+  exec('ls -la', (err, stdout, stderr) => {
+    console.log('files:', stdout);
+  });
   
   if (!fs.existsSync(filePath)) {
     throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
