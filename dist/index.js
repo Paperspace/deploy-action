@@ -64,8 +64,8 @@ const validateParams = () => {
 };
 const ensureFile = () => {
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
-    (0, child_process_1.exec)('ls -la', (err, stdout, stderr) => {
-        console.log('files:', stdout);
+    (0, child_process_1.exec)(`ls ${process.env.GITHUB_WORKSPACE}`, (err, stdout, stderr) => {
+        console.log('files:::', stdout);
     });
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
