@@ -187,7 +187,9 @@ const client = new graphql_request_1.GraphQLClient(API_HOST, {
 });
 ;
 const updateDeployment = (variables) => __awaiter(void 0, void 0, void 0, function* () {
-    return client.request(updateMutation, variables);
+    return client.request(updateMutation, {
+        input: variables
+    });
 });
 exports.updateDeployment = updateDeployment;
 const getDeployment = (id) => __awaiter(void 0, void 0, void 0, function* () {

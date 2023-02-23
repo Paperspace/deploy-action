@@ -39,7 +39,9 @@ interface DeploymentUpdate {
 };
 
 export const updateDeployment = async (variables: DeploymentUpdate) => {
-  return client.request(updateMutation, variables);
+  return client.request(updateMutation, {
+    input: variables
+  });
 }
 
 export const getDeployment = async (id: string) => {
