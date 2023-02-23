@@ -3,7 +3,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 
 ## Inputs
 
-### `apiKey`
+### `paperspaceApiKey`
 
 **Required** Your Paperspace API key.
 
