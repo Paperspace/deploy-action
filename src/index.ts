@@ -4,7 +4,7 @@ import YAML from 'yaml'
 import hash from 'object-hash';
 import * as core from '@actions/core'
 import path from 'path';
-import { getDeployment } from './service';
+import { getDeployment, updateDeployment } from './service';
 
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
@@ -37,17 +37,38 @@ async function maybeSyncDeployment() {
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);
 
-  const deployment = await getDeployment(deploymentId);
+  const res = await getDeployment(deploymentId);
 
-  console.log('!!!', deployment);
+  if (!res || !res.deployment) {
+    throw new Error(`Deployment with id ${deploymentId} does not exist`);
+  }
 
-  core.info(`Deployment: ${deployment.id}`);
+  const { deployment } = res;
 
   const specHash = hash(parsed, {
     algorithm: 'md5',
   })
 
-  core.info(`Spec hash: ${specHash}`);
+  core.info(`Deployment Found. Comparing Hashes...`);
+
+  if (specHash === deployment.latestSpecHash) {
+    core.info(`No spec changes detected. Skipping deployment sync.`);
+
+    return;
+  }
+
+  core.info('Spec changes detected. Syncing deployment...');
+
+  await syncDeployment(deploymentId, parsed);
+}
+
+async function syncDeployment(deploymentId: string, yaml: any) {
+  const res = await updateDeployment({
+    id: deploymentId,
+    spec: yaml,
+  });
+
+  console.log('res', res);
 }
 
 async function run(): Promise<void> {

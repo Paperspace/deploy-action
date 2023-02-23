@@ -72,13 +72,30 @@ function maybeSyncDeployment() {
         core.info(`Starting deployment sync...`);
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
-        const deployment = yield (0, service_1.getDeployment)(deploymentId);
-        console.log('!!!', deployment);
-        core.info(`Deployment: ${deployment.id}`);
+        const res = yield (0, service_1.getDeployment)(deploymentId);
+        if (!res || !res.deployment) {
+            throw new Error(`Deployment with id ${deploymentId} does not exist`);
+        }
+        const { deployment } = res;
         const specHash = (0, object_hash_1.default)(parsed, {
             algorithm: 'md5',
         });
-        core.info(`Spec hash: ${specHash}`);
+        core.info(`Deployment Found. Comparing Hashes...`);
+        if (specHash === deployment.latestSpecHash) {
+            core.info(`No spec changes detected. Skipping deployment sync.`);
+            return;
+        }
+        core.info('Spec changes detected. Syncing deployment...');
+        yield syncDeployment(deploymentId, parsed);
+    });
+}
+function syncDeployment(deploymentId, yaml) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const res = yield (0, service_1.updateDeployment)({
+            id: deploymentId,
+            spec: yaml,
+        });
+        console.log('res', res);
     });
 }
 function run() {
