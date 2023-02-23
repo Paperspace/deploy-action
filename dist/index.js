@@ -44,7 +44,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
-const child_process_1 = __nccwpck_require__(2081);
 const yaml_1 = __importDefault(__nccwpck_require__(3277));
 const object_hash_1 = __importDefault(__nccwpck_require__(5265));
 const core = __importStar(__nccwpck_require__(7733));
@@ -64,9 +63,6 @@ const validateParams = () => {
 };
 const ensureFile = () => {
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
-    (0, child_process_1.exec)(`ls ${process.env.GITHUB_WORKSPACE}`, (err, stdout, stderr) => {
-        console.log('files:::', stdout);
-    });
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
@@ -33320,14 +33316,6 @@ module.exports = eval("require")("encoding");
 
 "use strict";
 module.exports = require("assert");
-
-/***/ }),
-
-/***/ 2081:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("child_process");
 
 /***/ }),
 
