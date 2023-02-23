@@ -23,6 +23,7 @@ const validateParams = () => {
 }
 
 const ensureFile = () => {
+  core.info(`Current workspace: ${process.env.GITHUB_WORKSPACE}`)
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
   
   if (!fs.existsSync(filePath)) {
