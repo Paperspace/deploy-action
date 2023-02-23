@@ -8,7 +8,9 @@ import { getDeployment } from './service';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId');
 
-const filePath = path.join(__dirname, '.paperspace', 'spec.yaml');
+const filePath = path.join(__dirname, '..', '.paperspace', 'spec.yaml');
+
+console.log('checking process', process.env);
 
 const validateParams = () => {
   core.info(`Validating input paramters...`)
