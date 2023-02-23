@@ -15,12 +15,12 @@ const updateMutation = gql`
 `
 
 const getDeploymentQuery = gql`
-  query Deployment($deploymentId: UUID!, $first: Int) {
-    deployment(id: $deploymentId) {
-      id
-      latestHash
-    }
+  query Deployment($deploymentId: UUID!) {
+  deployment(id: $deploymentId) {
+    id
+    latestSpecHash
   }
+}
 `
 
 const client = new GraphQLClient(API_HOST, {
@@ -43,5 +43,7 @@ export const updateDeployment = async (variables: DeploymentUpdate) => {
 }
 
 export const getDeployment = async (id: string) => {
-
+  return client.request(getDeploymentQuery, {
+    deploymentId: id
+  });
 }

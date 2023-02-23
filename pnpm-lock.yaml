@@ -7,11 +7,13 @@ specifiers:
   '@types/config': ^0.0.39
   '@types/node': 18.11.18
   '@types/node-fetch': ^2.6.2
+  '@types/object-hash': ^3.0.2
   '@vercel/ncc': ^0.36.1
   eslint: ^8.34.0
   graphql: ^16.6.0
   graphql-request: ^5.1.0
   install: ^0.13.0
+  object-hash: ^3.0.0
   pino-pretty: ^9.2.0
   typescript: ^4.9.5
   wait-on: ^7.0.1
@@ -23,6 +25,7 @@ dependencies:
   graphql: 16.6.0
   graphql-request: 5.1.0_graphql@16.6.0
   install: 0.13.0
+  object-hash: 3.0.0
   yaml: 2.2.1
 
 devDependencies:
@@ -30,6 +33,7 @@ devDependencies:
   '@types/config': 0.0.39
   '@types/node': 18.11.18
   '@types/node-fetch': 2.6.2
+  '@types/object-hash': 3.0.2
   '@vercel/ncc': 0.36.1
   eslint: 8.34.0
   pino-pretty: 9.3.0
@@ -257,6 +261,10 @@ packages:
 
   /@types/node/18.11.18:
     resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
+    dev: true
+
+  /@types/object-hash/3.0.2:
+    resolution: {integrity: sha512-tfyXl1JPCf2hzIDK29gO7qGqJjThKBzg/Cn3bA68R9NmWdOx+f7k5mm4to/n43BHspCwcoUC6FU4NpUoK/h9bQ==}
     dev: true
 
   /@vercel/ncc/0.36.1:
@@ -917,6 +925,11 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
+    dev: false
+
+  /object-hash/3.0.0:
+    resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
+    engines: {node: '>= 6'}
     dev: false
 
   /on-exit-leak-free/2.1.0:

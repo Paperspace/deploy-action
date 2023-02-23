@@ -15,6 +15,7 @@
 		"@types/config": "^0.0.39",
 		"@types/node": "18.11.18",
 		"@types/node-fetch": "^2.6.2",
+		"@types/object-hash": "^3.0.2",
 		"@vercel/ncc": "^0.36.1",
 		"eslint": "^8.34.0",
 		"pino-pretty": "^9.2.0",
@@ -27,6 +28,7 @@
 		"graphql": "^16.6.0",
 		"graphql-request": "^5.1.0",
 		"install": "^0.13.0",
+		"object-hash": "^3.0.0",
 		"yaml": "^2.2.1"
 	}
 }
