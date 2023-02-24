@@ -4,11 +4,13 @@ import path from 'path';
 import dayjs from 'dayjs';
 import hash from 'object-hash';
 import * as core from '@actions/core'
+import * as github from '@actions/github';
 
 import { getDeployment, getDeploymentWithDetails, updateDeployment } from './service';
 
 const TIMEOUT_IN_MINUTES = 15;
 
+const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId', { required: true });
 
@@ -71,11 +73,37 @@ async function syncDeployment(deploymentId: string, yaml: any) {
     if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
       core.info('Deployment update complete.');
 
+      await postSuccess();
+
       isDeploymentUpdated = true;
     }
 
     await sleep(3000);
   }
+}
+
+async function postSuccess() {
+  if (!token) {
+    core.warning('No env.GITHUB_TOKEN or input.githubToken provided. Skipping deployment status update.');
+
+    return;
+  }
+
+  const context = github.context;
+
+  if (context.payload.pull_request == null) {
+    throw new Error('No pull request found.');;
+  }
+
+  const pull_request_number = context.payload.pull_request.number;
+
+  const octokit = github.getOctokit(token);
+
+  await octokit.rest.issues.createComment({
+    ...context.repo,
+    issue_number: pull_request_number,
+    body: 'Nice job!'
+  });
 }
 
 async function maybeSyncDeployment() {

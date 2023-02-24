@@ -10,6 +10,9 @@ inputs:
   filePath:
     description: 'Relative path to spec file to deploy'
     required: false
+  githubToken:
+    description: 'GitHub token which allows the deploy action to create comments on the associated PR'
+    required: false
 outputs:
   time: # id of output
     description: 'The time we greeted you'
