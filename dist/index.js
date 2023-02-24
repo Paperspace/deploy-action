@@ -70,6 +70,32 @@ const ensureFile = () => {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
 };
+function syncDeployment(deploymentId, yaml) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const res = yield (0, service_1.updateDeployment)({
+            id: deploymentId,
+            spec: yaml,
+        });
+        if (!res.updateDeployment) {
+            throw new Error('Deployment update failed');
+        }
+        const start = (0, dayjs_1.default)();
+        let isDeploymentUpdated = false;
+        while (!isDeploymentUpdated) {
+            core.info('Waiting for deployment to be healthy...');
+            if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+                throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to be healthy.`);
+            }
+            const { spec, latestRun } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
+            if ((spec === null || spec === void 0 ? void 0 : spec.externalApplied) && latestRun.readyReplicas === latestRun.replicas) {
+                core.info('Deployment sync complete. Deployment is healthy.');
+                core.summary.addHeading('Successfully deployed the following spec to Paperspace');
+                isDeploymentUpdated = true;
+            }
+            yield sleep(3000);
+        }
+    });
+}
 function maybeSyncDeployment() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Starting deployment sync...`);
@@ -90,31 +116,6 @@ function maybeSyncDeployment() {
         }
         core.info('Spec changes detected. Syncing deployment...');
         yield syncDeployment(deploymentId, parsed);
-    });
-}
-function syncDeployment(deploymentId, yaml) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const res = yield (0, service_1.updateDeployment)({
-            id: deploymentId,
-            spec: yaml,
-        });
-        if (!res.updateDeployment) {
-            throw new Error('Deployment update failed');
-        }
-        const start = (0, dayjs_1.default)();
-        let isDeploymentUpdated = false;
-        while (!isDeploymentUpdated) {
-            core.info('Waiting for deployment to be healthy...');
-            if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes`);
-            }
-            const { spec, latestRun } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
-            if ((spec === null || spec === void 0 ? void 0 : spec.externalApplied) && latestRun.readyReplicas === latestRun.replicas) {
-                core.info('Deployment sync complete. Deployment is healthy.');
-                isDeploymentUpdated = true;
-            }
-            yield sleep(1500);
-        }
     });
 }
 function run() {

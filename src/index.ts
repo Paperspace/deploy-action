@@ -36,6 +36,41 @@ const ensureFile = () => {
   }
 }
 
+async function syncDeployment(deploymentId: string, yaml: any) {
+  const res = await updateDeployment({
+    id: deploymentId,
+    spec: yaml,
+  });
+
+  if (!res.updateDeployment) {
+    throw new Error('Deployment update failed');
+  }
+
+  const start = dayjs();
+
+  let isDeploymentUpdated = false;
+
+  while (!isDeploymentUpdated) {
+    core.info('Waiting for deployment to be healthy...');
+
+    if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to be healthy.`);
+    }
+
+    const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
+  
+    if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
+      core.info('Deployment sync complete. Deployment is healthy.');
+
+      core.summary.addHeading('Successfully deployed the following spec to Paperspace');
+
+      isDeploymentUpdated = true;
+    }
+
+    await sleep(3000);
+  }
+}
+
 async function maybeSyncDeployment() {
   core.info(`Starting deployment sync...`)
 
@@ -65,39 +100,6 @@ async function maybeSyncDeployment() {
   core.info('Spec changes detected. Syncing deployment...');
 
   await syncDeployment(deploymentId, parsed);
-}
-
-async function syncDeployment(deploymentId: string, yaml: any) {
-  const res = await updateDeployment({
-    id: deploymentId,
-    spec: yaml,
-  });
-
-  if (!res.updateDeployment) {
-    throw new Error('Deployment update failed');
-  }
-
-  const start = dayjs();
-
-  let isDeploymentUpdated = false;
-
-  while (!isDeploymentUpdated) {
-    core.info('Waiting for deployment to be healthy...');
-
-    if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes`);
-    }
-
-    const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
-  
-    if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
-      core.info('Deployment sync complete. Deployment is healthy.');
-
-      isDeploymentUpdated = true;
-    }
-
-    await sleep(1500);
-  }
 }
 
 async function run(): Promise<void> {
