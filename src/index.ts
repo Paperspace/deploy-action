@@ -10,9 +10,20 @@ import { getDeployment, getDeploymentWithDetails, updateDeployment } from './ser
 const TIMEOUT_IN_MINUTES = 15;
 
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
-const deploymentId = core.getInput('deploymentId');
+const deploymentId = core.getInput('deploymentId', { required: true });
 
-const filePath = path.join(process.env.GITHUB_WORKSPACE ?? '', '.paperspace', 'spec.yaml');
+function getFilePath() {
+  const relativeFilePath = core.getInput('filePath');
+  const workspacePath = process.env.GITHUB_WORKSPACE ?? '';
+
+  if (relativeFilePath) {
+    return path.join(workspacePath, relativeFilePath);
+  } else {
+    core.warning('No filePath input provided. Defaulting to .paperspace/spec.yaml.');
+
+    return path.join(workspacePath, '.paperspace', 'spec.yaml');
+  }
+}
 
 const validateParams = () => {
   core.info(`Validating input paramters...`)
@@ -20,15 +31,13 @@ const validateParams = () => {
   if (!paperspaceApiKey) {
     throw new Error('Neither env.PAPERSPACE_API_KEY or inputs.paperspaceApiKey exists');
   }
-
-  if (!deploymentId) {
-    throw new Error('inputs.deploymentId is not set');
-  }
 }
 
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 
 const ensureFile = () => {
+  const filePath = getFilePath();
+  
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
 
   if (!fs.existsSync(filePath)) {
@@ -51,18 +60,16 @@ async function syncDeployment(deploymentId: string, yaml: any) {
   let isDeploymentUpdated = false;
 
   while (!isDeploymentUpdated) {
-    core.info('Waiting for deployment to be healthy...');
+    core.info('Waiting for deployment to be complete...');
 
     if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to be healthy.`);
+      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to complete.`);
     }
 
     const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
   
     if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
-      core.info('Deployment sync complete. Deployment is healthy.');
-
-      core.summary.addHeading('Successfully deployed the following spec to Paperspace');
+      core.info('Deployment sync complete. Deployment is complete.');
 
       isDeploymentUpdated = true;
     }
@@ -73,6 +80,8 @@ async function syncDeployment(deploymentId: string, yaml: any) {
 
 async function maybeSyncDeployment() {
   core.info(`Starting deployment sync...`)
+
+  const filePath = getFilePath();
 
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);

@@ -41,7 +41,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const yaml_1 = __importDefault(__nccwpck_require__(3277));
@@ -52,19 +51,28 @@ const core = __importStar(__nccwpck_require__(7733));
 const service_1 = __nccwpck_require__(1209);
 const TIMEOUT_IN_MINUTES = 15;
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
-const deploymentId = core.getInput('deploymentId');
-const filePath = path_1.default.join((_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '', '.paperspace', 'spec.yaml');
+const deploymentId = core.getInput('deploymentId', { required: true });
+function getFilePath() {
+    var _a;
+    const relativeFilePath = core.getInput('filePath');
+    const workspacePath = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '';
+    if (relativeFilePath) {
+        return path_1.default.join(workspacePath, relativeFilePath);
+    }
+    else {
+        core.warning('No filePath input provided. Defaulting to .paperspace/spec.yaml.');
+        return path_1.default.join(workspacePath, '.paperspace', 'spec.yaml');
+    }
+}
 const validateParams = () => {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
         throw new Error('Neither env.PAPERSPACE_API_KEY or inputs.paperspaceApiKey exists');
     }
-    if (!deploymentId) {
-        throw new Error('inputs.deploymentId is not set');
-    }
 };
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 const ensureFile = () => {
+    const filePath = getFilePath();
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
@@ -82,14 +90,13 @@ function syncDeployment(deploymentId, yaml) {
         const start = (0, dayjs_1.default)();
         let isDeploymentUpdated = false;
         while (!isDeploymentUpdated) {
-            core.info('Waiting for deployment to be healthy...');
+            core.info('Waiting for deployment to be complete...');
             if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to be healthy.`);
+                throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to complete.`);
             }
             const { spec, latestRun } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             if ((spec === null || spec === void 0 ? void 0 : spec.externalApplied) && latestRun.readyReplicas === latestRun.replicas) {
-                core.info('Deployment sync complete. Deployment is healthy.');
-                core.summary.addHeading('Successfully deployed the following spec to Paperspace');
+                core.info('Deployment sync complete. Deployment is complete.');
                 isDeploymentUpdated = true;
             }
             yield sleep(3000);
@@ -99,6 +106,7 @@ function syncDeployment(deploymentId, yaml) {
 function maybeSyncDeployment() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Starting deployment sync...`);
+        const filePath = getFilePath();
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
         const res = yield (0, service_1.getDeployment)(deploymentId);

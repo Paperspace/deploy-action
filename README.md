@@ -11,6 +11,10 @@ GitHub action for deploying updates to a Paperspace container deployment.
 
 **Required** The ID of the deployment you are updating.
 
+### `filePath`
+
+**Required** The relative file path of the spec file. Example: ./src/deploy/spec.yaml
+
 ## Outputs
 
 ### `externalApplied`

@@ -7,6 +7,9 @@ inputs:
   deploymentId:
     description: 'Container deployment ID'
     required: true
+  filePath:
+    description: 'Relative path to spec file to deploy'
+    required: false
 outputs:
   time: # id of output
     description: 'The time we greeted you'
