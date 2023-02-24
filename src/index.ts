@@ -63,13 +63,13 @@ async function syncDeployment(deploymentId: string, yaml: any) {
     core.info('Waiting for deployment to be complete...');
 
     if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-      throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to complete.`);
+      throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
     }
 
     const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
   
     if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
-      core.info('Deployment sync complete. Deployment is complete.');
+      core.info('Deployment update complete.');
 
       isDeploymentUpdated = true;
     }
@@ -79,7 +79,7 @@ async function syncDeployment(deploymentId: string, yaml: any) {
 }
 
 async function maybeSyncDeployment() {
-  core.info(`Starting deployment sync...`)
+  core.info(`Starting deployment update...`)
 
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);
@@ -99,12 +99,12 @@ async function maybeSyncDeployment() {
   core.info(`Deployment Found. Comparing Hashes...`);
 
   if (specHash === deployment.latestSpecHash) {
-    core.info(`No spec changes detected. Skipping deployment sync.`);
+    core.info(`No spec changes detected. Skipping deployment update.`);
 
     return;
   }
 
-  core.info('Spec changes detected. Syncing deployment...');
+  core.info('Spec changes detected. Updating deployment...');
 
   await syncDeployment(deploymentId, parsed);
 }

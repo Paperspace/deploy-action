@@ -92,11 +92,11 @@ function syncDeployment(deploymentId, yaml) {
         while (!isDeploymentUpdated) {
             core.info('Waiting for deployment to be complete...');
             if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                throw new Error(`Deployment sync timed out after: ${TIMEOUT_IN_MINUTES} minutes when waiting for deployment to complete.`);
+                throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
             }
             const { spec, latestRun } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             if ((spec === null || spec === void 0 ? void 0 : spec.externalApplied) && latestRun.readyReplicas === latestRun.replicas) {
-                core.info('Deployment sync complete. Deployment is complete.');
+                core.info('Deployment update complete.');
                 isDeploymentUpdated = true;
             }
             yield sleep(3000);
@@ -105,7 +105,7 @@ function syncDeployment(deploymentId, yaml) {
 }
 function maybeSyncDeployment() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info(`Starting deployment sync...`);
+        core.info(`Starting deployment update...`);
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
         const res = yield (0, service_1.getDeployment)(deploymentId);
@@ -118,10 +118,10 @@ function maybeSyncDeployment() {
         });
         core.info(`Deployment Found. Comparing Hashes...`);
         if (specHash === deployment.latestSpecHash) {
-            core.info(`No spec changes detected. Skipping deployment sync.`);
+            core.info(`No spec changes detected. Skipping deployment update.`);
             return;
         }
-        core.info('Spec changes detected. Syncing deployment...');
+        core.info('Spec changes detected. Updating deployment...');
         yield syncDeployment(deploymentId, parsed);
     });
 }
