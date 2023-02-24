@@ -64,6 +64,7 @@ function getFilePath() {
         return path_1.default.join(workspacePath, '.paperspace', 'spec.yaml');
     }
 }
+const filePath = getFilePath();
 const validateParams = () => {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
@@ -72,7 +73,6 @@ const validateParams = () => {
 };
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 const ensureFile = () => {
-    const filePath = getFilePath();
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
@@ -106,7 +106,6 @@ function syncDeployment(deploymentId, yaml) {
 function maybeSyncDeployment() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Starting deployment sync...`);
-        const filePath = getFilePath();
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
         const res = yield (0, service_1.getDeployment)(deploymentId);
