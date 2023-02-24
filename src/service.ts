@@ -27,7 +27,13 @@ const getPolledDeploymentQuery = gql`
   query Deployment($deploymentId: UUID!) {
   deployment(id: $deploymentId) {
     id
-    latestSpecHash   
+    latestSpecHash
+    team {
+      handle
+    }
+    project {
+      id
+    }
     deploymentSpecs(first: 1) {
       nodes {
         id
