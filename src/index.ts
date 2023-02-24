@@ -25,6 +25,8 @@ function getFilePath() {
   }
 }
 
+const filePath = getFilePath();
+
 const validateParams = () => {
   core.info(`Validating input paramters...`)
 
@@ -36,8 +38,6 @@ const validateParams = () => {
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 
 const ensureFile = () => {
-  const filePath = getFilePath();
-  
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
 
   if (!fs.existsSync(filePath)) {
@@ -80,8 +80,6 @@ async function syncDeployment(deploymentId: string, yaml: any) {
 
 async function maybeSyncDeployment() {
   core.info(`Starting deployment sync...`)
-
-  const filePath = getFilePath();
 
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);
