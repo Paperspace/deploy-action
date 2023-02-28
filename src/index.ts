@@ -73,8 +73,6 @@ async function syncDeployment(deploymentId: string, yaml: any) {
     if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
       core.info('Deployment update complete.');
 
-      await postSuccess();
-
       isDeploymentUpdated = true;
     }
 

@@ -99,7 +99,6 @@ function syncDeployment(deploymentId, yaml) {
             const { spec, latestRun } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             if ((spec === null || spec === void 0 ? void 0 : spec.externalApplied) && latestRun.readyReplicas === latestRun.replicas) {
                 core.info('Deployment update complete.');
-                yield postSuccess();
                 isDeploymentUpdated = true;
             }
             yield sleep(3000);
