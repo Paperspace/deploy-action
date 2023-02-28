@@ -226,12 +226,6 @@ const getPolledDeploymentQuery = (0, graphql_request_1.gql) `
   deployment(id: $deploymentId) {
     id
     latestSpecHash
-    team {
-      handle
-    }
-    project {
-      id
-    }
     deploymentSpecs(first: 1) {
       nodes {
         id
