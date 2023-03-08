@@ -1,102 +1,62 @@
+import 'whatwg-fetch';
 import * as core from '@actions/core'
-import { GraphQLClient, gql } from 'graphql-request'
+import { Fetcher } from 'openapi-typescript-fetch'
 
-const API_HOST = 'https://api.paperspace.com/graphql';
+import { paths, operations } from './api';
+
+const BASE_API_URL = 'https://api.paperspace.com/v1/deployments';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 
-const updateMutation = gql`
-  mutation updateDeployment($input: UpdateDeploymentInput!) {
-    updateDeployment(input: $input) {
-      deployment {
-        id
-      }
-    }
-  }
-`
+const fetcher = Fetcher.for<paths>()
 
-const getBaseDeploymentQuery = gql`
-  query Deployment($deploymentId: UUID!) {
-  deployment(id: $deploymentId) {
-    id
-    latestSpecHash    
-  }
-}
-`
-
-const getPolledDeploymentQuery = gql`
-  query Deployment($deploymentId: UUID!) {
-  deployment(id: $deploymentId) {
-    id
-    latestSpecHash
-    deploymentSpecs(first: 1) {
-      nodes {
-        id
-        externalApplied
-      }
-    }
-    deploymentRollouts(first: 1) {
-      nodes {
-        deploymentRuns(first: 1) {
-          nodes {
-            readyReplicas
-            replicas
-          }
-        }
-      }
-    }
-  }
-}
-`
-
-const client = new GraphQLClient(API_HOST, {
-  headers: {
-    Authorization: `Bearer ${paperspaceApiKey}`,
-  },
-  jsonSerializer: {
-    parse: JSON.parse,
-    stringify: JSON.stringify,
+// global configuration
+fetcher.configure({
+  baseUrl: BASE_API_URL,
+  init: {
+    headers: {
+      Authorization: `Bearer ${paperspaceApiKey}`,
+    },
   },
 })
 
-interface DeploymentUpdate {
-  id: string;
-  spec: unknown;
-};
+// create fetch operations
+const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create()
+const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create()
+const upsertDeployment = fetcher.path('/deployments').method('post').create()
 
-interface DeploymentDetails {
-  spec: {
-    externalApplied: string | null;
-  };
-  latestRun: {
-    readyReplicas: number;
-    replicas: number;
-  };
-}
+type Config = operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
 
-export const updateDeployment = async (variables: DeploymentUpdate) => {
-  return client.request(updateMutation, {
-    input: variables
-  });
+export const updateDeployment = async (config: Config) => {
+  const { data: deployment } = await upsertDeployment(config);
+
+  const { deploymentId } = deployment;
+
+  return deploymentId;
 }
 
 export const getDeployment = async (id: string) => {
-  return client.request(getBaseDeploymentQuery, {
-    deploymentId: id
-  });
-}
+  const { data: deployment } = await getSingleDeployment({
+    id,
+  })
 
-export const getDeploymentWithDetails = async (id: string): Promise<DeploymentDetails> => {
-  const res = await client.request(getPolledDeploymentQuery, {
-    deploymentId: id
-  });
-
-  if (!res || !res.deployment) {
+  if (!deployment) {
     throw new Error(`Deployment with id ${id} does not exist`);
   }
 
-  return {
-    spec: res.deployment.deploymentSpecs.nodes?.[0] ?? {},
-    latestRun: res.deployment.deploymentRollouts.nodes[0]?.deploymentRuns?.nodes?.[0] ?? {},
+  return deployment;
+}
+
+export const getDeploymentWithDetails = async (id: string) => {
+  const { data: runs } = await getDeploymentWithRuns({
+    id,
+  })
+
+  if (!runs) {
+    throw new Error(`Deployment runs for id: ${id} do not exist`);
   }
+
+  const [latestRun] = runs;
+
+  return latestRun;
 }
 

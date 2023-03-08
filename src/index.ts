@@ -4,7 +4,6 @@ import path from 'path';
 import dayjs from 'dayjs';
 import hash from 'object-hash';
 import * as core from '@actions/core'
-import * as github from '@actions/github';
 
 import { getDeployment, getDeploymentWithDetails, updateDeployment } from './service';
 
@@ -48,13 +47,10 @@ const ensureFile = () => {
 }
 
 async function syncDeployment(deploymentId: string, yaml: any) {
-  const res = await updateDeployment({
-    id: deploymentId,
-    spec: yaml,
-  });
+  const res = await updateDeployment(yaml);
 
-  if (!res.updateDeployment) {
-    throw new Error('Deployment update failed');
+  if (!res) {
+    throw new Error('Deployment upsert failed');
   }
 
   const start = dayjs();
@@ -68,9 +64,9 @@ async function syncDeployment(deploymentId: string, yaml: any) {
       throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
     }
 
-    const { spec, latestRun } = await getDeploymentWithDetails(deploymentId);
+    const latestRun = await getDeploymentWithDetails(deploymentId);
   
-    if (spec?.externalApplied && latestRun.readyReplicas === latestRun.replicas) {
+    if (latestRun.readyReplicas === latestRun.replicas) {
       core.info('Deployment update complete.');
 
       isDeploymentUpdated = true;
@@ -80,43 +76,17 @@ async function syncDeployment(deploymentId: string, yaml: any) {
   }
 }
 
-async function postSuccess() {
-  if (!token) {
-    core.warning('No env.GITHUB_TOKEN or input.githubToken provided. Skipping deployment status update.');
-
-    return;
-  }
-
-  const context = github.context;
-
-  if (context.payload.pull_request == null) {
-    throw new Error('No pull request found.');;
-  }
-
-  const pull_request_number = context.payload.pull_request.number;
-
-  const octokit = github.getOctokit(token);
-
-  await octokit.rest.issues.createComment({
-    ...context.repo,
-    issue_number: pull_request_number,
-    body: 'Nice job!'
-  });
-}
-
 async function maybeSyncDeployment() {
   core.info(`Starting deployment update...`)
 
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);
 
-  const res = await getDeployment(deploymentId);
+  const deployment = await getDeployment(deploymentId);
 
-  if (!res || !res.deployment) {
+  if (!deployment) {
     throw new Error(`Deployment with id ${deploymentId} does not exist`);
   }
-
-  const { deployment } = res;
 
   const specHash = hash(parsed, {
     algorithm: 'md5',
