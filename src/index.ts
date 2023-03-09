@@ -5,11 +5,12 @@ import dayjs from 'dayjs';
 import hash from 'object-hash';
 import * as core from '@actions/core'
 
-import { getDeployment, getDeploymentWithDetails, updateDeployment } from './service';
+import type { LatestRun, Deployment } from './service';
+import { getDeployment, getDeploymentWithDetails, upsertDeployment } from './service';
 
 const TIMEOUT_IN_MINUTES = 15;
 
-const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
+// const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId', { required: true });
 
@@ -46,8 +47,19 @@ const ensureFile = () => {
   }
 }
 
+function isDeploymentDisabled(latestRun: LatestRun, deployment: Deployment): boolean {
+  if (deployment?.latestSpec?.data && "resources" in deployment?.latestSpec?.data) {
+    return !latestRun && (deployment.latestSpec?.data.enabled === false || !deployment.latestSpec.data.resources.replicas);
+  }
+
+  return false;
+}
+
 async function syncDeployment(deploymentId: string, yaml: any) {
-  const res = await updateDeployment(yaml);
+  const res = await upsertDeployment({
+    config: yaml,
+    projectId: 'asdf',
+  });
 
   if (!res) {
     throw new Error('Deployment upsert failed');
@@ -60,16 +72,32 @@ async function syncDeployment(deploymentId: string, yaml: any) {
   while (!isDeploymentUpdated) {
     core.info('Waiting for deployment to be complete...');
 
-    if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-      throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
-    }
+    const { latestRun, deployment } = await getDeploymentWithDetails(deploymentId);
 
-    const latestRun = await getDeploymentWithDetails(deploymentId);
+    // only look at deployments that were applied to the target cluster
+    if (deployment.latestSpec?.externalApplied) {
+      if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+        const instanceMessages = latestRun.instances.find(instance => ['error', 'failed'].includes(instance.state));
+
+        throw new Error(`
+          Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
+          ${instanceMessages ? `Last instance messages: ${instanceMessages}` : ''}
+        `);
+      }
+
+      if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
+        core.info('Deployment successfully disabled.');
+
+        isDeploymentUpdated = true;
+        return;
+      }
   
-    if (latestRun.readyReplicas === latestRun.replicas) {
-      core.info('Deployment update complete.');
-
-      isDeploymentUpdated = true;
+      if (latestRun.readyReplicas === latestRun.replicas || !latestRun) {
+        core.info('Deployment update complete.');
+  
+        isDeploymentUpdated = true;
+        return;
+      }
     }
 
     await sleep(3000);

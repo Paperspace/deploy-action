@@ -50,7 +50,7 @@ const object_hash_1 = __importDefault(__nccwpck_require__(5265));
 const core = __importStar(__nccwpck_require__(7733));
 const service_1 = __nccwpck_require__(1209);
 const TIMEOUT_IN_MINUTES = 15;
-const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
+// const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const deploymentId = core.getInput('deploymentId', { required: true });
 function getFilePath() {
@@ -79,9 +79,20 @@ const ensureFile = () => {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
 };
+function isDeploymentDisabled(latestRun, deployment) {
+    var _a, _b, _c;
+    if (((_a = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.data) && "resources" in ((_b = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.data)) {
+        return !latestRun && (((_c = deployment.latestSpec) === null || _c === void 0 ? void 0 : _c.data.enabled) === false || !deployment.latestSpec.data.resources.replicas);
+    }
+    return false;
+}
 function syncDeployment(deploymentId, yaml) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield (0, service_1.updateDeployment)(yaml);
+        const res = yield (0, service_1.upsertDeployment)({
+            config: yaml,
+            projectId: 'asdf',
+        });
         if (!res) {
             throw new Error('Deployment upsert failed');
         }
@@ -89,13 +100,26 @@ function syncDeployment(deploymentId, yaml) {
         let isDeploymentUpdated = false;
         while (!isDeploymentUpdated) {
             core.info('Waiting for deployment to be complete...');
-            if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
-            }
-            const latestRun = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
-            if (latestRun.readyReplicas === latestRun.replicas) {
-                core.info('Deployment update complete.');
-                isDeploymentUpdated = true;
+            const { latestRun, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
+            // only look at deployments that were applied to the target cluster
+            if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
+                if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+                    const instanceMessages = latestRun.instances.find(instance => ['error', 'failed'].includes(instance.state));
+                    throw new Error(`
+          Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
+          ${instanceMessages ? `Last instance messages: ${instanceMessages}` : ''}
+        `);
+                }
+                if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
+                    core.info('Deployment successfully disabled.');
+                    isDeploymentUpdated = true;
+                    return;
+                }
+                if (latestRun.readyReplicas === latestRun.replicas || !latestRun) {
+                    core.info('Deployment update complete.');
+                    isDeploymentUpdated = true;
+                    return;
+                }
             }
             yield sleep(3000);
         }
@@ -178,7 +202,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDeploymentWithDetails = exports.getDeployment = exports.updateDeployment = void 0;
+exports.getDeploymentWithDetails = exports.getDeployment = exports.upsertDeployment = void 0;
 __nccwpck_require__(8854);
 const core = __importStar(__nccwpck_require__(7733));
 const openapi_typescript_fetch_1 = __nccwpck_require__(799);
@@ -197,13 +221,13 @@ fetcher.configure({
 // create fetch operations
 const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create();
 const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create();
-const upsertDeployment = fetcher.path('/deployments').method('post').create();
-const updateDeployment = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    const { data: deployment } = yield upsertDeployment(config);
+const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create();
+const upsertDeployment = (config) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data: deployment } = yield upsertDeploymentFetcher(config);
     const { deploymentId } = deployment;
     return deploymentId;
 });
-exports.updateDeployment = updateDeployment;
+exports.upsertDeployment = upsertDeployment;
 const getDeployment = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: deployment } = yield getSingleDeployment({
         id,
@@ -215,14 +239,25 @@ const getDeployment = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getDeployment = getDeployment;
 const getDeploymentWithDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const { data: runs } = yield getDeploymentWithRuns({
-        id,
-    });
+    const [{ data: runs }, { data: deployment }] = yield Promise.all([
+        getDeploymentWithRuns({
+            id,
+        }),
+        getSingleDeployment({
+            id,
+        }),
+    ]);
     if (!runs) {
         throw new Error(`Deployment runs for id: ${id} do not exist`);
     }
+    if (!deployment) {
+        throw new Error(`Deployment with id: ${id} does not exist`);
+    }
     const [latestRun] = runs;
-    return latestRun;
+    return {
+        latestRun,
+        deployment,
+    };
 });
 exports.getDeploymentWithDetails = getDeploymentWithDetails;
 

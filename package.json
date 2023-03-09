@@ -4,9 +4,8 @@
 	"version": "0.0.0",
 	"description": "Paperspace Container Deployment Action",
 	"scripts": {
-		"package": "ncc build lib --license licenses.txt",
-		"build": "tsc",
-		"compile": "pnpm build && pnpm package",
+		"compile": "ncc build lib --license licenses.txt",
+		"build": "tsc && pnpm compile",
 		"lint": "NODE_OPTIONS=--max-old-space-size=4096 pnpm run lint:arg -- .",
 		"lint:arg": "eslint --report-unused-disable-directives --fix --cache",
 		"generate:api": "npx openapi-typescript https://api.paperspace.com/v1/openapi.json --output src/api.ts"
