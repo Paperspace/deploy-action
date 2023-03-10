@@ -144,8 +144,9 @@ function throwBadDeployError(runs) {
     throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
 }
 function isDeploymentStable(runs) {
-    const healthyRun = runs.find(run => run.replicas && run.replicas > 0 && run.readyReplicas === run.replicas);
-    return !!healthyRun;
+    const filteredRuns = runs.filter(run => run.replicas && run.replicas > 0);
+    const healthyRun = filteredRuns.every(run => run.readyReplicas === run.replicas);
+    return healthyRun;
 }
 function syncDeployment(projectId, yaml) {
     var _a;
