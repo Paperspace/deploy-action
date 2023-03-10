@@ -3,7 +3,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 
 ## Inputs
 
-| input | Description | Required | Type | Default
+| Input | Description | Required | Type | Default
 | --- | --- | --- | --- | ---
 | `paperspaceApiKey` | Your Paperspace API key | true | string |
 | `projectId` | The ID of the project the deployment lives under | true | string |
