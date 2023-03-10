@@ -14,7 +14,7 @@ const TIMEOUT_IN_MINUTES = 5;
 const BAD_INSTANCE_STATES = ['errored', 'failed'];
 
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
-const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
+const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
 const projectId = core.getInput('projectId', { required: true });
 const optionalImage = core.getInput('image', { required: true });
 
@@ -39,7 +39,7 @@ function validateParams() {
   core.info(`Validating input paramters...`)
 
   if (!paperspaceApiKey) {
-    throw new Error('Neither env.PAPERSPACE_API_KEY or inputs.paperspaceApiKey exists');
+    throw new Error('Neither env.API_KEY or inputs.apiKey exists');
   }
 }
 

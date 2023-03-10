@@ -5,7 +5,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 
 | Input | Description | Required | Type | Default
 | --- | --- | --- | --- | ---
-| `paperspaceApiKey` | Your Paperspace API key | true | string |
+| `apiKey` | Your Paperspace API key | true | string |
 | `projectId` | The ID of the project the deployment lives under | true | string |
 | `configPath` | The relative file path of the configuration file. Example: ./src/deploy/app.yaml | false | string | `.paperspace/app.yaml`
 | `image` | Container image to be used in the configuration | false | string |
@@ -15,7 +15,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 ```yaml
 uses: paperspace/deploy@v1.0
 env:
-  PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
   projectId: p28rlnvnw51
 ```
@@ -25,7 +25,7 @@ You can also pass the api key as an input.
 ```yaml
 uses: paperspace/deploy@v1.0
 with:
-  paperspaceApiKey: ${{ secrets.PAPERSPACE_API_KEY }}
+  apiKey: ${{ secrets.PAPERSPACE_API_KEY }}
   projectId: p28rlnvnw51
 ```
 
@@ -46,7 +46,7 @@ resources:
 ```yaml
 uses: paperspace/deploy@v1.0
 env:
-  PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
   image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }})
   projectId: p28rlnvnw51
@@ -66,13 +66,13 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: paperspace/deploy@v1.0
         name: Deploy Staging
         id: deploy
         env:
-          PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+          API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
         with:
           projectId: p28rlnvnw51
           image: nginx:latest

@@ -1,7 +1,7 @@
 name: 'Paperspace Deploy'
 description: 'Creates a new paperspace deployment'
 inputs:
-  paperspaceApiKey:
+  apiKey:
     description: 'Paperspace API Key'
     required: false
   projectId:
