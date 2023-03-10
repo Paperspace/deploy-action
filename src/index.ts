@@ -79,9 +79,10 @@ function throwBadDeployError(runs: LatestRuns) {
 }
 
 function isDeploymentStable(runs: LatestRuns): boolean {
-  const healthyRun = runs.find(run => run.replicas && run.replicas > 0 && run.readyReplicas === run.replicas);
+  const filteredRuns = runs.filter(run => run.replicas && run.replicas > 0);
+  const healthyRun = filteredRuns.every(run => run.readyReplicas === run.replicas);
 
-  return !!healthyRun;
+  return healthyRun;
 }
 
 async function syncDeployment(projectId: string, yaml: any) {
