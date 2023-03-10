@@ -103,7 +103,7 @@ async function syncDeployment(projectId: string, yaml: any) {
         continue;
       }
   
-      if (latestRun.readyReplicas === latestRun.replicas || !latestRun) {
+      if (latestRun.replicas && latestRun.replicas > 0 && latestRun.readyReplicas === latestRun.replicas) {
         core.info('Deployment update complete.');
   
         isDeploymentUpdated = true;
