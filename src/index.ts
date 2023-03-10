@@ -15,7 +15,7 @@ const TIMEOUT_IN_MINUTES = 5;
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const projectId = core.getInput('projectId', { required: true });
-const optionalImageId = core.getInput('imageId', { required: true });
+const optionalImage = core.getInput('image', { required: true });
 
 function getFilePath() {
   const relativeFilePath = core.getInput('filePath');
@@ -123,15 +123,15 @@ async function maybeSyncDeployment() {
   }
 
   // image is always on top level of spec, regardless of version.
-  if (optionalImageId) {
-    if (parsed.image !== ':imageId') {
-      core.warning('Optional image was specified but config.image is not set to `:imageId`. This can lead to confusion and is not recommended.');
+  if (optionalImage) {
+    if (parsed.image !== ':image') {
+      core.warning('Optional image was specified but config.image is not set to `:image`. This can lead to confusion and is not recommended.');
     }
 
-    core.info(`Overriding config.image with imageId input: ${optionalImageId}`)
+    core.info(`Overriding config.image with optional image input: ${optionalImage}`)
 
     // replace the image in the spec with the one provided
-    parsed.image = optionalImageId;
+    parsed.image = optionalImage;
   }
 
   if (deployment) {
