@@ -1,4 +1,4 @@
-# [WORK IN PROGRESS] Container Deployment Action
+# Container Deployment Action
 GitHub action for deploying updates to a Paperspace container deployment.
 
 ## Inputs
