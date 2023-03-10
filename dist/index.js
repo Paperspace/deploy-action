@@ -182,7 +182,7 @@ function maybeSyncDeployment() {
             const specHash = (0, object_hash_1.default)(parsed, {
                 algorithm: 'md5',
             });
-            core.info('Deployment Found. Comparing Hashes...');
+            core.info(`Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`);
             if (specHash === deployment.latestSpecHash) {
                 core.info(`No spec changes detected. Skipping deployment update.`);
                 return;
