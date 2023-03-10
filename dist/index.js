@@ -147,10 +147,11 @@ function syncDeployment(projectId, yaml) {
             // only look at deployments that were applied to the target cluster
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                    const instanceMessages = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+                    const badInstance = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+                    console.log('!!!', badInstance, latestRun.instances);
                     throw new Error(`
           Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-          ${instanceMessages ? `Last instance message: ${instanceMessages}` : ''}
+          ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
         `);
                 }
                 if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
