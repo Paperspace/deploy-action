@@ -5,6 +5,8 @@ import dayjs from 'dayjs';
 import hash from 'object-hash';
 import * as core from '@actions/core'
 
+import './fetch-polyfill';
+
 import type { LatestRun, Deployment } from './service';
 import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndName } from './service';
 

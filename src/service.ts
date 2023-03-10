@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import * as core from '@actions/core'
 import { Fetcher } from 'openapi-typescript-fetch'
 
