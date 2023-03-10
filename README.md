@@ -3,23 +3,14 @@ GitHub action for deploying updates to a Paperspace container deployment.
 
 ## Inputs
 
-### `paperspaceApiKey`
+| input | Description | Required | Type | Default
+| --- | --- | --- | --- | ---
+| `paperspaceApiKey` | Your Paperspace API key | true | string |
+| `projectId` | The ID of the project the deployment lives under | true | string |
+| `filePath` | The relative file path of the spec file. Example: ./src/deploy/spec.yaml | false | string | `$PROJECT_ROOT/.paperspace/spec.yaml`
+| `image` | Container image to be used in the spec | false | string |
 
-**Required** Your Paperspace API key.
-
-### `projectId`
-
-**Required** The ID of the project the deployment lives under.
-
-### `filePath`
-
-**Optional** The relative file path of the spec file. Example: ./src/deploy/spec.yaml. Defaults to `$PROJECT_ROOT/.paperspace/spec.yaml`
-
-### `image`
-
-**Optional** The relative file path of the spec file. Example: ./src/deploy/spec.yaml
-
-## Example usage
+## Usage
 
 ```yaml
 uses: paperspace/deploy@v1.0
@@ -38,7 +29,7 @@ with:
   projectId: p28rlnvnw51
 ```
 
-## Example passing an image as an input:
+### Passing an image as an input:
 
 Mark the image as replacable using `:image` within your `.paperspace/spec.yaml`.
 ```yaml
@@ -59,4 +50,30 @@ env:
 with:
   image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }})
   projectId: p28rlnvnw51
+```
+
+### Full workflow
+
+```yaml
+name: test-pr
+on:
+  pull_request:
+    paths:
+      - "*"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: paperspace/deploy@v1.0
+        name: Deploy Staging
+        id: deploy
+        env:
+          PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+        with:
+          projectId: p28rlnvnw51
+          image: nginx:latest
 ```
