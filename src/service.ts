@@ -26,7 +26,7 @@ const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deploymen
 
 export type Config = operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
 export type Deployment = operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
-export type LatestRun = operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
+export type LatestRuns = operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
 export async function upsertDeployment(config: Config) {
   const { data: deployment } = await upsertDeploymentFetcher(config);
@@ -67,10 +67,8 @@ export async function getDeploymentWithDetails(id: string) {
     throw new Error(`Deployment with id: ${id} does not exist`);
   }
 
-  const [latestRun] = runs;
-
   return {
-    latestRun,
+    runs,
     deployment,
   };
 }

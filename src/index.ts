@@ -7,7 +7,7 @@ import * as core from '@actions/core'
 
 import './fetch-polyfill';
 
-import type { LatestRun, Deployment } from './service';
+import type { LatestRuns, Deployment } from './service';
 import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndName } from './service';
 
 const TIMEOUT_IN_MINUTES = 5;
@@ -19,7 +19,7 @@ const projectId = core.getInput('projectId', { required: true });
 const optionalImage = core.getInput('image', { required: true });
 
 function getFilePath() {
-  const relativeFilePath = core.getInput('filePath');
+  const relativeFilePath = core.getInput('configPath');
   const workspacePath = process.env.GITHUB_WORKSPACE ?? '';
 
   if (relativeFilePath) {
@@ -51,12 +51,37 @@ function ensureFile() {
   }
 }
 
-function isDeploymentDisabled(latestRun: LatestRun, deployment: Deployment): boolean {
+function isDeploymentDisabled(runs: LatestRuns, deployment: Deployment): boolean {
   if (deployment?.latestSpec?.data && "resources" in deployment?.latestSpec?.data) {
-    return !latestRun && (deployment.latestSpec?.data.enabled === false || !deployment.latestSpec.data.resources.replicas);
+    return !runs.length && (deployment.latestSpec?.data.enabled === false || !deployment.latestSpec.data.resources.replicas);
   }
 
   return false;
+}
+
+function throwBadDeployError(runs: LatestRuns) {
+  const badRun = runs.find(run => {
+    const badInstance = run.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+
+    return badInstance;
+  })
+
+  if (badRun) {
+    const badInstance = badRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+
+    throw new Error(`
+      Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
+      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
+    `);
+  }
+
+  throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
+}
+
+function isDeploymentStable(runs: LatestRuns): boolean {
+  const healthyRun = runs.find(run => run.replicas && run.replicas > 0 && run.readyReplicas === run.replicas);
+
+  return !!healthyRun;
 }
 
 async function syncDeployment(projectId: string, yaml: any) {
@@ -76,34 +101,29 @@ async function syncDeployment(projectId: string, yaml: any) {
   while (!isDeploymentUpdated) {
     core.info('Waiting for deployment to be complete...');
 
-    const { latestRun, deployment } = await getDeploymentWithDetails(deploymentId);
+    const { runs, deployment } = await getDeploymentWithDetails(deploymentId);
 
     // only look at deployments that were applied to the target cluster
     if (deployment.latestSpec?.externalApplied) {
       if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-        const badInstance = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
-
-        throw new Error(`
-          Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-          ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
-        `);
+        throwBadDeployError(runs);
       }
 
-      if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
+      if (isDeploymentDisabled(runs, deployment)) {
         core.info('Deployment successfully disabled.');
 
         isDeploymentUpdated = true;
         return;
       }
 
-      // No runs came back yet, still waiting for deployment update...
-      if (!latestRun) {
+      // No runs came back yet, and deployment isn't disabled, so we're waiting for deployment update...
+      if (!runs.length) {
         await sleep(3000);
 
         continue;
       }
   
-      if (latestRun.replicas && latestRun.replicas > 0 && latestRun.readyReplicas === latestRun.replicas) {
+      if (isDeploymentStable(runs)) {
         core.info('Deployment update complete.');
   
         isDeploymentUpdated = true;

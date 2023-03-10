@@ -98,7 +98,7 @@ const projectId = core.getInput('projectId', { required: true });
 const optionalImage = core.getInput('image', { required: true });
 function getFilePath() {
     var _a;
-    const relativeFilePath = core.getInput('filePath');
+    const relativeFilePath = core.getInput('configPath');
     const workspacePath = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '';
     if (relativeFilePath) {
         return path_1.default.join(workspacePath, relativeFilePath);
@@ -122,12 +122,30 @@ function ensureFile() {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
 }
-function isDeploymentDisabled(latestRun, deployment) {
+function isDeploymentDisabled(runs, deployment) {
     var _a, _b, _c;
     if (((_a = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.data) && "resources" in ((_b = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.data)) {
-        return !latestRun && (((_c = deployment.latestSpec) === null || _c === void 0 ? void 0 : _c.data.enabled) === false || !deployment.latestSpec.data.resources.replicas);
+        return !runs.length && (((_c = deployment.latestSpec) === null || _c === void 0 ? void 0 : _c.data.enabled) === false || !deployment.latestSpec.data.resources.replicas);
     }
     return false;
+}
+function throwBadDeployError(runs) {
+    const badRun = runs.find(run => {
+        const badInstance = run.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+        return badInstance;
+    });
+    if (badRun) {
+        const badInstance = badRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+        throw new Error(`
+      Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
+      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
+    `);
+    }
+    throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
+}
+function isDeploymentStable(runs) {
+    const healthyRun = runs.find(run => run.replicas && run.replicas > 0 && run.readyReplicas === run.replicas);
+    return !!healthyRun;
 }
 function syncDeployment(projectId, yaml) {
     var _a;
@@ -143,27 +161,23 @@ function syncDeployment(projectId, yaml) {
         let isDeploymentUpdated = false;
         while (!isDeploymentUpdated) {
             core.info('Waiting for deployment to be complete...');
-            const { latestRun, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
+            const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             // only look at deployments that were applied to the target cluster
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                    const badInstance = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
-                    throw new Error(`
-          Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-          ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
-        `);
+                    throwBadDeployError(runs);
                 }
-                if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
+                if (isDeploymentDisabled(runs, deployment)) {
                     core.info('Deployment successfully disabled.');
                     isDeploymentUpdated = true;
                     return;
                 }
-                // No runs came back yet, still waiting for deployment update...
-                if (!latestRun) {
+                // No runs came back yet, and deployment isn't disabled, so we're waiting for deployment update...
+                if (!runs.length) {
                     yield sleep(3000);
                     continue;
                 }
-                if (latestRun.replicas && latestRun.replicas > 0 && latestRun.readyReplicas === latestRun.replicas) {
+                if (isDeploymentStable(runs)) {
                     core.info('Deployment update complete.');
                     isDeploymentUpdated = true;
                     return;
@@ -324,9 +338,8 @@ function getDeploymentWithDetails(id) {
         if (!deployment) {
             throw new Error(`Deployment with id: ${id} does not exist`);
         }
-        const [latestRun] = runs;
         return {
-            latestRun,
+            runs,
             deployment,
         };
     });
