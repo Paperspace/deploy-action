@@ -42,8 +42,6 @@ export const getDeploymentByProjectAndName = async (handle: string, name: string
     name,
   })
 
-  console.log('res', deployments);
-
   if (!deployments) {
     throw new Error(`Deployments matching name and project not found.`);
   }

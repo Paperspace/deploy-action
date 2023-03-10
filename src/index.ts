@@ -57,10 +57,10 @@ function isDeploymentDisabled(latestRun: LatestRun, deployment: Deployment): boo
   return false;
 }
 
-async function syncDeployment(yaml: any) {
+async function syncDeployment(projectId: string, yaml: any) {
   const deploymentId = await upsertDeployment({
     config: yaml,
-    projectId: 'asdf',
+    projectId,
   });
 
   if (!deploymentId) {
@@ -130,7 +130,7 @@ async function maybeSyncDeployment() {
 
   core.info('Upserting deployment...');
 
-  await syncDeployment(parsed);
+  await syncDeployment(projectId, parsed);
 }
 
 async function run(): Promise<void> {

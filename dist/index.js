@@ -127,12 +127,12 @@ function isDeploymentDisabled(latestRun, deployment) {
     }
     return false;
 }
-function syncDeployment(yaml) {
+function syncDeployment(projectId, yaml) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const deploymentId = yield (0, service_1.upsertDeployment)({
             config: yaml,
-            projectId: 'asdf',
+            projectId,
         });
         if (!deploymentId) {
             throw new Error('Deployment upsert failed');
@@ -183,7 +183,7 @@ function maybeSyncDeployment() {
             }
         }
         core.info('Upserting deployment...');
-        yield syncDeployment(parsed);
+        yield syncDeployment(projectId, parsed);
     });
 }
 function run() {
@@ -273,7 +273,6 @@ const getDeploymentByProjectAndName = (handle, name) => __awaiter(void 0, void 0
         handle,
         name,
     });
-    console.log('res', deployments);
     if (!deployments) {
         throw new Error(`Deployments matching name and project not found.`);
     }
