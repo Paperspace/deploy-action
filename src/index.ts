@@ -11,6 +11,7 @@ import type { LatestRun, Deployment } from './service';
 import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndName } from './service';
 
 const TIMEOUT_IN_MINUTES = 5;
+const BAD_INSTANCE_STATES = ['errored', 'failed'];
 
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
@@ -80,11 +81,11 @@ async function syncDeployment(projectId: string, yaml: any) {
     // only look at deployments that were applied to the target cluster
     if (deployment.latestSpec?.externalApplied) {
       if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-        const instanceMessages = latestRun.instances.find(instance => ['error', 'failed'].includes(instance.state));
+        const instanceMessages = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
 
         throw new Error(`
           Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-          ${instanceMessages ? `Last instance messages: ${instanceMessages}` : ''}
+          ${instanceMessages ? `Last instance message: ${instanceMessages}` : ''}
         `);
       }
 

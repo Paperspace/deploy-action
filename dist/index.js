@@ -91,6 +91,7 @@ const core = __importStar(__nccwpck_require__(7733));
 __nccwpck_require__(4250);
 const service_1 = __nccwpck_require__(1209);
 const TIMEOUT_IN_MINUTES = 5;
+const BAD_INSTANCE_STATES = ['errored', 'failed'];
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const projectId = core.getInput('projectId', { required: true });
@@ -146,10 +147,10 @@ function syncDeployment(projectId, yaml) {
             // only look at deployments that were applied to the target cluster
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
-                    const instanceMessages = latestRun.instances.find(instance => ['error', 'failed'].includes(instance.state));
+                    const instanceMessages = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
                     throw new Error(`
           Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-          ${instanceMessages ? `Last instance messages: ${instanceMessages}` : ''}
+          ${instanceMessages ? `Last instance message: ${instanceMessages}` : ''}
         `);
                 }
                 if (!latestRun && isDeploymentDisabled(latestRun, deployment)) {
