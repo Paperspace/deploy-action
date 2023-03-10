@@ -94,6 +94,7 @@ const TIMEOUT_IN_MINUTES = 5;
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const projectId = core.getInput('projectId', { required: true });
+const optionalImageId = core.getInput('imageId', { required: true });
 function getFilePath() {
     var _a;
     const relativeFilePath = core.getInput('filePath');
@@ -177,6 +178,15 @@ function maybeSyncDeployment() {
         // ensure this happens before hash comparison.
         if (!parsed.apiVersion) {
             parsed.apiVersion = 'latest';
+        }
+        // image is always on top level of spec, regardless of version.
+        if (optionalImageId) {
+            if (parsed.image !== ':imageId') {
+                core.warning('Optional image was specified but config.image is not set to `:imageId`. This can lead to confusion and is not recommended.');
+            }
+            core.info(`Overriding config.image with imageId input: ${optionalImageId}`);
+            // replace the image in the spec with the one provided
+            parsed.image = optionalImageId;
         }
         if (deployment) {
             const specHash = (0, object_hash_1.default)(parsed, {
