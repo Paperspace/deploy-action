@@ -269,7 +269,6 @@ const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').crea
 const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create();
 const upsertDeployment = (config) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: deployment } = yield upsertDeploymentFetcher(config);
-    console.log('upsert response', deployment);
     const { deploymentId } = deployment;
     return deploymentId;
 });
