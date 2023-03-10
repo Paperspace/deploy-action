@@ -31,6 +31,8 @@ export type LatestRun = operations["query.deploymentRunsrouter.get"]["responses"
 export const upsertDeployment = async (config: Config) => {
   const { data: deployment } = await upsertDeploymentFetcher(config);
 
+  console.log('upsert response', deployment);
+
   const { deploymentId } = deployment;
 
   return deploymentId;

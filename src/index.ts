@@ -128,6 +128,12 @@ async function maybeSyncDeployment() {
     }
   }
 
+  // latest api version unless specified otherwise.
+  // this allows for backwards compat
+  if (!parsed.apiVersion) {
+    parsed.apiVersion = 'latest';
+  }
+
   core.info('Upserting deployment...');
 
   await syncDeployment(projectId, parsed);
