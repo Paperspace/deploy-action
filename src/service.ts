@@ -23,8 +23,9 @@ fetcher.configure({
 const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create()
 const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create()
 const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create()
+const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create()
 
-type Config = operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
+export type Config = operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
 export type Deployment = operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
 export type LatestRun = operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
@@ -36,16 +37,19 @@ export const upsertDeployment = async (config: Config) => {
   return deploymentId;
 }
 
-export const getDeployment = async (id: string) => {
-  const { data: deployment } = await getSingleDeployment({
-    id,
+export const getDeploymentByProjectAndName = async (handle: string, name: string) => {
+  const { data: deployments } = await getDeploymentByProjectFetcher({
+    handle,
+    name,
   })
 
-  if (!deployment) {
-    throw new Error(`Deployment with id ${id} does not exist`);
+  if (!deployments) {
+    throw new Error(`Deployments matchning name and project not found.`);
   }
 
-  return deployment;
+  const [match] = deployments;
+
+  return match;
 }
 
 export const getDeploymentWithDetails = async (id: string) => {

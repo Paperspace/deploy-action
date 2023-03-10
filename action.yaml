@@ -4,8 +4,8 @@ inputs:
   paperspaceApiKey:
     description: 'Paperspace API Key'
     required: false
-  deploymentId:
-    description: 'Container deployment ID'
+  projectId:
+    description: 'Project ID for the deployment'
     required: true
   filePath:
     description: 'Relative path to spec file to deploy'

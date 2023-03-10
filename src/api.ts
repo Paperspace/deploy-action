@@ -68,6 +68,13 @@ export interface paths {
      */
     put: operations["mutation.projects.update"];
   };
+  "/projects/{handle}/deployments": {
+    /**
+     * List Project's Deployments 
+     * @description Fetches a list of deployments for a project.
+     */
+    get: operations["query.projectsDeployments.list"];
+  };
   "/health": {
     /**
      * Health check 
@@ -145,6 +152,7 @@ export interface operations {
      * @description Fetches a single deployment by deployment ID.
      */
     parameters: {
+        /** @description The ID of the deployment to fetch */
       path: {
         id: string;
       };
@@ -158,8 +166,12 @@ export interface operations {
             name: string;
             /** @description The ID of the deployment */
             id: string;
+            /** @description The ID of the project the deployment belongs to */
+            projectId: string;
             /** @description The ID of the team the deployment belongs to */
-            teamId: number;
+            teamId: string;
+            /** @description The unique endpoint for the deployment */
+            endpoint: string;
             /**
              * @description The last version hash for the deployment 
              * @default null
@@ -380,12 +392,12 @@ export interface operations {
               deploymentId: string;
               /**
                * Format: date-time 
-               * @description The date the deployment was applied to the cluster
+               * @description The date the deployment configuration was applied to the cluster
                */
               externalApplied: string | null;
               /** @description The ID of the user the deployment belongs to */
               userId: number;
-              /** @description The error message for the deployment */
+              /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
               error: string | null;
             }) | null;
           };
@@ -400,6 +412,7 @@ export interface operations {
      * @description Deletes a deployment by deployment ID.
      */
     parameters: {
+        /** @description The ID of the deployment to delete */
       path: {
         id: string;
       };
@@ -409,6 +422,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
+            /** @description The ID of the deleted deployment */
             id: string;
           };
         };
@@ -448,8 +462,12 @@ export interface operations {
                 name: string;
                 /** @description The ID of the deployment */
                 id: string;
+                /** @description The ID of the project the deployment belongs to */
+                projectId: string;
                 /** @description The ID of the team the deployment belongs to */
-                teamId: number;
+                teamId: string;
+                /** @description The unique endpoint for the deployment */
+                endpoint: string;
                 /**
                  * @description The last version hash for the deployment 
                  * @default null
@@ -670,12 +688,12 @@ export interface operations {
                   deploymentId: string;
                   /**
                    * Format: date-time 
-                   * @description The date the deployment was applied to the cluster
+                   * @description The date the deployment configuration was applied to the cluster
                    */
                   externalApplied: string | null;
                   /** @description The ID of the user the deployment belongs to */
                   userId: number;
-                  /** @description The error message for the deployment */
+                  /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
                   error: string | null;
                 }) | null;
               })[];
@@ -911,7 +929,7 @@ export interface operations {
         content: {
           "application/json": {
             /** @description The ID of the deployment */
-            deploymentId?: string;
+            deploymentId: string;
           };
         };
       };
@@ -928,6 +946,7 @@ export interface operations {
       query: {
         limit?: number;
       };
+        /** @description The ID of the deployment to fetch */
       path: {
         id: string;
       };
@@ -953,6 +972,7 @@ export interface operations {
                * @default 0
                */
               replicas?: number;
+              /** @description The deployment run instances */
               instances: ({
                   /** @description The ID of the deployment instance */
                   id: string;
@@ -1245,6 +1265,269 @@ export interface operations {
              */
             githubAppInstallationId?: number | null;
           };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.projectsDeployments.list": {
+    /**
+     * List Project's Deployments 
+     * @description Fetches a list of deployments for a project.
+     */
+    parameters: {
+      query: {
+        name?: string;
+      };
+        /** @description The ID of the project to fetch deployments for */
+      path: {
+        handle: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": ({
+              /** @description The name of the deployment */
+              name: string;
+              /** @description The ID of the deployment */
+              id: string;
+              /** @description The ID of the project the deployment belongs to */
+              projectId: string;
+              /** @description The ID of the team the deployment belongs to */
+              teamId: string;
+              /** @description The unique endpoint for the deployment */
+              endpoint: string;
+              /**
+               * @description The last version hash for the deployment 
+               * @default null
+               */
+              latestSpecHash?: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the deployment was created
+               */
+              dtCreated: string;
+              /** @description The latest deployment configuration. If invalid, null is returned. */
+              latestSpec?: ({
+                /** @description The ID of the deployment spec */
+                id: string;
+                /** @description The data for the deployment spec */
+                data: ({
+                  apiVersion: "v0alpha0" | "latest";
+                  name: string;
+                  /** @default null */
+                  region?: string | null;
+                  command?: (string)[];
+                  /** Format: uuid */
+                  containerRegistry?: string;
+                  env?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                  /** @default true */
+                  enabled?: boolean;
+                  healthchecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  image: string;
+                  repositories?: {
+                    mountPath?: string;
+                    dataset: string;
+                    repositories: ({
+                        url: string;
+                        ref?: string;
+                        name: string;
+                        username?: string;
+                        password?: string;
+                      })[];
+                  };
+                  resources: {
+                    instanceType: string;
+                    /** @default 1 */
+                    replicas?: number;
+                    autoscaling?: {
+                      maxReplicas: number;
+                      enabled?: boolean;
+                      metrics: ({
+                          /** @enum {string} */
+                          metric: "requestDuration";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        } | ({
+                          /** @enum {string} */
+                          metric: "cpu" | "memory";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        }))[];
+                    };
+                  };
+                  models?: ({
+                      id: string;
+                      path?: string;
+                    })[];
+                  /** @default 80 */
+                  port?: number;
+                }) | ({
+                  /** @enum {string} */
+                  apiVersion: "v0alpha1";
+                  name: string;
+                  /** @default null */
+                  region?: string | null;
+                  command: (string)[];
+                  /** Format: uuid */
+                  containerRegistry?: string;
+                  env?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                  /** @default true */
+                  enabled?: boolean;
+                  healthchecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  image: string;
+                });
+                /** @description The ID of the deployment the spec belongs to */
+                deploymentId: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment configuration was applied to the cluster
+                 */
+                externalApplied: string | null;
+                /** @description The ID of the user the deployment belongs to */
+                userId: number;
+                /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
+                error: string | null;
+              }) | null;
+            })[];
         };
       };
       default: components["responses"]["error"];

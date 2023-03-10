@@ -6,13 +6,13 @@ import hash from 'object-hash';
 import * as core from '@actions/core'
 
 import type { LatestRun, Deployment } from './service';
-import { getDeployment, getDeploymentWithDetails, upsertDeployment } from './service';
+import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndName } from './service';
 
-const TIMEOUT_IN_MINUTES = 15;
+const TIMEOUT_IN_MINUTES = 5;
 
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
-const deploymentId = core.getInput('deploymentId', { required: true });
+const projectId = core.getInput('projectId', { required: true });
 
 function getFilePath() {
   const relativeFilePath = core.getInput('filePath');
@@ -55,13 +55,13 @@ function isDeploymentDisabled(latestRun: LatestRun, deployment: Deployment): boo
   return false;
 }
 
-async function syncDeployment(deploymentId: string, yaml: any) {
-  const res = await upsertDeployment({
+async function syncDeployment(yaml: any) {
+  const deploymentId = await upsertDeployment({
     config: yaml,
     projectId: 'asdf',
   });
 
-  if (!res) {
+  if (!deploymentId) {
     throw new Error('Deployment upsert failed');
   }
 
@@ -110,27 +110,25 @@ async function maybeSyncDeployment() {
   const file = fs.readFileSync(filePath, 'utf8');
   const parsed = YAML.parse(file);
 
-  const deployment = await getDeployment(deploymentId);
+  const deployment = await getDeploymentByProjectAndName(projectId, parsed.name);
 
-  if (!deployment) {
-    throw new Error(`Deployment with id ${deploymentId} does not exist`);
+  if (deployment) {
+    const specHash = hash(parsed, {
+      algorithm: 'md5',
+    })
+  
+    core.info('Deployment Found. Comparing Hashes...');
+  
+    if (specHash === deployment.latestSpecHash) {
+      core.info(`No spec changes detected. Skipping deployment update.`);
+  
+      return;
+    }
   }
 
-  const specHash = hash(parsed, {
-    algorithm: 'md5',
-  })
+  core.info('Upserting deployment...');
 
-  core.info(`Deployment Found. Comparing Hashes...`);
-
-  if (specHash === deployment.latestSpecHash) {
-    core.info(`No spec changes detected. Skipping deployment update.`);
-
-    return;
-  }
-
-  core.info('Spec changes detected. Updating deployment...');
-
-  await syncDeployment(deploymentId, parsed);
+  await syncDeployment(parsed);
 }
 
 async function run(): Promise<void> {

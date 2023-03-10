@@ -49,10 +49,10 @@ const dayjs_1 = __importDefault(__nccwpck_require__(184));
 const object_hash_1 = __importDefault(__nccwpck_require__(5265));
 const core = __importStar(__nccwpck_require__(7733));
 const service_1 = __nccwpck_require__(1209);
-const TIMEOUT_IN_MINUTES = 15;
+const TIMEOUT_IN_MINUTES = 5;
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
-const deploymentId = core.getInput('deploymentId', { required: true });
+const projectId = core.getInput('projectId', { required: true });
 function getFilePath() {
     var _a;
     const relativeFilePath = core.getInput('filePath');
@@ -86,14 +86,14 @@ function isDeploymentDisabled(latestRun, deployment) {
     }
     return false;
 }
-function syncDeployment(deploymentId, yaml) {
+function syncDeployment(yaml) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield (0, service_1.upsertDeployment)({
+        const deploymentId = yield (0, service_1.upsertDeployment)({
             config: yaml,
             projectId: 'asdf',
         });
-        if (!res) {
+        if (!deploymentId) {
             throw new Error('Deployment upsert failed');
         }
         const start = (0, dayjs_1.default)();
@@ -130,20 +130,19 @@ function maybeSyncDeployment() {
         core.info(`Starting deployment update...`);
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
-        const deployment = yield (0, service_1.getDeployment)(deploymentId);
-        if (!deployment) {
-            throw new Error(`Deployment with id ${deploymentId} does not exist`);
+        const deployment = yield (0, service_1.getDeploymentByProjectAndName)(projectId, parsed.name);
+        if (deployment) {
+            const specHash = (0, object_hash_1.default)(parsed, {
+                algorithm: 'md5',
+            });
+            core.info('Deployment Found. Comparing Hashes...');
+            if (specHash === deployment.latestSpecHash) {
+                core.info(`No spec changes detected. Skipping deployment update.`);
+                return;
+            }
         }
-        const specHash = (0, object_hash_1.default)(parsed, {
-            algorithm: 'md5',
-        });
-        core.info(`Deployment Found. Comparing Hashes...`);
-        if (specHash === deployment.latestSpecHash) {
-            core.info(`No spec changes detected. Skipping deployment update.`);
-            return;
-        }
-        core.info('Spec changes detected. Updating deployment...');
-        yield syncDeployment(deploymentId, parsed);
+        core.info('Upserting deployment...');
+        yield syncDeployment(parsed);
     });
 }
 function run() {
@@ -202,7 +201,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDeploymentWithDetails = exports.getDeployment = exports.upsertDeployment = void 0;
+exports.getDeploymentWithDetails = exports.getDeploymentByProjectAndName = exports.upsertDeployment = void 0;
 __nccwpck_require__(8854);
 const core = __importStar(__nccwpck_require__(7733));
 const openapi_typescript_fetch_1 = __nccwpck_require__(799);
@@ -222,22 +221,25 @@ fetcher.configure({
 const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create();
 const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create();
 const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create();
+const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create();
 const upsertDeployment = (config) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: deployment } = yield upsertDeploymentFetcher(config);
     const { deploymentId } = deployment;
     return deploymentId;
 });
 exports.upsertDeployment = upsertDeployment;
-const getDeployment = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const { data: deployment } = yield getSingleDeployment({
-        id,
+const getDeploymentByProjectAndName = (handle, name) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data: deployments } = yield getDeploymentByProjectFetcher({
+        handle,
+        name,
     });
-    if (!deployment) {
-        throw new Error(`Deployment with id ${id} does not exist`);
+    if (!deployments) {
+        throw new Error(`Deployments matchning name and project not found.`);
     }
-    return deployment;
+    const [match] = deployments;
+    return match;
 });
-exports.getDeployment = getDeployment;
+exports.getDeploymentByProjectAndName = getDeploymentByProjectAndName;
 const getDeploymentWithDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const [{ data: runs }, { data: deployment }] = yield Promise.all([
         getDeploymentWithRuns({
