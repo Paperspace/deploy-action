@@ -1,0 +1,15 @@
+name: deploy-action-release
+on:
+  push:
+    tags:
+      - deploy-action@*
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set docker tag name
+        run: echo "::set-output name=DOCKER_TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3 | sed 's/deploy-action@//')"
+        id: docker-tag-name
