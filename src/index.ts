@@ -94,6 +94,11 @@ async function syncDeployment(projectId: string, yaml: any) {
         isDeploymentUpdated = true;
         return;
       }
+
+      // No runs came back yet, still waiting for deployment update...
+      if (!latestRun) {
+        continue;
+      }
   
       if (latestRun.readyReplicas === latestRun.replicas || !latestRun) {
         core.info('Deployment update complete.');
