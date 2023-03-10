@@ -5,17 +5,14 @@ inputs:
     description: 'Paperspace API Key'
     required: false
   projectId:
-    description: 'Project ID for the deployment'
+    description: 'Project ID that the deployment lives under.'
     required: true
   filePath:
-    description: 'Relative path to spec file to deploy'
+    description: 'Relative path to configuration file to deploy.'
     required: false
-  imageId:
-    description: 'Optional image ID to use for deployment'
+  image:
+    description: 'Optional container image to use for the deployment.'
     required: false
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
 runs:
   using: 'node16'
   main: 'dist/index.js'

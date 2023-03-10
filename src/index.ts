@@ -83,8 +83,6 @@ async function syncDeployment(projectId: string, yaml: any) {
       if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
         const badInstance = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
 
-        console.log('!!!', badInstance, latestRun.instances)
-
         throw new Error(`
           Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
           ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}

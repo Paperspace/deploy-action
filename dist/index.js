@@ -148,7 +148,6 @@ function syncDeployment(projectId, yaml) {
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
                     const badInstance = latestRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
-                    console.log('!!!', badInstance, latestRun.instances);
                     throw new Error(`
           Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
           ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
