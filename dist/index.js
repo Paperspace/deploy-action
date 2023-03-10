@@ -103,8 +103,8 @@ function getFilePath() {
         return path_1.default.join(workspacePath, relativeFilePath);
     }
     else {
-        core.warning('No filePath input provided. Defaulting to .paperspace/spec.yaml.');
-        return path_1.default.join(workspacePath, '.paperspace', 'spec.yaml');
+        core.warning('No filePath input provided. Defaulting to .paperspace/app.yaml.');
+        return path_1.default.join(workspacePath, '.paperspace', 'app.yaml');
     }
 }
 const filePath = getFilePath();

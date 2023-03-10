@@ -24,9 +24,9 @@ function getFilePath() {
   if (relativeFilePath) {
     return path.join(workspacePath, relativeFilePath);
   } else {
-    core.warning('No filePath input provided. Defaulting to .paperspace/spec.yaml.');
+    core.warning('No filePath input provided. Defaulting to .paperspace/app.yaml.');
 
-    return path.join(workspacePath, '.paperspace', 'spec.yaml');
+    return path.join(workspacePath, '.paperspace', 'app.yaml');
   }
 }
 

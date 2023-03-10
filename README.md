@@ -7,7 +7,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 | --- | --- | --- | --- | ---
 | `paperspaceApiKey` | Your Paperspace API key | true | string |
 | `projectId` | The ID of the project the deployment lives under | true | string |
-| `filePath` | The relative file path of the spec file. Example: ./src/deploy/spec.yaml | false | string | `$PROJECT_ROOT/.paperspace/spec.yaml`
+| `filePath` | The relative file path of the spec file. Example: ./src/deploy/spec.yaml | false | string | `.paperspace/app.yaml`
 | `image` | Container image to be used in the spec | false | string |
 
 ## Usage
