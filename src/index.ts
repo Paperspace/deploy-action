@@ -97,6 +97,8 @@ async function syncDeployment(projectId: string, yaml: any) {
 
       // No runs came back yet, still waiting for deployment update...
       if (!latestRun) {
+        await sleep(3000);
+
         continue;
       }
   

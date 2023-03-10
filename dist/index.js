@@ -159,6 +159,7 @@ function syncDeployment(projectId, yaml) {
                 }
                 // No runs came back yet, still waiting for deployment update...
                 if (!latestRun) {
+                    yield sleep(3000);
                     continue;
                 }
                 if (latestRun.readyReplicas === latestRun.replicas || !latestRun) {
