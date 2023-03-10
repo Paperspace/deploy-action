@@ -42,13 +42,13 @@ export const getDeploymentByProjectAndName = async (handle: string, name: string
     name,
   })
 
+  console.log('res', deployments);
+
   if (!deployments) {
-    throw new Error(`Deployments matchning name and project not found.`);
+    throw new Error(`Deployments matching name and project not found.`);
   }
 
-  const [match] = deployments;
-
-  return match;
+  return deployments[0];
 }
 
 export const getDeploymentWithDetails = async (id: string) => {

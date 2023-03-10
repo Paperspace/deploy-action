@@ -273,11 +273,11 @@ const getDeploymentByProjectAndName = (handle, name) => __awaiter(void 0, void 0
         handle,
         name,
     });
+    console.log('res', deployments);
     if (!deployments) {
-        throw new Error(`Deployments matchning name and project not found.`);
+        throw new Error(`Deployments matching name and project not found.`);
     }
-    const [match] = deployments;
-    return match;
+    return deployments[0];
 });
 exports.getDeploymentByProjectAndName = getDeploymentByProjectAndName;
 const getDeploymentWithDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
