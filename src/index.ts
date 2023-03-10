@@ -114,6 +114,13 @@ async function maybeSyncDeployment() {
 
   const deployment = await getDeploymentByProjectAndName(projectId, parsed.name);
 
+  // latest api version unless specified otherwise.
+  // this allows for backwards compat.
+  // ensure this happens before hash comparison.
+  if (!parsed.apiVersion) {
+    parsed.apiVersion = 'latest';
+  }
+
   if (deployment) {
     const specHash = hash(parsed, {
       algorithm: 'md5',
@@ -126,12 +133,6 @@ async function maybeSyncDeployment() {
   
       return;
     }
-  }
-
-  // latest api version unless specified otherwise.
-  // this allows for backwards compat
-  if (!parsed.apiVersion) {
-    parsed.apiVersion = 'latest';
   }
 
   core.info('Upserting deployment...');

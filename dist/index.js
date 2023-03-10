@@ -172,6 +172,12 @@ function maybeSyncDeployment() {
         const file = fs_1.default.readFileSync(filePath, 'utf8');
         const parsed = yaml_1.default.parse(file);
         const deployment = yield (0, service_1.getDeploymentByProjectAndName)(projectId, parsed.name);
+        // latest api version unless specified otherwise.
+        // this allows for backwards compat.
+        // ensure this happens before hash comparison.
+        if (!parsed.apiVersion) {
+            parsed.apiVersion = 'latest';
+        }
         if (deployment) {
             const specHash = (0, object_hash_1.default)(parsed, {
                 algorithm: 'md5',
@@ -181,11 +187,6 @@ function maybeSyncDeployment() {
                 core.info(`No spec changes detected. Skipping deployment update.`);
                 return;
             }
-        }
-        // latest api version unless specified otherwise.
-        // this allows for backwards compat
-        if (!parsed.apiVersion) {
-            parsed.apiVersion = 'latest';
         }
         core.info('Upserting deployment...');
         yield syncDeployment(projectId, parsed);
