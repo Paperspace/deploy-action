@@ -3,7 +3,7 @@ import { Fetcher } from 'openapi-typescript-fetch'
 
 import { paths, operations } from './api';
 
-const BASE_API_URL = 'https://api.paperspace.com/v1/deployments';
+const BASE_API_URL = 'https://api.paperspace.com/v1';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 
 const fetcher = Fetcher.for<paths>()

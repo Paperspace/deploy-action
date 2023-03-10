@@ -245,7 +245,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getDeploymentWithDetails = exports.getDeploymentByProjectAndName = exports.upsertDeployment = void 0;
 const core = __importStar(__nccwpck_require__(7733));
 const openapi_typescript_fetch_1 = __nccwpck_require__(799);
-const BASE_API_URL = 'https://api.paperspace.com/v1/deployments';
+const BASE_API_URL = 'https://api.paperspace.com/v1';
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput('paperspaceApiKey');
 const fetcher = openapi_typescript_fetch_1.Fetcher.for();
 // global configuration
