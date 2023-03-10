@@ -108,19 +108,19 @@ function getFilePath() {
     }
 }
 const filePath = getFilePath();
-const validateParams = () => {
+const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
+function validateParams() {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
         throw new Error('Neither env.PAPERSPACE_API_KEY or inputs.paperspaceApiKey exists');
     }
-};
-const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
-const ensureFile = () => {
+}
+function ensureFile() {
     core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
     if (!fs_1.default.existsSync(filePath)) {
         throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
-};
+}
 function isDeploymentDisabled(latestRun, deployment) {
     var _a, _b, _c;
     if (((_a = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.data) && "resources" in ((_b = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.data)) {
@@ -220,6 +220,9 @@ function run() {
         }
     });
 }
+/**
+ * Main entry point
+ */
 run();
 
 
@@ -283,44 +286,50 @@ const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').crea
 const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create();
 const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create();
 const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create();
-const upsertDeployment = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    const { data: deployment } = yield upsertDeploymentFetcher(config);
-    const { deploymentId } = deployment;
-    return deploymentId;
-});
-exports.upsertDeployment = upsertDeployment;
-const getDeploymentByProjectAndName = (handle, name) => __awaiter(void 0, void 0, void 0, function* () {
-    const { data: deployments } = yield getDeploymentByProjectFetcher({
-        handle,
-        name,
+function upsertDeployment(config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { data: deployment } = yield upsertDeploymentFetcher(config);
+        const { deploymentId } = deployment;
+        return deploymentId;
     });
-    if (!deployments) {
-        throw new Error(`Deployments matching name and project not found.`);
-    }
-    return deployments[0];
-});
+}
+exports.upsertDeployment = upsertDeployment;
+function getDeploymentByProjectAndName(handle, name) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { data: deployments } = yield getDeploymentByProjectFetcher({
+            handle,
+            name,
+        });
+        if (!deployments) {
+            throw new Error(`Deployments matching name and project not found.`);
+        }
+        return deployments[0];
+    });
+}
 exports.getDeploymentByProjectAndName = getDeploymentByProjectAndName;
-const getDeploymentWithDetails = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const [{ data: runs }, { data: deployment }] = yield Promise.all([
-        getDeploymentWithRuns({
-            id,
-        }),
-        getSingleDeployment({
-            id,
-        }),
-    ]);
-    if (!runs) {
-        throw new Error(`Deployment runs for id: ${id} do not exist`);
-    }
-    if (!deployment) {
-        throw new Error(`Deployment with id: ${id} does not exist`);
-    }
-    const [latestRun] = runs;
-    return {
-        latestRun,
-        deployment,
-    };
-});
+function getDeploymentWithDetails(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const [{ data: runs }, { data: deployment }] = yield Promise.all([
+            getDeploymentWithRuns({
+                id,
+            }),
+            getSingleDeployment({
+                id,
+            }),
+        ]);
+        if (!runs) {
+            throw new Error(`Deployment runs for id: ${id} do not exist`);
+        }
+        if (!deployment) {
+            throw new Error(`Deployment with id: ${id} does not exist`);
+        }
+        const [latestRun] = runs;
+        return {
+            latestRun,
+            deployment,
+        };
+    });
+}
 exports.getDeploymentWithDetails = getDeploymentWithDetails;
 
 

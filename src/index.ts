@@ -32,7 +32,9 @@ function getFilePath() {
 
 const filePath = getFilePath();
 
-const validateParams = () => {
+const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
+
+function validateParams() {
   core.info(`Validating input paramters...`)
 
   if (!paperspaceApiKey) {
@@ -40,9 +42,7 @@ const validateParams = () => {
   }
 }
 
-const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
-
-const ensureFile = () => {
+function ensureFile() {
   core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
 
   if (!fs.existsSync(filePath)) {
@@ -171,4 +171,7 @@ async function run(): Promise<void> {
   }
 }
 
+/**
+ * Main entry point
+ */
 run()

@@ -28,7 +28,7 @@ export type Config = operations["mutation.deployments.upsert"]["requestBody"]["c
 export type Deployment = operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
 export type LatestRun = operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
-export const upsertDeployment = async (config: Config) => {
+export async function upsertDeployment(config: Config) {
   const { data: deployment } = await upsertDeploymentFetcher(config);
 
   const { deploymentId } = deployment;
@@ -36,7 +36,7 @@ export const upsertDeployment = async (config: Config) => {
   return deploymentId;
 }
 
-export const getDeploymentByProjectAndName = async (handle: string, name: string) => {
+export async function getDeploymentByProjectAndName(handle: string, name: string) {
   const { data: deployments } = await getDeploymentByProjectFetcher({
     handle,
     name,
@@ -49,7 +49,7 @@ export const getDeploymentByProjectAndName = async (handle: string, name: string
   return deployments[0];
 }
 
-export const getDeploymentWithDetails = async (id: string) => {
+export async function getDeploymentWithDetails(id: string) {
   const [{ data: runs }, { data: deployment }] = await Promise.all([
     getDeploymentWithRuns({
       id,
