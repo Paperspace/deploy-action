@@ -1,13 +1,13 @@
 name: 'Paperspace Deploy'
-description: 'Creates a new paperspace deployment'
+description: 'Upserts a Paperspace Deployment with the specified configuration'
 inputs:
   apiKey:
-    description: 'Paperspace API Key'
+    description: 'Paperspace API Key. Defaults to env.API_KEY.'
     required: false
   projectId:
     description: 'Project ID that the deployment lives under.'
     required: true
-  filePath:
+  configPath:
     description: 'Relative path to configuration file to deploy.'
     required: false
   image:

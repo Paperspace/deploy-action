@@ -77,3 +77,55 @@ jobs:
           projectId: p28rlnvnw51
           image: nginx:latest
 ```
+
+### Full build + deploy
+
+An example of building a custom image and syncing the deployment to Paperspace after pushing to a container registry.
+
+```yaml
+name: fixture-release
+on:
+  push:
+    tags:
+      - deployment-fixture@*
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set docker tag name
+        run: echo "::set-output name=DOCKER_TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3 | sed 's/deployment-fixture@//')"
+        id: docker-tag-name
+
+      - name: Set up docker build
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          file: Dockerfile
+          push: true
+          tags: |
+            paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
+
+      - uses: paperspace/deploy-action@main
+        name: Deploy to Paperspace
+        id: deploy
+        env:
+          API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+        with:
+          projectId: ptzm6ujwqwa
+          image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
+
+```
+
+

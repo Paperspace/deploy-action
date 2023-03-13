@@ -23,6 +23,8 @@ function getFilePath() {
   const workspacePath = process.env.GITHUB_WORKSPACE ?? '';
 
   if (relativeFilePath) {
+    core.info(`Using configPath input: ${relativeFilePath}`);
+
     return path.join(workspacePath, relativeFilePath);
   } else {
     core.warning('No filePath input provided. Defaulting to .paperspace/app.yaml.');
