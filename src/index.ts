@@ -78,11 +78,10 @@ function throwBadDeployError(runs: LatestRuns) {
   throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
 }
 
-function isDeploymentStable(runs: LatestRuns): boolean {
-  const filteredRuns = runs.filter(run => run.replicas && run.replicas > 0);
-  const healthyRun = filteredRuns.every(run => run.readyReplicas === run.replicas);
+function isDeploymentStable(deployment: Deployment): boolean {
+  const { latestSpec } = deployment;
 
-  return healthyRun;
+  return !!latestSpec?.dtHealthy;
 }
 
 async function syncDeployment(projectId: string, yaml: any) {
@@ -117,14 +116,7 @@ async function syncDeployment(projectId: string, yaml: any) {
         return;
       }
 
-      // No runs came back yet, and deployment isn't disabled, so we're waiting for deployment update...
-      if (!runs.length) {
-        await sleep(3000);
-
-        continue;
-      }
-  
-      if (isDeploymentStable(runs)) {
+      if (isDeploymentStable(deployment)) {
         core.info('Deployment update complete.');
   
         isDeploymentUpdated = true;

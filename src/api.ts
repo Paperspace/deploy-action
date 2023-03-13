@@ -70,10 +70,68 @@ export interface paths {
   };
   "/projects/{handle}/deployments": {
     /**
-     * List Project's Deployments 
+     * List a project's deployments 
      * @description Fetches a list of deployments for a project.
      */
     get: operations["query.projectsDeployments.list"];
+  };
+  "/projects/{handle}/secrets": {
+    /**
+     * List a project's secrets 
+     * @description Fetches a list of secrets for a project.
+     */
+    get: operations["query.projectSecrets.list"];
+    /**
+     * Create a project secret 
+     * @description Creates a new secret for a project.
+     */
+    post: operations["mutation.projectSecrets.create"];
+  };
+  "/projects/{handle}/secrets/{name}": {
+    /**
+     * Get a project secret 
+     * @description Fetches a secret for a project.
+     */
+    get: operations["query.projectSecrets.getProjectSecret"];
+    /**
+     * Delete a project secret 
+     * @description Deletes a secret for a project.
+     */
+    delete: operations["mutation.projectSecrets.delete"];
+    /**
+     * Update a project secret 
+     * @description Update the value of a secret for a project.
+     */
+    patch: operations["mutation.projectSecrets.update"];
+  };
+  "/teams/{handle}/secrets": {
+    /**
+     * List a team's secrets 
+     * @description Fetches a list of secrets for a team.
+     */
+    get: operations["query.teamSecrets.list"];
+    /**
+     * Create a team secret 
+     * @description Creates a new secret for a team.
+     */
+    post: operations["mutation.teamSecrets.create"];
+  };
+  "/teams/{handle}/secrets/{name}": {
+    /**
+     * Get a team secret 
+     * @description Fetches a secret for a team.
+     */
+    get: operations["query.teamSecrets.get"];
+    /**
+     * Delete a team secret 
+     * @description Deletes a secret for a team.
+     */
+    delete: operations["mutation.teamSecrets.delete"];
+    /**
+     * Update a team secret 
+     * @description Update the value of a secret for a team.
+     */
+    patch: operations["mutation.teamSecrets.update"];
   };
   "/health": {
     /**
@@ -182,16 +240,18 @@ export interface operations {
              * @description The date the deployment was created
              */
             dtCreated: string;
-            /** @description The latest deployment configuration. If invalid, null is returned. */
+            /**
+             * @description The latest deployment configuration. If invalid, null is returned. 
+             * @default null
+             */
             latestSpec?: ({
               /** @description The ID of the deployment spec */
               id: string;
               /** @description The data for the deployment spec */
-              data: ({
+              data?: (({
                 apiVersion: "v0alpha0" | "latest";
                 name: string;
-                /** @default null */
-                region?: string | null;
+                region?: string;
                 command?: (string)[];
                 /** Format: uuid */
                 containerRegistry?: string;
@@ -201,7 +261,7 @@ export interface operations {
                   })[];
                 /** @default true */
                 enabled?: boolean;
-                healthchecks?: {
+                healthChecks?: {
                   liveness?: {
                     timeoutSeconds?: number;
                     initialDelaySeconds?: number;
@@ -310,8 +370,7 @@ export interface operations {
                 /** @enum {string} */
                 apiVersion: "v0alpha1";
                 name: string;
-                /** @default null */
-                region?: string | null;
+                region?: string;
                 command: (string)[];
                 /** Format: uuid */
                 containerRegistry?: string;
@@ -387,18 +446,28 @@ export interface operations {
                   };
                 };
                 image: string;
-              });
+              })) | null;
               /** @description The ID of the deployment the spec belongs to */
               deploymentId: string;
               /**
                * Format: date-time 
-               * @description The date the deployment configuration was applied to the cluster
+               * @description The date the deployment configuration was applied to the cluster 
+               * @default null
                */
-              externalApplied: string | null;
+              externalApplied?: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the deployment was marked "healthy" 
+               * @default null
+               */
+              dtHealthy?: string | null;
               /** @description The ID of the user the deployment belongs to */
               userId: number;
-              /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
-              error: string | null;
+              /**
+               * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+               * @default null
+               */
+              error?: string | null;
             }) | null;
           };
         };
@@ -478,16 +547,18 @@ export interface operations {
                  * @description The date the deployment was created
                  */
                 dtCreated: string;
-                /** @description The latest deployment configuration. If invalid, null is returned. */
+                /**
+                 * @description The latest deployment configuration. If invalid, null is returned. 
+                 * @default null
+                 */
                 latestSpec?: ({
                   /** @description The ID of the deployment spec */
                   id: string;
                   /** @description The data for the deployment spec */
-                  data: ({
+                  data?: (({
                     apiVersion: "v0alpha0" | "latest";
                     name: string;
-                    /** @default null */
-                    region?: string | null;
+                    region?: string;
                     command?: (string)[];
                     /** Format: uuid */
                     containerRegistry?: string;
@@ -497,7 +568,7 @@ export interface operations {
                       })[];
                     /** @default true */
                     enabled?: boolean;
-                    healthchecks?: {
+                    healthChecks?: {
                       liveness?: {
                         timeoutSeconds?: number;
                         initialDelaySeconds?: number;
@@ -606,8 +677,7 @@ export interface operations {
                     /** @enum {string} */
                     apiVersion: "v0alpha1";
                     name: string;
-                    /** @default null */
-                    region?: string | null;
+                    region?: string;
                     command: (string)[];
                     /** Format: uuid */
                     containerRegistry?: string;
@@ -683,18 +753,28 @@ export interface operations {
                       };
                     };
                     image: string;
-                  });
+                  })) | null;
                   /** @description The ID of the deployment the spec belongs to */
                   deploymentId: string;
                   /**
                    * Format: date-time 
-                   * @description The date the deployment configuration was applied to the cluster
+                   * @description The date the deployment configuration was applied to the cluster 
+                   * @default null
                    */
-                  externalApplied: string | null;
+                  externalApplied?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment was marked "healthy" 
+                   * @default null
+                   */
+                  dtHealthy?: string | null;
                   /** @description The ID of the user the deployment belongs to */
                   userId: number;
-                  /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
-                  error: string | null;
+                  /**
+                   * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                   * @default null
+                   */
+                  error?: string | null;
                 }) | null;
               })[];
           };
@@ -722,8 +802,7 @@ export interface operations {
           config: ({
             apiVersion: "v0alpha0" | "latest";
             name: string;
-            /** @default null */
-            region?: string | null;
+            region?: string;
             command?: (string)[];
             /** Format: uuid */
             containerRegistry?: string;
@@ -733,7 +812,7 @@ export interface operations {
               })[];
             /** @default true */
             enabled?: boolean;
-            healthchecks?: {
+            healthChecks?: {
               liveness?: {
                 timeoutSeconds?: number;
                 initialDelaySeconds?: number;
@@ -842,8 +921,7 @@ export interface operations {
             /** @enum {string} */
             apiVersion: "v0alpha1";
             name: string;
-            /** @default null */
-            region?: string | null;
+            region?: string;
             command: (string)[];
             /** Format: uuid */
             containerRegistry?: string;
@@ -1272,7 +1350,7 @@ export interface operations {
   };
   "query.projectsDeployments.list": {
     /**
-     * List Project's Deployments 
+     * List a project's deployments 
      * @description Fetches a list of deployments for a project.
      */
     parameters: {
@@ -1309,16 +1387,18 @@ export interface operations {
                * @description The date the deployment was created
                */
               dtCreated: string;
-              /** @description The latest deployment configuration. If invalid, null is returned. */
+              /**
+               * @description The latest deployment configuration. If invalid, null is returned. 
+               * @default null
+               */
               latestSpec?: ({
                 /** @description The ID of the deployment spec */
                 id: string;
                 /** @description The data for the deployment spec */
-                data: ({
+                data?: (({
                   apiVersion: "v0alpha0" | "latest";
                   name: string;
-                  /** @default null */
-                  region?: string | null;
+                  region?: string;
                   command?: (string)[];
                   /** Format: uuid */
                   containerRegistry?: string;
@@ -1328,7 +1408,7 @@ export interface operations {
                     })[];
                   /** @default true */
                   enabled?: boolean;
-                  healthchecks?: {
+                  healthChecks?: {
                     liveness?: {
                       timeoutSeconds?: number;
                       initialDelaySeconds?: number;
@@ -1437,8 +1517,7 @@ export interface operations {
                   /** @enum {string} */
                   apiVersion: "v0alpha1";
                   name: string;
-                  /** @default null */
-                  region?: string | null;
+                  region?: string;
                   command: (string)[];
                   /** Format: uuid */
                   containerRegistry?: string;
@@ -1514,20 +1593,432 @@ export interface operations {
                     };
                   };
                   image: string;
-                });
+                })) | null;
                 /** @description The ID of the deployment the spec belongs to */
                 deploymentId: string;
                 /**
                  * Format: date-time 
-                 * @description The date the deployment configuration was applied to the cluster
+                 * @description The date the deployment configuration was applied to the cluster 
+                 * @default null
                  */
-                externalApplied: string | null;
+                externalApplied?: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment was marked "healthy" 
+                 * @default null
+                 */
+                dtHealthy?: string | null;
                 /** @description The ID of the user the deployment belongs to */
                 userId: number;
-                /** @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. */
-                error: string | null;
+                /**
+                 * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                 * @default null
+                 */
+                error?: string | null;
               }) | null;
             })[];
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.projectSecrets.list": {
+    /**
+     * List a project's secrets 
+     * @description Fetches a list of secrets for a project.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+        /** @description The ID of the project where the secret is stored. */
+      path: {
+        handle: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage: string | null;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The name of the secret, e.g. "DB_PASSWORD". */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was last modified.
+                 */
+                dtModified: string;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projectSecrets.create": {
+    /**
+     * Create a project secret 
+     * @description Creates a new secret for a project.
+     */
+    parameters: {
+        /** @description The ID of the project where the secret is stored. */
+      path: {
+        handle: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the secret, e.g. "DB_PASSWORD". */
+          name: string;
+          /** @description The value of the secret, e.g. "password". */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.projectSecrets.getProjectSecret": {
+    /**
+     * Get a project secret 
+     * @description Fetches a secret for a project.
+     */
+    parameters: {
+        /** @description The ID of the project where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projectSecrets.delete": {
+    /**
+     * Delete a project secret 
+     * @description Deletes a secret for a project.
+     */
+    parameters: {
+        /** @description The ID of the project where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projectSecrets.update": {
+    /**
+     * Update a project secret 
+     * @description Update the value of a secret for a project.
+     */
+    parameters: {
+        /** @description The ID of the project where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The value of the secret, e.g. "password". */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.teamSecrets.list": {
+    /**
+     * List a team's secrets 
+     * @description Fetches a list of secrets for a team.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+        /** @description The ID of the team where the secret is stored. */
+      path: {
+        handle: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage: string | null;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The name of the secret, e.g. "DB_PASSWORD". */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was last modified.
+                 */
+                dtModified: string;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.teamSecrets.create": {
+    /**
+     * Create a team secret 
+     * @description Creates a new secret for a team.
+     */
+    parameters: {
+        /** @description The ID of the team where the secret is stored. */
+      path: {
+        handle: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the secret, e.g. "DB_PASSWORD". */
+          name: string;
+          /** @description The value of the secret, e.g. "password". */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.teamSecrets.get": {
+    /**
+     * Get a team secret 
+     * @description Fetches a secret for a team.
+     */
+    parameters: {
+        /** @description The ID of the team where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.teamSecrets.delete": {
+    /**
+     * Delete a team secret 
+     * @description Deletes a secret for a team.
+     */
+    parameters: {
+        /** @description The ID of the team where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.teamSecrets.update": {
+    /**
+     * Update a team secret 
+     * @description Update the value of a secret for a team.
+     */
+    parameters: {
+        /** @description The ID of the team where the secret is stored. */
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        handle: string;
+        name: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The value of the secret, e.g. "password". */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The name of the secret, e.g. "DB_PASSWORD". */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the secret was last modified.
+             */
+            dtModified: string;
+          };
         };
       };
       default: components["responses"]["error"];
