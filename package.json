@@ -1,14 +1,27 @@
 {
-  "author": "Brodey Newman <brodey@paperspace.com>",
-  "name": "@paperspace/container-deploy",
+  "name": "@paperspace/deploy-action",
   "version": "0.0.0",
-  "description": "Paperspace Container Deployment Action",
+  "description": "Paperspace Deployment Action",
+  "author": {
+    "name": "Paperspace Engineering",
+    "url": "https://paperspace.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Paperspace/deploy-action.git"
+  },
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
   "scripts": {
     "compile": "ncc build lib --license licenses.txt",
     "build": "tsc && pnpm compile",
     "check-types": "tsc --noEmit",
-    "lint": "NODE_OPTIONS=--max-old-space-size=4096 pnpm run lint:arg -- .",
-    "lint:arg": "eslint --report-unused-disable-directives --fix --cache",
+    "lint": "eslint . --fix",
     "generate:api": "npx openapi-typescript https://api.paperspace.com/v1/openapi.json --output src/api.ts"
   },
   "devDependencies": {
