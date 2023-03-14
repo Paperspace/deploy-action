@@ -57,6 +57,8 @@ function ensureAndGetConfigPath(): string {
     core.info(`Trying for path: ${pathToTry}...`)
 
     if (fs.existsSync(pathToTry)) {
+      core.info(`Path found: ${pathToTry}`)
+
       return pathToTry;
     }
   }
