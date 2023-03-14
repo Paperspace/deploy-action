@@ -94,7 +94,7 @@ function isDeploymentDisabled(
 ): boolean {
   if (
     deployment?.latestSpec?.data &&
-    "resources" in deployment?.latestSpec?.data
+    "resources" in deployment.latestSpec.data
   ) {
     return (
       !runs.length &&
@@ -137,6 +137,7 @@ function isDeploymentStable(deployment: Deployment): boolean {
   return !!latestSpec?.dtHealthy;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function syncDeployment(projectId: string, yaml: any) {
   const deploymentId = await upsertDeployment({
     config: yaml,
