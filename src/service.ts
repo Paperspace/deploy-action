@@ -1,11 +1,7 @@
 import * as core from "@actions/core";
 import { Fetcher } from "openapi-typescript-fetch";
 
-<<<<<<< Updated upstream
 import { paths, operations } from "./api";
-=======
-import { paths, operations, components } from './api';
->>>>>>> Stashed changes
 
 const BASE_API_URL = "https://api.paperspace.com/v1";
 const paperspaceApiKey =
@@ -22,20 +18,6 @@ fetcher.configure({
     },
   },
 });
-
-export function isErrorResponse(
-  response: Response,
-  data: Record<string, unknown>,
-): boolean {
-  return (
-    response.status >= 400 ||
-    !response.ok ||
-    (data &&
-      "code" in data &&
-      "message" in data &&
-      Object.values(data).length <= 3)
-  );
-}
 
 // create fetch operations
 const getSingleDeployment = fetcher
