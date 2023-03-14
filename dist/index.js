@@ -356,9 +356,9 @@ function upsertDeployment(config) {
             if (e instanceof upsertDeploymentFetcher.Error) {
                 const { data } = e.getActualType();
                 if ("issues" in data) {
-                    throw new Error(`Error creating deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`);
+                    throw new Error(`Error upserting deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`);
                 }
-                throw new Error(`Error creating deployment: ${data.message}.`);
+                throw new Error(`Error upserting deployment: ${data.message}.`);
             }
         }
     });
