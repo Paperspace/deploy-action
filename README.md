@@ -144,7 +144,7 @@ You can supply an optional relative path for your paperspace config like so:
     image: paperspace/deployment-fixture
 ```
 
-By default, the github action will look for a config file in the follow paths:
+By default, the github action will look for a config file with the following paths:
 
 ```js
 [
