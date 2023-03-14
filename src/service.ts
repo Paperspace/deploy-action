@@ -1,7 +1,11 @@
 import * as core from "@actions/core";
 import { Fetcher } from "openapi-typescript-fetch";
 
+<<<<<<< Updated upstream
 import { paths, operations } from "./api";
+=======
+import { paths, operations, components } from './api';
+>>>>>>> Stashed changes
 
 const BASE_API_URL = "https://api.paperspace.com/v1";
 const paperspaceApiKey =
@@ -18,6 +22,20 @@ fetcher.configure({
     },
   },
 });
+
+export function isErrorResponse(
+  response: Response,
+  data: Record<string, unknown>,
+): boolean {
+  return (
+    response.status >= 400 ||
+    !response.ok ||
+    (data &&
+      "code" in data &&
+      "message" in data &&
+      Object.values(data).length <= 3)
+  );
+}
 
 // create fetch operations
 const getSingleDeployment = fetcher
@@ -45,11 +63,24 @@ export type LatestRuns =
   operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
 export async function upsertDeployment(config: Config) {
-  const { data: deployment } = await upsertDeploymentFetcher(config);
+  try {
+    const { data: deployment } = await upsertDeploymentFetcher(config);
 
-  const { deploymentId } = deployment;
+    const { deploymentId } = deployment;
 
-  return deploymentId;
+    return deploymentId;
+  } catch(e) {
+    // check which operation threw the exception
+    if (e instanceof upsertDeploymentFetcher.Error) {
+      const { data } = e.getActualType()
+
+      if ("issues" in data) {
+        throw new Error(`Error creating deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`)
+      }
+
+      throw new Error(`Error creating deployment: ${data.message}.`)
+    }
+  }
 }
 
 export async function getDeploymentByProjectAndName(

@@ -312,7 +312,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDeploymentWithDetails = exports.getDeploymentByProjectAndName = exports.upsertDeployment = void 0;
+exports.getDeploymentWithDetails = exports.getDeploymentByProjectAndName = exports.upsertDeployment = exports.isErrorResponse = void 0;
 const core = __importStar(__nccwpck_require__(7733));
 const openapi_typescript_fetch_1 = __nccwpck_require__(799);
 const BASE_API_URL = "https://api.paperspace.com/v1";
@@ -327,6 +327,15 @@ fetcher.configure({
         },
     },
 });
+function isErrorResponse(response, data) {
+    return (response.status >= 400 ||
+        !response.ok ||
+        (data &&
+            "code" in data &&
+            "message" in data &&
+            Object.values(data).length <= 3));
+}
+exports.isErrorResponse = isErrorResponse;
 // create fetch operations
 const getSingleDeployment = fetcher
     .path("/deployments/{id}")
@@ -346,9 +355,21 @@ const getDeploymentByProjectFetcher = fetcher
     .create();
 function upsertDeployment(config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { data: deployment } = yield upsertDeploymentFetcher(config);
-        const { deploymentId } = deployment;
-        return deploymentId;
+        try {
+            const { data: deployment } = yield upsertDeploymentFetcher(config);
+            const { deploymentId } = deployment;
+            return deploymentId;
+        }
+        catch (e) {
+            // check which operation threw the exception
+            if (e instanceof upsertDeploymentFetcher.Error) {
+                const { data } = e.getActualType();
+                if ("issues" in data) {
+                    throw new Error(`Error creating deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`);
+                }
+                throw new Error(`Error creating deployment: ${data.message}.`);
+            }
+        }
     });
 }
 exports.upsertDeployment = upsertDeployment;
