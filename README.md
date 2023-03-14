@@ -1,14 +1,15 @@
-# Container Deployment Action
-GitHub action for deploying updates to a Paperspace container deployment.
+# Paperspace Deployment Action
+
+> A GitHub action for deploying updates to a Paperspace deployment.
 
 ## Inputs
 
-| Input | Description | Required | Type | Default
-| --- | --- | --- | --- | ---
-| `apiKey` | Your Paperspace API key | true | string |
-| `projectId` | The ID of the project the deployment lives under | true | string |
-| `configPath` | The relative file path of the configuration file. | false | string | see default paths below
-| `image` | Container image to be used in the configuration | false | string |
+| Input        | Type     | Required? | Description                                                                |
+| ------------ | -------- | --------- | -------------------------------------------------------------------------- |
+| `apiKey`     | `string` | Yes       | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys) |
+| `projectId`  | `string` | Yes       | The ID of the project the deployment lives under                           |
+| `configPath` | `string` | No        | The relative file path of the configuration file.                          |
+| `image`      | `string` | No        | Container image to be used in the configuration                            |
 
 ## Usage
 
