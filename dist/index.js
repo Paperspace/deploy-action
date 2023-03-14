@@ -178,7 +178,7 @@ function syncDeployment(projectId, yaml) {
         const start = (0, dayjs_1.default)();
         let isDeploymentUpdated = false;
         while (!isDeploymentUpdated) {
-            core.info('Waiting for deployment to be complete...');
+            core.info('Waiting for deployment to complete...');
             const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             // only look at deployments that were applied to the target cluster
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {

@@ -124,7 +124,7 @@ async function syncDeployment(projectId: string, yaml: any) {
   let isDeploymentUpdated = false;
 
   while (!isDeploymentUpdated) {
-    core.info('Waiting for deployment to be complete...');
+    core.info('Waiting for deployment to complete...');
 
     const { runs, deployment } = await getDeploymentWithDetails(deploymentId);
 
