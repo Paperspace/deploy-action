@@ -84,6 +84,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const yaml_1 = __importDefault(__nccwpck_require__(3277));
+const jsonc_1 = __nccwpck_require__(7350);
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const dayjs_1 = __importDefault(__nccwpck_require__(184));
 const object_hash_1 = __importDefault(__nccwpck_require__(5265));
@@ -92,34 +93,49 @@ __nccwpck_require__(4250);
 const service_1 = __nccwpck_require__(1209);
 const TIMEOUT_IN_MINUTES = 5;
 const BAD_INSTANCE_STATES = ['errored', 'failed'];
+const defaultConfigPaths = [
+    "paperspace.yaml",
+    "paperspace.yml",
+    "paperspace.json",
+    "paperspace.jsonc",
+    "paperspace.toml",
+    ".paperspace/app.yaml",
+    ".paperspace/app.yml",
+    ".paperspace/app.json",
+    ".paperspace/app.jsonc",
+    ".paperspace/app.toml",
+];
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
 const projectId = core.getInput('projectId', { required: true });
 const optionalImage = core.getInput('image', { required: true });
-function getFilePath() {
+function ensureAndGetConfigPath() {
     var _a;
     const relativeFilePath = core.getInput('configPath');
     const workspacePath = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '';
     if (relativeFilePath) {
-        return path_1.default.join(workspacePath, relativeFilePath);
+        core.info(`Found configPath input: ${relativeFilePath}. Ensuring file exists...`);
+        const relPath = path_1.default.join(workspacePath, relativeFilePath);
+        if (!fs_1.default.existsSync(relPath)) {
+            throw new Error(`File not found at path: ${relPath}`);
+        }
+        return relPath;
     }
-    else {
-        core.warning('No filePath input provided. Defaulting to .paperspace/app.yaml.');
-        return path_1.default.join(workspacePath, '.paperspace', 'app.yaml');
+    core.warning('No configPath input provided. Searching for default...');
+    for (const fileName of defaultConfigPaths) {
+        const pathToTry = path_1.default.join(workspacePath, fileName);
+        core.info(`Trying for path: ${pathToTry}...`);
+        if (fs_1.default.existsSync(pathToTry)) {
+            return pathToTry;
+        }
     }
+    throw new Error(`No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(', ')}`);
 }
-const filePath = getFilePath();
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 function validateParams() {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
         throw new Error('Neither env.API_KEY or inputs.apiKey exists');
-    }
-}
-function ensureFile() {
-    core.info(`Checking for Paperspace spec file at path: ${filePath}...`);
-    if (!fs_1.default.existsSync(filePath)) {
-        throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
     }
 }
 function isDeploymentDisabled(runs, deployment) {
@@ -182,11 +198,25 @@ function syncDeployment(projectId, yaml) {
         }
     });
 }
+const parseByExt = (filePath) => {
+    const ext = path_1.default.extname(filePath);
+    const content = fs_1.default.readFileSync(filePath, 'utf8');
+    switch (ext) {
+        case '.yaml':
+            return yaml_1.default.parse(content);
+        case '.jsonc':
+            return jsonc_1.jsonc.parse(content);
+        case '.json':
+            return JSON.parse(content);
+        default:
+            throw new Error(`Unsupported file extension: ${ext}`);
+    }
+};
 function maybeSyncDeployment() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Starting deployment update...`);
-        const file = fs_1.default.readFileSync(filePath, 'utf8');
-        const parsed = yaml_1.default.parse(file);
+        const filePath = yield ensureAndGetConfigPath();
+        const parsed = parseByExt(filePath);
         const deployment = yield (0, service_1.getDeploymentByProjectAndName)(projectId, parsed.name);
         // latest api version unless specified otherwise.
         // this allows for backwards compat.
@@ -221,7 +251,6 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             validateParams();
-            ensureFile();
             yield maybeSyncDeployment();
         }
         catch (error) {
@@ -2112,6 +2141,2677 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
+/***/ 7620:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var util = __nccwpck_require__(3837);
+var isArrayish = __nccwpck_require__(868);
+
+var errorEx = function errorEx(name, properties) {
+	if (!name || name.constructor !== String) {
+		properties = name || {};
+		name = Error.name;
+	}
+
+	var errorExError = function ErrorEXError(message) {
+		if (!this) {
+			return new ErrorEXError(message);
+		}
+
+		message = message instanceof Error
+			? message.message
+			: (message || this.message);
+
+		Error.call(this, message);
+		Error.captureStackTrace(this, errorExError);
+
+		this.name = name;
+
+		Object.defineProperty(this, 'message', {
+			configurable: true,
+			enumerable: false,
+			get: function () {
+				var newMessage = message.split(/\r?\n/g);
+
+				for (var key in properties) {
+					if (!properties.hasOwnProperty(key)) {
+						continue;
+					}
+
+					var modifier = properties[key];
+
+					if ('message' in modifier) {
+						newMessage = modifier.message(this[key], newMessage) || newMessage;
+						if (!isArrayish(newMessage)) {
+							newMessage = [newMessage];
+						}
+					}
+				}
+
+				return newMessage.join('\n');
+			},
+			set: function (v) {
+				message = v;
+			}
+		});
+
+		var overwrittenStack = null;
+
+		var stackDescriptor = Object.getOwnPropertyDescriptor(this, 'stack');
+		var stackGetter = stackDescriptor.get;
+		var stackValue = stackDescriptor.value;
+		delete stackDescriptor.value;
+		delete stackDescriptor.writable;
+
+		stackDescriptor.set = function (newstack) {
+			overwrittenStack = newstack;
+		};
+
+		stackDescriptor.get = function () {
+			var stack = (overwrittenStack || ((stackGetter)
+				? stackGetter.call(this)
+				: stackValue)).split(/\r?\n+/g);
+
+			// starting in Node 7, the stack builder caches the message.
+			// just replace it.
+			if (!overwrittenStack) {
+				stack[0] = this.name + ': ' + this.message;
+			}
+
+			var lineCount = 1;
+			for (var key in properties) {
+				if (!properties.hasOwnProperty(key)) {
+					continue;
+				}
+
+				var modifier = properties[key];
+
+				if ('line' in modifier) {
+					var line = modifier.line(this[key]);
+					if (line) {
+						stack.splice(lineCount++, 0, '    ' + line);
+					}
+				}
+
+				if ('stack' in modifier) {
+					modifier.stack(this[key], stack);
+				}
+			}
+
+			return stack.join('\n');
+		};
+
+		Object.defineProperty(this, 'stack', stackDescriptor);
+	};
+
+	if (Object.setPrototypeOf) {
+		Object.setPrototypeOf(errorExError.prototype, Error.prototype);
+		Object.setPrototypeOf(errorExError, Error);
+	} else {
+		util.inherits(errorExError, Error);
+	}
+
+	return errorExError;
+};
+
+errorEx.append = function (str, def) {
+	return {
+		message: function (v, message) {
+			v = v || def;
+
+			if (v) {
+				message[0] += ' ' + str.replace('%s', v.toString());
+			}
+
+			return message;
+		}
+	};
+};
+
+errorEx.line = function (str, def) {
+	return {
+		line: function (v) {
+			v = v || def;
+
+			if (v) {
+				return str.replace('%s', v.toString());
+			}
+
+			return null;
+		}
+	};
+};
+
+module.exports = errorEx;
+
+
+/***/ }),
+
+/***/ 6584:
+/***/ ((module) => {
+
+module.exports = stringify
+stringify.default = stringify
+stringify.stable = deterministicStringify
+stringify.stableStringify = deterministicStringify
+
+var LIMIT_REPLACE_NODE = '[...]'
+var CIRCULAR_REPLACE_NODE = '[Circular]'
+
+var arr = []
+var replacerStack = []
+
+function defaultOptions () {
+  return {
+    depthLimit: Number.MAX_SAFE_INTEGER,
+    edgesLimit: Number.MAX_SAFE_INTEGER
+  }
+}
+
+// Regular stringify
+function stringify (obj, replacer, spacer, options) {
+  if (typeof options === 'undefined') {
+    options = defaultOptions()
+  }
+
+  decirc(obj, '', 0, [], undefined, 0, options)
+  var res
+  try {
+    if (replacerStack.length === 0) {
+      res = JSON.stringify(obj, replacer, spacer)
+    } else {
+      res = JSON.stringify(obj, replaceGetterValues(replacer), spacer)
+    }
+  } catch (_) {
+    return JSON.stringify('[unable to serialize, circular reference is too complex to analyze]')
+  } finally {
+    while (arr.length !== 0) {
+      var part = arr.pop()
+      if (part.length === 4) {
+        Object.defineProperty(part[0], part[1], part[3])
+      } else {
+        part[0][part[1]] = part[2]
+      }
+    }
+  }
+  return res
+}
+
+function setReplace (replace, val, k, parent) {
+  var propertyDescriptor = Object.getOwnPropertyDescriptor(parent, k)
+  if (propertyDescriptor.get !== undefined) {
+    if (propertyDescriptor.configurable) {
+      Object.defineProperty(parent, k, { value: replace })
+      arr.push([parent, k, val, propertyDescriptor])
+    } else {
+      replacerStack.push([val, k, replace])
+    }
+  } else {
+    parent[k] = replace
+    arr.push([parent, k, val])
+  }
+}
+
+function decirc (val, k, edgeIndex, stack, parent, depth, options) {
+  depth += 1
+  var i
+  if (typeof val === 'object' && val !== null) {
+    for (i = 0; i < stack.length; i++) {
+      if (stack[i] === val) {
+        setReplace(CIRCULAR_REPLACE_NODE, val, k, parent)
+        return
+      }
+    }
+
+    if (
+      typeof options.depthLimit !== 'undefined' &&
+      depth > options.depthLimit
+    ) {
+      setReplace(LIMIT_REPLACE_NODE, val, k, parent)
+      return
+    }
+
+    if (
+      typeof options.edgesLimit !== 'undefined' &&
+      edgeIndex + 1 > options.edgesLimit
+    ) {
+      setReplace(LIMIT_REPLACE_NODE, val, k, parent)
+      return
+    }
+
+    stack.push(val)
+    // Optimize for Arrays. Big arrays could kill the performance otherwise!
+    if (Array.isArray(val)) {
+      for (i = 0; i < val.length; i++) {
+        decirc(val[i], i, i, stack, val, depth, options)
+      }
+    } else {
+      var keys = Object.keys(val)
+      for (i = 0; i < keys.length; i++) {
+        var key = keys[i]
+        decirc(val[key], key, i, stack, val, depth, options)
+      }
+    }
+    stack.pop()
+  }
+}
+
+// Stable-stringify
+function compareFunction (a, b) {
+  if (a < b) {
+    return -1
+  }
+  if (a > b) {
+    return 1
+  }
+  return 0
+}
+
+function deterministicStringify (obj, replacer, spacer, options) {
+  if (typeof options === 'undefined') {
+    options = defaultOptions()
+  }
+
+  var tmp = deterministicDecirc(obj, '', 0, [], undefined, 0, options) || obj
+  var res
+  try {
+    if (replacerStack.length === 0) {
+      res = JSON.stringify(tmp, replacer, spacer)
+    } else {
+      res = JSON.stringify(tmp, replaceGetterValues(replacer), spacer)
+    }
+  } catch (_) {
+    return JSON.stringify('[unable to serialize, circular reference is too complex to analyze]')
+  } finally {
+    // Ensure that we restore the object as it was.
+    while (arr.length !== 0) {
+      var part = arr.pop()
+      if (part.length === 4) {
+        Object.defineProperty(part[0], part[1], part[3])
+      } else {
+        part[0][part[1]] = part[2]
+      }
+    }
+  }
+  return res
+}
+
+function deterministicDecirc (val, k, edgeIndex, stack, parent, depth, options) {
+  depth += 1
+  var i
+  if (typeof val === 'object' && val !== null) {
+    for (i = 0; i < stack.length; i++) {
+      if (stack[i] === val) {
+        setReplace(CIRCULAR_REPLACE_NODE, val, k, parent)
+        return
+      }
+    }
+    try {
+      if (typeof val.toJSON === 'function') {
+        return
+      }
+    } catch (_) {
+      return
+    }
+
+    if (
+      typeof options.depthLimit !== 'undefined' &&
+      depth > options.depthLimit
+    ) {
+      setReplace(LIMIT_REPLACE_NODE, val, k, parent)
+      return
+    }
+
+    if (
+      typeof options.edgesLimit !== 'undefined' &&
+      edgeIndex + 1 > options.edgesLimit
+    ) {
+      setReplace(LIMIT_REPLACE_NODE, val, k, parent)
+      return
+    }
+
+    stack.push(val)
+    // Optimize for Arrays. Big arrays could kill the performance otherwise!
+    if (Array.isArray(val)) {
+      for (i = 0; i < val.length; i++) {
+        deterministicDecirc(val[i], i, i, stack, val, depth, options)
+      }
+    } else {
+      // Create a temporary object in the required way
+      var tmp = {}
+      var keys = Object.keys(val).sort(compareFunction)
+      for (i = 0; i < keys.length; i++) {
+        var key = keys[i]
+        deterministicDecirc(val[key], key, i, stack, val, depth, options)
+        tmp[key] = val[key]
+      }
+      if (typeof parent !== 'undefined') {
+        arr.push([parent, k, val])
+        parent[k] = tmp
+      } else {
+        return tmp
+      }
+    }
+    stack.pop()
+  }
+}
+
+// wraps replacer function to handle values we couldn't replace
+// and mark them as replaced value
+function replaceGetterValues (replacer) {
+  replacer =
+    typeof replacer !== 'undefined'
+      ? replacer
+      : function (k, v) {
+        return v
+      }
+  return function (key, val) {
+    if (replacerStack.length > 0) {
+      for (var i = 0; i < replacerStack.length; i++) {
+        var part = replacerStack[i]
+        if (part[1] === key && part[0] === val) {
+          val = part[2]
+          replacerStack.splice(i, 1)
+          break
+        }
+      }
+    }
+    return replacer.call(this, key, val)
+  }
+}
+
+
+/***/ }),
+
+/***/ 8671:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = clone
+
+var getPrototypeOf = Object.getPrototypeOf || function (obj) {
+  return obj.__proto__
+}
+
+function clone (obj) {
+  if (obj === null || typeof obj !== 'object')
+    return obj
+
+  if (obj instanceof Object)
+    var copy = { __proto__: getPrototypeOf(obj) }
+  else
+    var copy = Object.create(null)
+
+  Object.getOwnPropertyNames(obj).forEach(function (key) {
+    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
+  })
+
+  return copy
+}
+
+
+/***/ }),
+
+/***/ 1242:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var fs = __nccwpck_require__(7147)
+var polyfills = __nccwpck_require__(8421)
+var legacy = __nccwpck_require__(8922)
+var clone = __nccwpck_require__(8671)
+
+var util = __nccwpck_require__(3837)
+
+/* istanbul ignore next - node 0.x polyfill */
+var gracefulQueue
+var previousSymbol
+
+/* istanbul ignore else - node 0.x polyfill */
+if (typeof Symbol === 'function' && typeof Symbol.for === 'function') {
+  gracefulQueue = Symbol.for('graceful-fs.queue')
+  // This is used in testing by future versions
+  previousSymbol = Symbol.for('graceful-fs.previous')
+} else {
+  gracefulQueue = '___graceful-fs.queue'
+  previousSymbol = '___graceful-fs.previous'
+}
+
+function noop () {}
+
+function publishQueue(context, queue) {
+  Object.defineProperty(context, gracefulQueue, {
+    get: function() {
+      return queue
+    }
+  })
+}
+
+var debug = noop
+if (util.debuglog)
+  debug = util.debuglog('gfs4')
+else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
+  debug = function() {
+    var m = util.format.apply(util, arguments)
+    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ')
+    console.error(m)
+  }
+
+// Once time initialization
+if (!fs[gracefulQueue]) {
+  // This queue can be shared by multiple loaded instances
+  var queue = global[gracefulQueue] || []
+  publishQueue(fs, queue)
+
+  // Patch fs.close/closeSync to shared queue version, because we need
+  // to retry() whenever a close happens *anywhere* in the program.
+  // This is essential when multiple graceful-fs instances are
+  // in play at the same time.
+  fs.close = (function (fs$close) {
+    function close (fd, cb) {
+      return fs$close.call(fs, fd, function (err) {
+        // This function uses the graceful-fs shared queue
+        if (!err) {
+          resetQueue()
+        }
+
+        if (typeof cb === 'function')
+          cb.apply(this, arguments)
+      })
+    }
+
+    Object.defineProperty(close, previousSymbol, {
+      value: fs$close
+    })
+    return close
+  })(fs.close)
+
+  fs.closeSync = (function (fs$closeSync) {
+    function closeSync (fd) {
+      // This function uses the graceful-fs shared queue
+      fs$closeSync.apply(fs, arguments)
+      resetQueue()
+    }
+
+    Object.defineProperty(closeSync, previousSymbol, {
+      value: fs$closeSync
+    })
+    return closeSync
+  })(fs.closeSync)
+
+  if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
+    process.on('exit', function() {
+      debug(fs[gracefulQueue])
+      __nccwpck_require__(9491).equal(fs[gracefulQueue].length, 0)
+    })
+  }
+}
+
+if (!global[gracefulQueue]) {
+  publishQueue(global, fs[gracefulQueue]);
+}
+
+module.exports = patch(clone(fs))
+if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs.__patched) {
+    module.exports = patch(fs)
+    fs.__patched = true;
+}
+
+function patch (fs) {
+  // Everything that references the open() function needs to be in here
+  polyfills(fs)
+  fs.gracefulify = patch
+
+  fs.createReadStream = createReadStream
+  fs.createWriteStream = createWriteStream
+  var fs$readFile = fs.readFile
+  fs.readFile = readFile
+  function readFile (path, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$readFile(path, options, cb)
+
+    function go$readFile (path, options, cb, startTime) {
+      return fs$readFile(path, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$readFile, [path, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$writeFile = fs.writeFile
+  fs.writeFile = writeFile
+  function writeFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$writeFile(path, data, options, cb)
+
+    function go$writeFile (path, data, options, cb, startTime) {
+      return fs$writeFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$writeFile, [path, data, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$appendFile = fs.appendFile
+  if (fs$appendFile)
+    fs.appendFile = appendFile
+  function appendFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$appendFile(path, data, options, cb)
+
+    function go$appendFile (path, data, options, cb, startTime) {
+      return fs$appendFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$appendFile, [path, data, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$copyFile = fs.copyFile
+  if (fs$copyFile)
+    fs.copyFile = copyFile
+  function copyFile (src, dest, flags, cb) {
+    if (typeof flags === 'function') {
+      cb = flags
+      flags = 0
+    }
+    return go$copyFile(src, dest, flags, cb)
+
+    function go$copyFile (src, dest, flags, cb, startTime) {
+      return fs$copyFile(src, dest, flags, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$copyFile, [src, dest, flags, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$readdir = fs.readdir
+  fs.readdir = readdir
+  var noReaddirOptionVersions = /^v[0-5]\./
+  function readdir (path, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    var go$readdir = noReaddirOptionVersions.test(process.version)
+      ? function go$readdir (path, options, cb, startTime) {
+        return fs$readdir(path, fs$readdirCallback(
+          path, options, cb, startTime
+        ))
+      }
+      : function go$readdir (path, options, cb, startTime) {
+        return fs$readdir(path, options, fs$readdirCallback(
+          path, options, cb, startTime
+        ))
+      }
+
+    return go$readdir(path, options, cb)
+
+    function fs$readdirCallback (path, options, cb, startTime) {
+      return function (err, files) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([
+            go$readdir,
+            [path, options, cb],
+            err,
+            startTime || Date.now(),
+            Date.now()
+          ])
+        else {
+          if (files && files.sort)
+            files.sort()
+
+          if (typeof cb === 'function')
+            cb.call(this, err, files)
+        }
+      }
+    }
+  }
+
+  if (process.version.substr(0, 4) === 'v0.8') {
+    var legStreams = legacy(fs)
+    ReadStream = legStreams.ReadStream
+    WriteStream = legStreams.WriteStream
+  }
+
+  var fs$ReadStream = fs.ReadStream
+  if (fs$ReadStream) {
+    ReadStream.prototype = Object.create(fs$ReadStream.prototype)
+    ReadStream.prototype.open = ReadStream$open
+  }
+
+  var fs$WriteStream = fs.WriteStream
+  if (fs$WriteStream) {
+    WriteStream.prototype = Object.create(fs$WriteStream.prototype)
+    WriteStream.prototype.open = WriteStream$open
+  }
+
+  Object.defineProperty(fs, 'ReadStream', {
+    get: function () {
+      return ReadStream
+    },
+    set: function (val) {
+      ReadStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+  Object.defineProperty(fs, 'WriteStream', {
+    get: function () {
+      return WriteStream
+    },
+    set: function (val) {
+      WriteStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+
+  // legacy names
+  var FileReadStream = ReadStream
+  Object.defineProperty(fs, 'FileReadStream', {
+    get: function () {
+      return FileReadStream
+    },
+    set: function (val) {
+      FileReadStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+  var FileWriteStream = WriteStream
+  Object.defineProperty(fs, 'FileWriteStream', {
+    get: function () {
+      return FileWriteStream
+    },
+    set: function (val) {
+      FileWriteStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+
+  function ReadStream (path, options) {
+    if (this instanceof ReadStream)
+      return fs$ReadStream.apply(this, arguments), this
+    else
+      return ReadStream.apply(Object.create(ReadStream.prototype), arguments)
+  }
+
+  function ReadStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        if (that.autoClose)
+          that.destroy()
+
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+        that.read()
+      }
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (this instanceof WriteStream)
+      return fs$WriteStream.apply(this, arguments), this
+    else
+      return WriteStream.apply(Object.create(WriteStream.prototype), arguments)
+  }
+
+  function WriteStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        that.destroy()
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+      }
+    })
+  }
+
+  function createReadStream (path, options) {
+    return new fs.ReadStream(path, options)
+  }
+
+  function createWriteStream (path, options) {
+    return new fs.WriteStream(path, options)
+  }
+
+  var fs$open = fs.open
+  fs.open = open
+  function open (path, flags, mode, cb) {
+    if (typeof mode === 'function')
+      cb = mode, mode = null
+
+    return go$open(path, flags, mode, cb)
+
+    function go$open (path, flags, mode, cb, startTime) {
+      return fs$open(path, flags, mode, function (err, fd) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$open, [path, flags, mode, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  return fs
+}
+
+function enqueue (elem) {
+  debug('ENQUEUE', elem[0].name, elem[1])
+  fs[gracefulQueue].push(elem)
+  retry()
+}
+
+// keep track of the timeout between retry() calls
+var retryTimer
+
+// reset the startTime and lastTime to now
+// this resets the start of the 60 second overall timeout as well as the
+// delay between attempts so that we'll retry these jobs sooner
+function resetQueue () {
+  var now = Date.now()
+  for (var i = 0; i < fs[gracefulQueue].length; ++i) {
+    // entries that are only a length of 2 are from an older version, don't
+    // bother modifying those since they'll be retried anyway.
+    if (fs[gracefulQueue][i].length > 2) {
+      fs[gracefulQueue][i][3] = now // startTime
+      fs[gracefulQueue][i][4] = now // lastTime
+    }
+  }
+  // call retry to make sure we're actively processing the queue
+  retry()
+}
+
+function retry () {
+  // clear the timer and remove it to help prevent unintended concurrency
+  clearTimeout(retryTimer)
+  retryTimer = undefined
+
+  if (fs[gracefulQueue].length === 0)
+    return
+
+  var elem = fs[gracefulQueue].shift()
+  var fn = elem[0]
+  var args = elem[1]
+  // these items may be unset if they were added by an older graceful-fs
+  var err = elem[2]
+  var startTime = elem[3]
+  var lastTime = elem[4]
+
+  // if we don't have a startTime we have no way of knowing if we've waited
+  // long enough, so go ahead and retry this item now
+  if (startTime === undefined) {
+    debug('RETRY', fn.name, args)
+    fn.apply(null, args)
+  } else if (Date.now() - startTime >= 60000) {
+    // it's been more than 60 seconds total, bail now
+    debug('TIMEOUT', fn.name, args)
+    var cb = args.pop()
+    if (typeof cb === 'function')
+      cb.call(null, err)
+  } else {
+    // the amount of time between the last attempt and right now
+    var sinceAttempt = Date.now() - lastTime
+    // the amount of time between when we first tried, and when we last tried
+    // rounded up to at least 1
+    var sinceStart = Math.max(lastTime - startTime, 1)
+    // backoff. wait longer than the total time we've been retrying, but only
+    // up to a maximum of 100ms
+    var desiredDelay = Math.min(sinceStart * 1.2, 100)
+    // it's been long enough since the last retry, do it again
+    if (sinceAttempt >= desiredDelay) {
+      debug('RETRY', fn.name, args)
+      fn.apply(null, args.concat([startTime]))
+    } else {
+      // if we can't do this job yet, push it to the end of the queue
+      // and let the next iteration check again
+      fs[gracefulQueue].push(elem)
+    }
+  }
+
+  // schedule our next run if one isn't already scheduled
+  if (retryTimer === undefined) {
+    retryTimer = setTimeout(retry, 0)
+  }
+}
+
+
+/***/ }),
+
+/***/ 8922:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var Stream = (__nccwpck_require__(2781).Stream)
+
+module.exports = legacy
+
+function legacy (fs) {
+  return {
+    ReadStream: ReadStream,
+    WriteStream: WriteStream
+  }
+
+  function ReadStream (path, options) {
+    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
+
+    Stream.call(this);
+
+    var self = this;
+
+    this.path = path;
+    this.fd = null;
+    this.readable = true;
+    this.paused = false;
+
+    this.flags = 'r';
+    this.mode = 438; /*=0666*/
+    this.bufferSize = 64 * 1024;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.encoding) this.setEncoding(this.encoding);
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.end === undefined) {
+        this.end = Infinity;
+      } else if ('number' !== typeof this.end) {
+        throw TypeError('end must be a Number');
+      }
+
+      if (this.start > this.end) {
+        throw new Error('start must be <= end');
+      }
+
+      this.pos = this.start;
+    }
+
+    if (this.fd !== null) {
+      process.nextTick(function() {
+        self._read();
+      });
+      return;
+    }
+
+    fs.open(this.path, this.flags, this.mode, function (err, fd) {
+      if (err) {
+        self.emit('error', err);
+        self.readable = false;
+        return;
+      }
+
+      self.fd = fd;
+      self.emit('open', fd);
+      self._read();
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
+
+    Stream.call(this);
+
+    this.path = path;
+    this.fd = null;
+    this.writable = true;
+
+    this.flags = 'w';
+    this.encoding = 'binary';
+    this.mode = 438; /*=0666*/
+    this.bytesWritten = 0;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.start < 0) {
+        throw new Error('start must be >= zero');
+      }
+
+      this.pos = this.start;
+    }
+
+    this.busy = false;
+    this._queue = [];
+
+    if (this.fd === null) {
+      this._open = fs.open;
+      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
+      this.flush();
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ 8421:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var constants = __nccwpck_require__(2057)
+
+var origCwd = process.cwd
+var cwd = null
+
+var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform
+
+process.cwd = function() {
+  if (!cwd)
+    cwd = origCwd.call(process)
+  return cwd
+}
+try {
+  process.cwd()
+} catch (er) {}
+
+// This check is needed until node.js 12 is required
+if (typeof process.chdir === 'function') {
+  var chdir = process.chdir
+  process.chdir = function (d) {
+    cwd = null
+    chdir.call(process, d)
+  }
+  if (Object.setPrototypeOf) Object.setPrototypeOf(process.chdir, chdir)
+}
+
+module.exports = patch
+
+function patch (fs) {
+  // (re-)implement some things that are known busted or missing.
+
+  // lchmod, broken prior to 0.6.2
+  // back-port the fix here.
+  if (constants.hasOwnProperty('O_SYMLINK') &&
+      process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
+    patchLchmod(fs)
+  }
+
+  // lutimes implementation, or no-op
+  if (!fs.lutimes) {
+    patchLutimes(fs)
+  }
+
+  // https://github.com/isaacs/node-graceful-fs/issues/4
+  // Chown should not fail on einval or eperm if non-root.
+  // It should not fail on enosys ever, as this just indicates
+  // that a fs doesn't support the intended operation.
+
+  fs.chown = chownFix(fs.chown)
+  fs.fchown = chownFix(fs.fchown)
+  fs.lchown = chownFix(fs.lchown)
+
+  fs.chmod = chmodFix(fs.chmod)
+  fs.fchmod = chmodFix(fs.fchmod)
+  fs.lchmod = chmodFix(fs.lchmod)
+
+  fs.chownSync = chownFixSync(fs.chownSync)
+  fs.fchownSync = chownFixSync(fs.fchownSync)
+  fs.lchownSync = chownFixSync(fs.lchownSync)
+
+  fs.chmodSync = chmodFixSync(fs.chmodSync)
+  fs.fchmodSync = chmodFixSync(fs.fchmodSync)
+  fs.lchmodSync = chmodFixSync(fs.lchmodSync)
+
+  fs.stat = statFix(fs.stat)
+  fs.fstat = statFix(fs.fstat)
+  fs.lstat = statFix(fs.lstat)
+
+  fs.statSync = statFixSync(fs.statSync)
+  fs.fstatSync = statFixSync(fs.fstatSync)
+  fs.lstatSync = statFixSync(fs.lstatSync)
+
+  // if lchmod/lchown do not exist, then make them no-ops
+  if (fs.chmod && !fs.lchmod) {
+    fs.lchmod = function (path, mode, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchmodSync = function () {}
+  }
+  if (fs.chown && !fs.lchown) {
+    fs.lchown = function (path, uid, gid, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchownSync = function () {}
+  }
+
+  // on Windows, A/V software can lock the directory, causing this
+  // to fail with an EACCES or EPERM if the directory contains newly
+  // created files.  Try again on failure, for up to 60 seconds.
+
+  // Set the timeout this long because some Windows Anti-Virus, such as Parity
+  // bit9, may lock files for up to a minute, causing npm package install
+  // failures. Also, take care to yield the scheduler. Windows scheduling gives
+  // CPU to a busy looping process, which can cause the program causing the lock
+  // contention to be starved of CPU by node, so the contention doesn't resolve.
+  if (platform === "win32") {
+    fs.rename = typeof fs.rename !== 'function' ? fs.rename
+    : (function (fs$rename) {
+      function rename (from, to, cb) {
+        var start = Date.now()
+        var backoff = 0;
+        fs$rename(from, to, function CB (er) {
+          if (er
+              && (er.code === "EACCES" || er.code === "EPERM")
+              && Date.now() - start < 60000) {
+            setTimeout(function() {
+              fs.stat(to, function (stater, st) {
+                if (stater && stater.code === "ENOENT")
+                  fs$rename(from, to, CB);
+                else
+                  cb(er)
+              })
+            }, backoff)
+            if (backoff < 100)
+              backoff += 10;
+            return;
+          }
+          if (cb) cb(er)
+        })
+      }
+      if (Object.setPrototypeOf) Object.setPrototypeOf(rename, fs$rename)
+      return rename
+    })(fs.rename)
+  }
+
+  // if read() returns EAGAIN, then just try it again.
+  fs.read = typeof fs.read !== 'function' ? fs.read
+  : (function (fs$read) {
+    function read (fd, buffer, offset, length, position, callback_) {
+      var callback
+      if (callback_ && typeof callback_ === 'function') {
+        var eagCounter = 0
+        callback = function (er, _, __) {
+          if (er && er.code === 'EAGAIN' && eagCounter < 10) {
+            eagCounter ++
+            return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+          }
+          callback_.apply(this, arguments)
+        }
+      }
+      return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+    }
+
+    // This ensures `util.promisify` works as it does for native `fs.read`.
+    if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read)
+    return read
+  })(fs.read)
+
+  fs.readSync = typeof fs.readSync !== 'function' ? fs.readSync
+  : (function (fs$readSync) { return function (fd, buffer, offset, length, position) {
+    var eagCounter = 0
+    while (true) {
+      try {
+        return fs$readSync.call(fs, fd, buffer, offset, length, position)
+      } catch (er) {
+        if (er.code === 'EAGAIN' && eagCounter < 10) {
+          eagCounter ++
+          continue
+        }
+        throw er
+      }
+    }
+  }})(fs.readSync)
+
+  function patchLchmod (fs) {
+    fs.lchmod = function (path, mode, callback) {
+      fs.open( path
+             , constants.O_WRONLY | constants.O_SYMLINK
+             , mode
+             , function (err, fd) {
+        if (err) {
+          if (callback) callback(err)
+          return
+        }
+        // prefer to return the chmod error, if one occurs,
+        // but still try to close, and report closing errors if they occur.
+        fs.fchmod(fd, mode, function (err) {
+          fs.close(fd, function(err2) {
+            if (callback) callback(err || err2)
+          })
+        })
+      })
+    }
+
+    fs.lchmodSync = function (path, mode) {
+      var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode)
+
+      // prefer to return the chmod error, if one occurs,
+      // but still try to close, and report closing errors if they occur.
+      var threw = true
+      var ret
+      try {
+        ret = fs.fchmodSync(fd, mode)
+        threw = false
+      } finally {
+        if (threw) {
+          try {
+            fs.closeSync(fd)
+          } catch (er) {}
+        } else {
+          fs.closeSync(fd)
+        }
+      }
+      return ret
+    }
+  }
+
+  function patchLutimes (fs) {
+    if (constants.hasOwnProperty("O_SYMLINK") && fs.futimes) {
+      fs.lutimes = function (path, at, mt, cb) {
+        fs.open(path, constants.O_SYMLINK, function (er, fd) {
+          if (er) {
+            if (cb) cb(er)
+            return
+          }
+          fs.futimes(fd, at, mt, function (er) {
+            fs.close(fd, function (er2) {
+              if (cb) cb(er || er2)
+            })
+          })
+        })
+      }
+
+      fs.lutimesSync = function (path, at, mt) {
+        var fd = fs.openSync(path, constants.O_SYMLINK)
+        var ret
+        var threw = true
+        try {
+          ret = fs.futimesSync(fd, at, mt)
+          threw = false
+        } finally {
+          if (threw) {
+            try {
+              fs.closeSync(fd)
+            } catch (er) {}
+          } else {
+            fs.closeSync(fd)
+          }
+        }
+        return ret
+      }
+
+    } else if (fs.futimes) {
+      fs.lutimes = function (_a, _b, _c, cb) { if (cb) process.nextTick(cb) }
+      fs.lutimesSync = function () {}
+    }
+  }
+
+  function chmodFix (orig) {
+    if (!orig) return orig
+    return function (target, mode, cb) {
+      return orig.call(fs, target, mode, function (er) {
+        if (chownErOk(er)) er = null
+        if (cb) cb.apply(this, arguments)
+      })
+    }
+  }
+
+  function chmodFixSync (orig) {
+    if (!orig) return orig
+    return function (target, mode) {
+      try {
+        return orig.call(fs, target, mode)
+      } catch (er) {
+        if (!chownErOk(er)) throw er
+      }
+    }
+  }
+
+
+  function chownFix (orig) {
+    if (!orig) return orig
+    return function (target, uid, gid, cb) {
+      return orig.call(fs, target, uid, gid, function (er) {
+        if (chownErOk(er)) er = null
+        if (cb) cb.apply(this, arguments)
+      })
+    }
+  }
+
+  function chownFixSync (orig) {
+    if (!orig) return orig
+    return function (target, uid, gid) {
+      try {
+        return orig.call(fs, target, uid, gid)
+      } catch (er) {
+        if (!chownErOk(er)) throw er
+      }
+    }
+  }
+
+  function statFix (orig) {
+    if (!orig) return orig
+    // Older versions of Node erroneously returned signed integers for
+    // uid + gid.
+    return function (target, options, cb) {
+      if (typeof options === 'function') {
+        cb = options
+        options = null
+      }
+      function callback (er, stats) {
+        if (stats) {
+          if (stats.uid < 0) stats.uid += 0x100000000
+          if (stats.gid < 0) stats.gid += 0x100000000
+        }
+        if (cb) cb.apply(this, arguments)
+      }
+      return options ? orig.call(fs, target, options, callback)
+        : orig.call(fs, target, callback)
+    }
+  }
+
+  function statFixSync (orig) {
+    if (!orig) return orig
+    // Older versions of Node erroneously returned signed integers for
+    // uid + gid.
+    return function (target, options) {
+      var stats = options ? orig.call(fs, target, options)
+        : orig.call(fs, target)
+      if (stats) {
+        if (stats.uid < 0) stats.uid += 0x100000000
+        if (stats.gid < 0) stats.gid += 0x100000000
+      }
+      return stats;
+    }
+  }
+
+  // ENOSYS means that the fs doesn't support the op. Just ignore
+  // that, because it doesn't matter.
+  //
+  // if there's no getuid, or if getuid() is something other
+  // than 0, and the error is EINVAL or EPERM, then just ignore
+  // it.
+  //
+  // This specific case is a silent failure in cp, install, tar,
+  // and most other unix tools that manage permissions.
+  //
+  // When running as root, or if other types of errors are
+  // encountered, then it's strict.
+  function chownErOk (er) {
+    if (!er)
+      return true
+
+    if (er.code === "ENOSYS")
+      return true
+
+    var nonroot = !process.getuid || process.getuid() !== 0
+    if (nonroot) {
+      if (er.code === "EINVAL" || er.code === "EPERM")
+        return true
+    }
+
+    return false
+  }
+}
+
+
+/***/ }),
+
+/***/ 868:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function isArrayish(obj) {
+	if (!obj) {
+		return false;
+	}
+
+	return obj instanceof Array || Array.isArray(obj) ||
+		(obj.length >= 0 && obj.splice instanceof Function);
+};
+
+
+/***/ }),
+
+/***/ 9214:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = parseJson
+function parseJson (txt, reviver, context) {
+  context = context || 20
+  try {
+    return JSON.parse(txt, reviver)
+  } catch (e) {
+    if (typeof txt !== 'string') {
+      const isEmptyArray = Array.isArray(txt) && txt.length === 0
+      const errorMessage = 'Cannot parse ' +
+      (isEmptyArray ? 'an empty array' : String(txt))
+      throw new TypeError(errorMessage)
+    }
+    const syntaxErr = e.message.match(/^Unexpected token.*position\s+(\d+)/i)
+    const errIdx = syntaxErr
+    ? +syntaxErr[1]
+    : e.message.match(/^Unexpected end of JSON.*/i)
+    ? txt.length - 1
+    : null
+    if (errIdx != null) {
+      const start = errIdx <= context
+      ? 0
+      : errIdx - context
+      const end = errIdx + context >= txt.length
+      ? txt.length
+      : errIdx + context
+      e.message += ` while parsing near '${
+        start === 0 ? '' : '...'
+      }${txt.slice(start, end)}${
+        end === txt.length ? '' : '...'
+      }'`
+    } else {
+      e.message += ` while parsing '${txt.slice(0, context * 2)}'`
+    }
+    throw e
+  }
+}
+
+
+/***/ }),
+
+/***/ 7350:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var jsonc = (__nccwpck_require__(9888).jsonc);
+module.exports = jsonc;
+// adding circular ref to allow easy importing in both ES5/6 and TS projects
+module.exports.jsonc = jsonc;
+module.exports.safe = jsonc.safe;
+
+/***/ }),
+
+/***/ 1630:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// dep modules
+var fast_safe_stringify_1 = __nccwpck_require__(6584);
+var fs = __nccwpck_require__(1242);
+var mkdirp = __nccwpck_require__(6945);
+// vars
+var oproto = Object.prototype;
+// simple promisification. this won't work for callbacks with more than 2
+// args.
+function promisify(fn) {
+    return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return new Promise(function (resolve, reject) {
+            fn.apply(void 0, args.concat([function (err, result) {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve(result);
+                    }
+                }]));
+        });
+    };
+}
+var defaultStringifyOpts = {
+    replacer: null,
+    space: 0,
+    handleCircular: true
+};
+var helper = {
+    isObject: function (o) {
+        return oproto.toString.call(o) === '[object Object]';
+    },
+    isPrimitive: function (value) {
+        var t = typeof value;
+        return value === null
+            || value === undefined
+            || (t !== 'function' && t !== 'object');
+    },
+    strLog: function (value, pretty) {
+        if (helper.isPrimitive(value))
+            return value;
+        var s = pretty ? '  ' : null;
+        return fast_safe_stringify_1.default(value, null, s);
+    },
+    getLogger: function (config, pretty) {
+        return function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            var stream = config.stream;
+            var msg = args.map(function (arg) {
+                if (arg instanceof Error) {
+                    stream = config.streamErr;
+                    return arg.stack
+                        /* istanbul ignore next */
+                        || arg.message
+                        /* istanbul ignore next */
+                        || String(arg);
+                }
+                return helper.strLog(arg, pretty);
+            }).join(' ');
+            stream.write(msg + '\n');
+        };
+    },
+    getStringifyOptions: function (options, space) {
+        if (helper.isObject(options)) {
+            return __assign({}, defaultStringifyOpts, options); // as IStringifyOptions
+        }
+        if (typeof options === 'function' || Array.isArray(options)) {
+            return __assign({}, defaultStringifyOpts, { replacer: options, space: space });
+        }
+        return __assign({}, defaultStringifyOpts, { space: space });
+    },
+    fs: fs,
+    mkdirp: mkdirp,
+    promise: {
+        readFile: promisify(fs.readFile),
+        writeFile: promisify(fs.writeFile),
+        mkdirp: promisify(mkdirp)
+    },
+    safeSync: function (fn) {
+        return function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            try {
+                return [null, fn.apply(void 0, args)];
+            }
+            catch (err) {
+                return [err, undefined];
+            }
+        };
+    },
+    safeAsync: function (promise) {
+        return promise
+            .then(function (data) { return [null, data]; })
+            .catch(function (err) { return [err, undefined]; });
+    }
+};
+exports.helper = helper;
+
+
+/***/ }),
+
+/***/ 9888:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+/* tslint:disable:class-name no-require-imports no-default-export max-line-length interface-name max-classes-per-file max-file-line-count */
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// core modules
+var path = __nccwpck_require__(1017);
+// dep modules
+var fast_safe_stringify_1 = __nccwpck_require__(6584);
+var parseJson = __nccwpck_require__(3931);
+var stripBOM = __nccwpck_require__(3410);
+var stripJsonComments = __nccwpck_require__(6642);
+// own modules
+var helper_1 = __nccwpck_require__(1630);
+var jsonc_safe_1 = __nccwpck_require__(1479);
+// constants, variables
+var fs = helper_1.helper.fs, mkdirp = helper_1.helper.mkdirp, promise = helper_1.helper.promise;
+/**
+ *  JSON utility class that can handle comments and circular references; and
+ *  other extra functionality.
+ *  @class
+ *  @author Onur Yıldırım <onur@cutepilot.com>
+ *  @license MIT
+ *  @see {@link https://github.com/onury/jsonc|GitHub Repo}
+ *  @see {@link https://github.com/onury/jsonc#related-modules|Related Modules}
+ *
+ *  @example
+ *  const jsonc = require('jsonc');
+ *  // or
+ *  import { jsonc } from 'jsonc';
+ *
+ *  const result = jsonc.parse('// comments\n{ "key": "value" }');
+ *  console.log(result); // { key: "value" }
+ */
+var jsonc = /** @class */ (function () {
+    function jsonc() {
+    }
+    /**
+     *  Configures `jsonc` object.
+     *
+     *  @param {IConfig} cfg - Configurations.
+     *  @param {NodeJS.WriteStream} [stream] - Stream to write logs to. This is
+     *  used with `.log()` and `.logp()` methods.
+     *  @param {NodeJS.WriteStream} [streamErr] - Stream to write error logs to.
+     *  This is used with `.log()` and `.logp()` methods.
+     *
+     *  @example
+     *  // Output logs to stdout but logs containing errors to a file.
+     *  jsonc.config({
+     *      stream: process.stdout,
+     *      streamErr: fs.createWriteStream('path/to/log.txt')
+     *  });
+     *  jsonc.log({ info: 'this is logged to console' });
+     *  jsonc.log(new Error('this is logged to file'));
+     */
+    jsonc.config = function (cfg) {
+        var conf = __assign({ stream: process.stdout, streamErr: process.stderr }, (cfg || {}));
+        jsonc._ = {
+            logger: helper_1.helper.getLogger(conf, false),
+            prettyLogger: helper_1.helper.getLogger(conf, true)
+        };
+    };
+    /**
+     *  Stringifies and logs the given arguments to console. This will
+     *  automatically handle circular references; so it won't throw.
+     *
+     *  If an `Error` instance is passed, it will log the `.stack` property on
+     *  the instance, without stringifying the object.
+     *
+     *  @param {...any[]} [args] - Arguments to be logged.
+     *  @returns {void}
+     */
+    jsonc.log = function () {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = jsonc._).logger.apply(_a, args);
+    };
+    /**
+     *  Pretty version of `log()` method. Stringifies and logs the given
+     *  arguments to console, with indents. This will automatically handle
+     *  circular references; so it won't throw.
+     *
+     *  If an `Error` instance is passed, it will log the `.stack` property on
+     *  the instance, without stringifying the object.
+     *
+     *  @param {...any[]} [args] - Arguments to be logged.
+     *  @returns {void}
+     */
+    jsonc.logp = function () {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = jsonc._).prettyLogger.apply(_a, args);
+    };
+    /**
+     *  Parses the given JSON string into a JavaScript object. The input string
+     *  can include comments.
+     *
+     *  @param {string} str - JSON string to be parsed.
+     *  @param {IParseOptions|Reviver} [options] - Either a parse options
+     *  object or a reviver function.
+     *  @param {Reviver} [options.reviver] - A function that can filter
+     *  and transform the results. It receives each of the keys and values, and
+     *  its return value is used instead of the original value. If it returns
+     *  what it received, then the structure is not modified. If it returns
+     *  `undefined` then the member is deleted.
+     *  @param {Boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will throw if this is set to
+     *  `false` and the string includes comments.
+     *
+     *  @returns {any} - Parsed value.
+     *
+     *  @throws {JSONError} - If JSON string is not valid. Note that any
+     *  comments within JSON are removed by default; so this will not throw for
+     *  comments unless you explicitly set `stripComments` to `false`.
+     *
+     *  @example
+     *  const parsed = jsonc.parse('// comments\n{"success":true}\n');
+     *  console.log(parsed); // { success: true }
+     */
+    jsonc.parse = function (str, options) {
+        var opts = typeof options === 'function'
+            ? { reviver: options }
+            : (options || {});
+        if (opts.stripComments !== false)
+            str = stripJsonComments(str, { whitespace: false });
+        return parseJson(str, opts.reviver);
+    };
+    /**
+     *  Outputs a JSON string from the given JavaScript object.
+     *
+     *  @param {*} value - JavaScript value to be stringified.
+     *  @param {IStringifyOptions|Replacer} [options] - Stringify options or a
+     *  replacer.
+     *  @param {Replacer} [options.replacer] - Determines how object values are
+     *  stringified for objects. It can be a function or an array of strings or
+     *  numbers.
+     *  @param {string|number} [options.space] - Specifies the indentation of
+     *  nested structures. If it is omitted, the text will be packed without
+     *  extra whitespace. If it is a number, it will specify the number of
+     *  spaces to indent at each level. If it is a string (such as `"\t"` or
+     *  `"&nbsp;"`), it contains the characters used to indent at each level.
+     *  @param {string|number} [space] - This takes effect if second argument is
+     *  the `replacer` or a falsy value. This is for supporting the signature of
+     *  native `JSON.stringify()` method.
+     *  @param {boolean} [options.handleCircular=true] - Whether to handle
+     *  circular references (if any) by replacing their values with the string
+     *  `"[Circular]"`. You can also use a replacer function to replace or
+     *  remove circular references instead.
+     *
+     *  @returns {string} - JSON string.
+     *
+     *  @throws {Error} - If there are any circular references within the
+     *  original input. In this case, use `jsonc.safe.stringify()` method
+     *  instead.
+     *
+     *  @example
+     *  const obj = { key: 'value' };
+     *  console.log(jsonc.stringify(obj)); // '{"key":"value"}'
+     *
+     *  // pretty output with indents
+     *  let pretty = jsonc.stringify(obj, null, 2);
+     *  // equivalent to:
+     *  pretty = jsonc.stringify(obj, { reviver: null, space: 2 });
+     *  if (!err) console.log(pretty);
+     *  // {
+     *  //   "key": "value"
+     *  // }
+     */
+    jsonc.stringify = function (value, optionsOrReplacer, space) {
+        var opts = helper_1.helper.getStringifyOptions(optionsOrReplacer, space);
+        return opts.handleCircular
+            ? fast_safe_stringify_1.default(value, opts.replacer, opts.space)
+            : JSON.stringify(value, opts.replacer, opts.space);
+    };
+    /**
+     *  Specifies whether the given string has well-formed JSON structure.
+     *
+     *  Note that, not all JSON-parsable strings are considered well-formed JSON
+     *  structures. JSON is built on two structures; a collection of name/value
+     *  pairs (object) or an ordered list of values (array).
+     *
+     *  For example, `JSON.parse('true')` will parse successfully but
+     *  `jsonc.isJSON('true')` will return `false` since it has no object or
+     *  array structure.
+     *
+     *  @param {string} str - String to be validated.
+     *  @param {boolean} [allowComments=false] - Whether comments should be
+     *  considered valid.
+     *
+     *  @returns {boolean}
+     *
+     *  @example
+     *  jsonc.isJSON('{"x":1}');            // true
+     *  jsonc.isJSON('true');               // false
+     *  jsonc.isJSON('[1, false, null]');   // true
+     *  jsonc.isJSON('string');             // false
+     *  jsonc.isJSON('null');               // false
+     */
+    jsonc.isJSON = function (str, allowComments) {
+        if (allowComments === void 0) { allowComments = false; }
+        if (typeof str !== 'string')
+            return false;
+        var _a = jsonc.safe.parse(str, { stripComments: allowComments }), err = _a[0], result = _a[1];
+        return !err && (helper_1.helper.isObject(result) || Array.isArray(result));
+    };
+    /**
+     *  Strips comments from the given JSON string.
+     *
+     *  @param {string} str - JSON string.
+     *  @param {boolean} [whitespace=false] - Whether to replace comments with
+     *  whitespace instead of stripping them entirely.
+     *
+     *  @returns {string} - Valid JSON string.
+     *
+     *  @example
+     *  const str = jsonc.stripComments('// comments\n{"key":"value"}');
+     *  console.log(str); // '\n{"key":"value"}'
+     */
+    jsonc.stripComments = function (str, whitespace) {
+        if (whitespace === void 0) { whitespace = false; }
+        return stripJsonComments(str, { whitespace: whitespace });
+    };
+    /**
+     *  Uglifies the given JSON string.
+     *
+     *  @param {string} str - JSON string to be uglified.
+     *  @returns {string} - Uglified JSON string.
+     *
+     *  @example
+     *  const pretty = `
+     *  {
+     *    // comments...
+     *    "key": "value"
+     *  }
+     *  `;
+     *  const ugly = jsonc.uglify(pretty);
+     *  console.log(ugly); // '{"key":"value"}'
+     */
+    jsonc.uglify = function (str) {
+        return jsonc.stringify(jsonc.parse(str, { stripComments: true }));
+    };
+    /**
+     *  Beautifies the given JSON string. Note that this will remove comments,
+     *  if any.
+     *
+     *  @param {string} str - JSON string to be beautified.
+     *  @param {string|number} [space=2] Specifies the indentation of nested
+     *  structures. If it is omitted, the text will be packed without extra
+     *  whitespace. If it is a number, it will specify the number of spaces to
+     *  indent at each level. If it is a string (such as "\t" or "&nbsp;"), it
+     *  contains the characters used to indent at each level.
+     *
+     *  @returns {string} - Beautified JSON string.
+     *
+     *  @example
+     *  const ugly = '{"key":"value"}';
+     *  const pretty = jsonc.beautify(ugly);
+     *  console.log(pretty);
+     *  // {
+     *  //   "key": "value"
+     *  // }
+     */
+    jsonc.beautify = function (str, space) {
+        if (space === void 0) { space = 2; }
+        if (!space)
+            space = 2;
+        return jsonc.stringify(jsonc.parse(str), { space: space });
+    };
+    /**
+     *  Normalizes the given value by stringifying and parsing it back to a
+     *  Javascript object.
+     *
+     *  @param {any} value
+     *  @param {Replacer} [replacer] - Determines how object values are
+     *  normalized for objects. It can be a function or an array of strings.
+     *
+     *  @returns {any} - Normalized object.
+     *
+     *  @example
+     *  const c = new SomeClass();
+     *  console.log(c.constructor.name); // "SomeClass"
+     *  const normalized = jsonc.normalize(c);
+     *  console.log(normalized.constructor.name); // "Object"
+     */
+    jsonc.normalize = function (value, replacer) {
+        return jsonc.parse(jsonc.stringify(value, { replacer: replacer }));
+    };
+    /**
+     *  Asynchronously reads a JSON file, strips comments and UTF-8 BOM and
+     *  parses the JSON content.
+     *
+     *  @param {string} filePath - Path to JSON file.
+     *  @param {Function|IReadOptions} [options] - Read options.
+     *  @param {Function} [options.reviver] - A function that can filter and
+     *  transform the results. It receives each of the keys and values, and its
+     *  return value is used instead of the original value. If it returns what
+     *  it received, then the structure is not modified. If it returns undefined
+     *  then the member is deleted.
+     *  @param {boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will throw if this is set to
+     *  `false` and the string includes comments.
+     *
+     *  @returns {Promise<any>} - Promise of the parsed JSON content as a
+     *  JavaScript object.
+     *
+     *  @example <caption>Using async/await</caption> (async () => {try {const
+     *  obj = await jsonc.read('path/to/file.json'); console.log(typeof obj); //
+     *  "object"} catch (err) {console.log('Failed to read JSON file');
+     *      }
+     *  })();
+     *
+     *  @example <caption>Using promises</caption>
+     *  jsonc.read('path/to/file.json') .then(obj => {console.log(typeof obj);
+     *  // "object"
+     *      })
+     *      .catch(err => {
+     *          console.log('Failed to read JSON file');
+     *      });
+     */
+    jsonc.read = function (filePath, options) {
+        return __awaiter(this, void 0, void 0, function () {
+            var opts, data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        opts = __assign({ reviver: null, stripComments: true }, (options || {}));
+                        return [4 /*yield*/, promise.readFile(filePath, 'utf8')];
+                    case 1:
+                        data = _a.sent();
+                        if (opts.stripComments !== false)
+                            data = stripJsonComments(data);
+                        return [2 /*return*/, parseJson(stripBOM(data), opts.reviver, filePath)];
+                }
+            });
+        });
+    };
+    /**
+     *  Synchronously reads a JSON file, strips UTF-8 BOM and parses the JSON
+     *  content.
+     *
+     *  @param {string} filePath - Path to JSON file.
+     *  @param {Function|IReadOptions} [options] - Read options.
+     *  @param {Function} [options.reviver] - A function that can filter and
+     *  transform the results. It receives each of the keys and values, and its
+     *  return value is used instead of the original value. If it returns what
+     *  it received, then the structure is not modified. If it returns undefined
+     *  then the member is deleted.
+     *  @param {boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will throw if this is set to
+     *  `false` and the string includes comments.
+     *
+     *  @returns {any} - Parsed JSON content as a JavaScript object.
+     *
+     *  @example
+     *  const obj = jsonc.readSync('path/to/file.json');
+     *  // use try/catch block to handle errors. or better, use the safe version.
+     *  console.log(typeof obj); // "object"
+     */
+    jsonc.readSync = function (filePath, options) {
+        var opts = __assign({ reviver: null, stripComments: true }, (options || {}));
+        var data = fs.readFileSync(filePath, 'utf8');
+        if (opts.stripComments !== false)
+            data = stripJsonComments(data);
+        return parseJson(stripBOM(data), opts.reviver, filePath);
+    };
+    /**
+     *  Asynchronously writes a JSON file from the given JavaScript object.
+     *
+     *  @param {string} filePath - Path to JSON file to be written.
+     *  @param {any} data - Data to be stringified into JSON.
+     *  @param {IWriteOptions} [options] - Write options.
+     *  @param {Replacer} [options.replacer] - Determines how object values are
+     *  stringified for objects. It can be a function or an array of strings.
+     *  @param {string|number} [options.space] - Specifies the indentation of
+     *  nested structures. If it is omitted, the text will be packed without
+     *  extra whitespace. If it is a number, it will specify the number of
+     *  spaces to indent at each level. If it is a string (such as "\t" or
+     *  "&nbsp;"), it contains the characters used to indent at each level.
+     *  @param {number} [options.mode=438] - FileSystem permission mode to be used when
+     *  writing the file. Default is `438` (`0666` in octal).
+     *  @param {boolean} [options.autoPath=true] - Specifies whether to create path
+     *  directories if they don't exist. This will throw if set to `false` and
+     *  path does not exist.
+     *
+     *  @returns {Promise<boolean>} - Always resolves with `true`, if no errors occur.
+     *
+     *  @example <caption>Using async/await</caption>
+     *  (async () => {
+     *      try {
+     *          await jsonc.write('path/to/file.json', data);
+     *          console.log('Successfully wrote JSON file');
+     *      } catch (err) {
+     *          console.log('Failed to write JSON file');
+     *      }
+     *  })();
+     *
+     *  @example <caption>Using promises</caption>
+     *  jsonc.write('path/to/file.json', data)
+     *      .then(success => {
+     *           console.log('Successfully wrote JSON file');
+     *      })
+     *      .catch(err => {
+     *          console.log('Failed to write JSON file');
+     *      });
+     */
+    jsonc.write = function (filePath, data, options) {
+        return __awaiter(this, void 0, void 0, function () {
+            var opts, content;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        opts = __assign({ replacer: null, space: 0, mode: 438, autoPath: true }, (options || {}));
+                        if (!opts.autoPath) return [3 /*break*/, 2];
+                        return [4 /*yield*/, promise.mkdirp(path.dirname(filePath), { fs: fs })];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        content = JSON.stringify(data, opts.replacer, opts.space);
+                        return [4 /*yield*/, promise.writeFile(filePath, content + "\n", {
+                                mode: opts.mode,
+                                encoding: 'utf8'
+                            })];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    /**
+     *  Synchronously writes a JSON file from the given JavaScript object.
+     *
+     *  @param {string} filePath - Path to JSON file to be written.
+     *  @param {any} data - Data to be stringified into JSON.
+     *  @param {IWriteOptions} [options] - Write options.
+     *  @param {Replacer} [options.replacer] - Determines how object values are
+     *  stringified for objects. It can be a function or an array of strings.
+     *  @param {string|number} [options.space] - Specifies the indentation of
+     *  nested structures. If it is omitted, the text will be packed without
+     *  extra whitespace. If it is a number, it will specify the number of
+     *  spaces to indent at each level. If it is a string (such as "\t" or
+     *  "&nbsp;"), it contains the characters used to indent at each level.
+     *  @param {number} [options.mode=438] - FileSystem permission mode to be used when
+     *  writing the file. Default is `438` (`0666` in octal).
+     *  @param {boolean} [options.autoPath=true] - Specifies whether to create path
+     *  directories if they don't exist. This will throw if set to `false` and
+     *  path does not exist.
+     *
+     *  @returns {boolean} - Always returns `true`, if no errors occur.
+     *
+     *  @example
+     *  const success = jsonc.writeSync('path/to/file.json');
+     *  // this will always return true. use try/catch block to handle errors. or better, use the safe version.
+     *  console.log('Successfully wrote JSON file');
+     */
+    jsonc.writeSync = function (filePath, data, options) {
+        var opts = __assign({ replacer: null, space: 0, mode: 438, autoPath: true }, (options || {}));
+        if (opts.autoPath)
+            mkdirp.sync(path.dirname(filePath), { fs: fs });
+        var content = JSON.stringify(data, opts.replacer, opts.space);
+        fs.writeFileSync(filePath, content + "\n", {
+            mode: opts.mode,
+            encoding: 'utf8'
+        });
+        return true;
+    };
+    return jsonc;
+}());
+exports.jsonc = jsonc;
+// default configuration
+jsonc.config(null);
+/* istanbul ignore next */
+(function (jsonc) {
+    jsonc.safe = jsonc_safe_1.jsoncSafe;
+})(jsonc || (jsonc = {}));
+exports.jsonc = jsonc;
+
+
+/***/ }),
+
+/***/ 1479:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+/* tslint:disable:class-name no-require-imports no-default-export max-line-length interface-name max-classes-per-file max-file-line-count */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+// core modules
+// dep modules
+var fast_safe_stringify_1 = __nccwpck_require__(6584);
+var stripJsonComments = __nccwpck_require__(6642);
+// own modules
+var helper_1 = __nccwpck_require__(1630);
+var jsonc_1 = __nccwpck_require__(9888);
+// constants, variables
+var safeSync = helper_1.helper.safeSync, safeAsync = helper_1.helper.safeAsync;
+/**
+ *  Class that provides safe versions of `jsonc` methods. Safe methods provide a
+ *  way to easily handle errors without throwing; so that you don't need to use
+ *  try/catch blocks.
+ *
+ *  Each method (except a few such as `.isJSON`), will return an array with the
+ *  first item being the `Error` instance caught. If successful, second item
+ *  will be the result.
+ *  @name jsonc.safe
+ *  @class
+ *
+ *  @example
+ *  const { safe } = require('jsonc');
+ *  // or
+ *  import { safe as jsonc } from 'jsonc';
+ *
+ *  const [err, result] = jsonc.parse('[invalid JSON}');
+ *  if (err) {
+ *     console.log(`Failed to parse JSON: ${err.message}`);
+ *  } else {
+ *     console.log(result);
+ *  }
+ */
+var jsoncSafe = /** @class */ (function () {
+    function jsoncSafe() {
+    }
+    /**
+     *  Configures `jsonc` object.
+     *
+     *  <blockquote>This method is added for convenience. Works the same as `jsonc.config()`.</blockquote>
+     *
+     *  @name jsonc.safe.config
+     *  @function
+     *
+     *  @param {IConfig} cfg - Configurations.
+     *  @param {NodeJS.WriteStream} [stream] - Stream to write logs to. This is
+     *  used with `.log()` and `.logp()` methods.
+     *  @param {NodeJS.WriteStream} [streamErr] - Stream to write error logs to.
+     *  This is used with `.log()` and `.logp()` methods.
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  // Output logs to stdout but logs containing errors to a file.
+     *  jsonc.config({
+     *      stream: process.stdout,
+     *      streamErr: fs.createWriteStream('path/to/log.txt')
+     *  });
+     *  jsonc.log({ info: 'this is logged to console' });
+     *  jsonc.log(new Error('this is logged to file'));
+     */
+    jsoncSafe.config = function (cfg) {
+        jsonc_1.jsonc.config(cfg);
+    };
+    /**
+     *  Stringifies and logs the given arguments to console. This will
+     *  automatically handle circular references; so it won't throw.
+     *
+     *  If an `Error` instance is passed, it will log the `.stack` property on
+     *  the instance, without stringifying the object.
+     *
+     *  <blockquote>This method is added for convenience. Works the same as `jsonc.log()`.</blockquote>
+     *  @name jsonc.safe.log
+     *  @function
+     *
+     *  @param {...any[]} [args] - Arguments to be logged.
+     *  @returns {void}
+     */
+    jsoncSafe.log = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        jsonc_1.jsonc.log.apply(jsonc_1.jsonc, args);
+    };
+    /**
+     *  Pretty version of `log()` method. Stringifies and logs the given
+     *  arguments to console, with indents. This will automatically handle
+     *  circular references; so it won't throw.
+     *
+     *  If an `Error` instance is passed, it will log the `.stack` property on
+     *  the instance, without stringifying the object.
+     *
+     *  <blockquote>This method is added for convenience. Works the same as `jsonc.logp()`.</blockquote>
+     *  @name jsonc.safe.logp
+     *  @function
+     *
+     *  @param {...any[]} [args] - Arguments to be logged.
+     *  @returns {void}
+     */
+    jsoncSafe.logp = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        jsonc_1.jsonc.logp.apply(jsonc_1.jsonc, args);
+    };
+    /**
+     *  Safe version of `jsonc.parse()`. Parses the given string into a
+     *  JavaScript object.
+     *  @name jsonc.safe.parse
+     *  @function
+     *
+     *  @param {string} str - JSON string to be parsed.
+     *  @param {IParseOptions|Reviver} [options] - Either a parse options
+     *  object or a reviver function.
+     *  @param {Reviver} [options.reviver] - A function that can filter and
+     *  transform the results. It receives each of the keys and values, and
+     *  its return value is used instead of the original value. If it
+     *  returns what it received, then the structure is not modified. If it
+     *  returns `undefined` then the member is deleted.
+     *  @param {boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will return the first
+     *  parameter as an error if this is set to `false` and the string
+     *  includes comments.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, any]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const [err, result] = jsonc.parse('--invalid JSON--');
+     *  if (err) {
+     *      console.log('Failed to parse JSON: ' + err.message);
+     *  } else {
+     *      console.log(result);
+     *  }
+     */
+    jsoncSafe.parse = function (str, options) {
+        return safeSync(jsonc_1.jsonc.parse)(str, options);
+    };
+    jsoncSafe.stringify = function (value, optionsOrReplacer, space) {
+        var opts = helper_1.helper.getStringifyOptions(optionsOrReplacer, space);
+        try {
+            return [null, fast_safe_stringify_1.default(value, opts.replacer, opts.space)];
+        }
+        catch (err) {
+            return [err, undefined];
+        }
+    };
+    /**
+     *  Specifies whether the given string has well-formed JSON structure.
+     *
+     *  Note that, not all JSON-parsable strings are considered well-formed JSON
+     *  structures. JSON is built on two structures; a collection of name/value
+     *  pairs (object) or an ordered list of values (array).
+     *
+     *  For example, `JSON.parse('true')` will parse successfully but
+     *  `jsonc.isJSON('true')` will return `false` since it has no object or
+     *  array structure.
+     *
+     *  <blockquote>This method is added for convenience. Works the same as
+     *  `jsonc.isJSON()`.</blockquote>
+     *  @name jsonc.safe.isJSON
+     *  @function
+     *
+     *  @param {string} str - String to be validated.
+     *  @param {boolean} [allowComments=false] - Whether comments should be
+     *  considered valid.
+     *
+     *  @returns {boolean}
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  jsonc.isJSON('{"x":1}');            // true
+     *  jsonc.isJSON('true');               // false
+     *  jsonc.isJSON('[1, false, null]');   // true
+     *  jsonc.isJSON('string');             // false
+     *  jsonc.isJSON('null');               // false
+     */
+    jsoncSafe.isJSON = function (str, allowComments) {
+        if (allowComments === void 0) { allowComments = false; }
+        return jsonc_1.jsonc.isJSON(str, allowComments);
+    };
+    /**
+     *  Strips comments from the given JSON string.
+     *  @name jsonc.safe.stripComments
+     *  @function
+     *
+     *  @param {string} str - JSON string.
+     *  @param {boolean} [whitespace=false] - Whether to replace comments
+     *  with whitespace instead of stripping them entirely.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, string]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const [err, str] = jsonc.stripComments('// comments\n{"key":"value"}');
+     *  if (!err) console.log(str); // '\n{"key":"value"}'
+     */
+    jsoncSafe.stripComments = function (str, whitespace) {
+        if (whitespace === void 0) { whitespace = false; }
+        return safeSync(stripJsonComments)(str, { whitespace: whitespace });
+    };
+    /**
+     *  Safe version of `jsonc.uglify()`. Uglifies the given JSON string.
+     *  @name jsonc.safe.uglify
+     *  @function
+     *
+     *  @param {string} str - JSON string to be uglified.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, string]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const pretty = `
+     *  {
+     *    // comments...
+     *    "key": "value"
+     *  }
+     *  `;
+     *  const [err, ugly] = jsonc.uglify(pretty);
+     *  if (!err) console.log(ugly); // '{"key":"value"}'
+     */
+    jsoncSafe.uglify = function (str) {
+        return safeSync(jsonc_1.jsonc.uglify)(str);
+    };
+    /**
+     *  Safe version of `jsonc.beautify()`. Beautifies the given JSON
+     *  string. Note that this will remove comments, if any.
+     *  @name jsonc.safe.beautify
+     *  @function
+     *
+     *  @param {string} str - JSON string to be beautified.
+     *  @param {string|number} [space=2] Specifies the indentation of nested
+     *  structures. If it is omitted, the text will be packed without extra
+     *  whitespace. If it is a number, it will specify the number of spaces
+     *  to indent at each level. If it is a string (such as "\t" or
+     *  "&nbsp;"), it contains the characters used to indent at each level.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, string]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const ugly = '{"key":"value"}';
+     *  const [err, pretty] = jsonc.beautify(ugly);
+     *  if (!err) console.log(pretty);
+     *  // {
+     *  //   "key": "value"
+     *  // }
+     */
+    jsoncSafe.beautify = function (str, space) {
+        if (space === void 0) { space = 2; }
+        return safeSync(jsonc_1.jsonc.beautify)(str, space);
+    };
+    /**
+     *  Safe version of `jsonc.normalize()`. Normalizes the given value by
+     *  stringifying and parsing it back to a Javascript object.
+     *  @name jsonc.safe.normalize
+     *  @function
+     *
+     *  @param {any} value
+     *  @param {Replacer} [replacer] - Determines how object values are
+     *  normalized for objects. It can be a function or an array of strings.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, any]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const c = new SomeClass();
+     *  console.log(c.constructor.name); // "SomeClass"
+     *  const [err, normalized] = jsonc.normalize(c);
+     *  if (err) {
+     *      console.log('Failed to normalize: ' + err.message);
+     *  } else {
+     *      console.log(normalized.constructor.name); // "Object"
+     *  }
+     */
+    jsoncSafe.normalize = function (value, replacer) {
+        return safeSync(jsonc_1.jsonc.normalize)(value, replacer);
+    };
+    /**
+     *  Safe version of `jsonc.read()`. Asynchronously reads a JSON file,
+     *  strips comments and UTF-8 BOM and parses the JSON content.
+     *  @name jsonc.safe.read
+     *  @function
+     *
+     *  @param {string} filePath - Path to JSON file.
+     *  @param {Function|IReadOptions} [options] - Read options.
+     *  @param {Function} [options.reviver] - A function that can filter and
+     *  transform the results. It receives each of the keys and values, and
+     *  its return value is used instead of the original value. If it
+     *  returns what it received, then the structure is not modified. If it
+     *  returns undefined then the member is deleted.
+     *  @param {boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will fail if this is
+     *  set to `false` and the string includes comments.
+     *
+     *  @returns {Promise<Array>} - Safe methods return an array with
+     *  the first item being the `Error` instance caught. If successful,
+     *  second item will be the result: `Promise<[Error, any]>`
+     *
+     *  @example <caption>Using async/await (recommended)</caption>
+     *  import { safe as jsonc } from 'jsonc';
+     *  (async () => {
+     *      const [err, obj] = await jsonc.read('path/to/file.json');
+     *      if (err) {
+     *          console.log('Failed to read JSON file');
+     *      } catch (err) {
+     *          console.log(typeof obj); // "object"
+     *      }
+     *  })();
+     *
+     *  @example <caption>Using promises</caption>
+     *  import { safe as jsonc } from 'jsonc';
+     *  jsonc.read('path/to/file.json')
+     *      .then([err, obj] => {
+     *           if (err) {
+     *               console.log('Failed to read JSON file');
+     *           } else {
+     *               console.log(typeof obj); // "object"
+     *           }
+     *      })
+     *      // .catch(err => {}); // this is never invoked when safe version is used.
+     */
+    jsoncSafe.read = function (filePath, options) {
+        return safeAsync(jsonc_1.jsonc.read(filePath, options));
+    };
+    /**
+     *  Safe version of `jsonc.readSync()`. Synchronously reads a JSON file,
+     *  strips UTF-8 BOM and parses the JSON content.
+     *  @name jsonc.safe.readSync
+     *  @function
+     *
+     *  @param {string} filePath - Path to JSON file.
+     *  @param {Function|IReadOptions} [options] - Read options.
+     *  @param {Function} [options.reviver] - A function that can filter and
+     *  transform the results. It receives each of the keys and values, and
+     *  its return value is used instead of the original value. If it
+     *  returns what it received, then the structure is not modified. If it
+     *  returns undefined then the member is deleted.
+     *  @param {boolean} [options.stripComments=true] - Whether to strip
+     *  comments from the JSON string. Note that it will fail if this is
+     *  set to `false` and the string includes comments.
+     *
+     *  @returns {Array} - Safe methods return an array with
+     *  the first item being the `Error` instance caught. If successful,
+     *  second item will be the result: `[Error, any]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const [err, obj] = jsonc.readSync('path/to/file.json');
+     *  if (!err) console.log(typeof obj); // "object"
+     */
+    jsoncSafe.readSync = function (filePath, options) {
+        return safeSync(jsonc_1.jsonc.readSync)(filePath, options);
+    };
+    /**
+     *  Safe version of `jsonc.write()`. Asynchronously writes a JSON file
+     *  from the given JavaScript object.
+     *  @name jsonc.safe.write
+     *  @function
+     *
+     *  @param {string} filePath - Path to JSON file to be written.
+     *  @param {any} data - Data to be stringified into JSON.
+     *  @param {IWriteOptions} [options] - Write options.
+     *  @param {Replacer} [options.replacer] - Determines how object values
+     *  are stringified for objects. It can be a function or an array of
+     *  strings.
+     *  @param {string|number} [options.space] - Specifies the indentation
+     *  of nested structures. If it is omitted, the text will be packed
+     *  without extra whitespace. If it is a number, it will specify the
+     *  number of spaces to indent at each level. If it is a string (such as
+     *  "\t" or "&nbsp;"), it contains the characters used to indent at each
+     *  level.
+     *  @param {number} [options.mode=438] - FileSystem permission mode to
+     *  be used when writing the file. Default is `438` (`0666` in octal).
+     *  @param {boolean} [options.autoPath=true] - Specifies whether to
+     *  create path directories if they don't exist. This will throw if set
+     *  to `false` and path does not exist.
+     *
+     *  @returns {Promise<Array>} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful,
+     *  second item will be the result: `Promise<[Error, boolean]>`
+     *
+     *  @example <caption>Using async/await (recommended)</caption>
+     *  import { safe as jsonc } from 'jsonc';
+     *  (async () => {
+     *      const [err, success] = await jsonc.write('path/to/file.json', data);
+     *      if (err) {
+     *          console.log('Failed to read JSON file');
+     *      } else {
+     *          console.log('Successfully wrote JSON file');
+     *      }
+     *  })();
+     *
+     *  @example <caption>Using promises</caption>
+     *  import { safe as jsonc } from 'jsonc';
+     *  jsonc.write('path/to/file.json', data)
+     *      .then([err, obj] => {
+     *           if (err) {
+     *               console.log('Failed to read JSON file');
+     *           } else {
+     *               console.log('Successfully wrote JSON file');
+     *           }
+     *      })
+     *      // .catch(err => {}); // this is never invoked when safe version is used.
+     */
+    jsoncSafe.write = function (filePath, data, options) {
+        return safeAsync(jsonc_1.jsonc.write(filePath, data, options));
+    };
+    /**
+     *  Safe version of `jsonc.writeSync()`. Synchronously writes a JSON
+     *  file from the given JavaScript object.
+     *  @name jsonc.safe.writeSync
+     *  @function
+     *
+     *  @param {string} filePath - Path to JSON file to be written.
+     *  @param {any} data - Data to be stringified into JSON.
+     *  @param {IWriteOptions} [options] - Write options.
+     *  @param {Replacer} [options.replacer] - Determines how object values
+     *  are stringified for objects. It can be a function or an array of
+     *  strings.
+     *  @param {string|number} [options.space] - Specifies the indentation
+     *  of nested structures. If it is omitted, the text will be packed
+     *  without extra whitespace. If it is a number, it will specify the
+     *  number of spaces to indent at each level. If it is a string (such as
+     *  "\t" or "&nbsp;"), it contains the characters used to indent at each
+     *  level.
+     *  @param {number} [options.mode=438] - FileSystem permission mode to
+     *  be used when writing the file. Default is `438` (`0666` in octal).
+     *  @param {boolean} [options.autoPath=true] - Specifies whether to
+     *  create path directories if they don't exist. This will throw if set
+     *  to `false` and path does not exist.
+     *
+     *  @returns {Array} - Safe methods return an array with the
+     *  first item being the `Error` instance caught. If successful, second
+     *  item will be the result: `[Error, boolean]`
+     *
+     *  @example
+     *  import { safe as jsonc } from 'jsonc';
+     *  const [err, obj] = jsonc.writeSync('path/to/file.json');
+     *  if (!err) console.log(typeof obj); // "object"
+     */
+    jsoncSafe.writeSync = function (filePath, data, options) {
+        return safeSync(jsonc_1.jsonc.writeSync)(filePath, data, options);
+    };
+    return jsoncSafe;
+}());
+exports.jsoncSafe = jsoncSafe;
+
+
+/***/ }),
+
+/***/ 6945:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var path = __nccwpck_require__(1017);
+var fs = __nccwpck_require__(7147);
+var _0777 = parseInt('0777', 8);
+
+module.exports = mkdirP.mkdirp = mkdirP.mkdirP = mkdirP;
+
+function mkdirP (p, opts, f, made) {
+    if (typeof opts === 'function') {
+        f = opts;
+        opts = {};
+    }
+    else if (!opts || typeof opts !== 'object') {
+        opts = { mode: opts };
+    }
+    
+    var mode = opts.mode;
+    var xfs = opts.fs || fs;
+    
+    if (mode === undefined) {
+        mode = _0777
+    }
+    if (!made) made = null;
+    
+    var cb = f || /* istanbul ignore next */ function () {};
+    p = path.resolve(p);
+    
+    xfs.mkdir(p, mode, function (er) {
+        if (!er) {
+            made = made || p;
+            return cb(null, made);
+        }
+        switch (er.code) {
+            case 'ENOENT':
+                /* istanbul ignore if */
+                if (path.dirname(p) === p) return cb(er);
+                mkdirP(path.dirname(p), opts, function (er, made) {
+                    /* istanbul ignore if */
+                    if (er) cb(er, made);
+                    else mkdirP(p, opts, cb, made);
+                });
+                break;
+
+            // In the case of any other error, just see if there's a dir
+            // there already.  If so, then hooray!  If not, then something
+            // is borked.
+            default:
+                xfs.stat(p, function (er2, stat) {
+                    // if the stat fails, then that's super weird.
+                    // let the original error be the failure reason.
+                    if (er2 || !stat.isDirectory()) cb(er, made)
+                    else cb(null, made);
+                });
+                break;
+        }
+    });
+}
+
+mkdirP.sync = function sync (p, opts, made) {
+    if (!opts || typeof opts !== 'object') {
+        opts = { mode: opts };
+    }
+    
+    var mode = opts.mode;
+    var xfs = opts.fs || fs;
+    
+    if (mode === undefined) {
+        mode = _0777
+    }
+    if (!made) made = null;
+
+    p = path.resolve(p);
+
+    try {
+        xfs.mkdirSync(p, mode);
+        made = made || p;
+    }
+    catch (err0) {
+        switch (err0.code) {
+            case 'ENOENT' :
+                made = sync(path.dirname(p), opts, made);
+                sync(p, opts, made);
+                break;
+
+            // In the case of any other error, just see if there's a dir
+            // there already.  If so, then hooray!  If not, then something
+            // is borked.
+            default:
+                var stat;
+                try {
+                    stat = xfs.statSync(p);
+                }
+                catch (err1) /* istanbul ignore next */ {
+                    throw err0;
+                }
+                /* istanbul ignore if */
+                if (!stat.isDirectory()) throw err0;
+                break;
+        }
+    }
+
+    return made;
+};
+
+
+/***/ }),
+
 /***/ 1351:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -2889,6 +5589,155 @@ function arrayRequestBody(array, params) {
     return Object.assign([...array], params);
 }
 exports.arrayRequestBody = arrayRequestBody;
+
+
+/***/ }),
+
+/***/ 3931:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const errorEx = __nccwpck_require__(7620);
+const fallback = __nccwpck_require__(9214);
+
+const JSONError = errorEx('JSONError', {
+	fileName: errorEx.append('in %s')
+});
+
+module.exports = (input, reviver, filename) => {
+	if (typeof reviver === 'string') {
+		filename = reviver;
+		reviver = null;
+	}
+
+	try {
+		try {
+			return JSON.parse(input, reviver);
+		} catch (err) {
+			fallback(input, reviver);
+
+			throw err;
+		}
+	} catch (err) {
+		err.message = err.message.replace(/\n/g, '');
+
+		const jsonErr = new JSONError(err);
+		if (filename) {
+			jsonErr.fileName = filename;
+		}
+
+		throw jsonErr;
+	}
+};
+
+
+/***/ }),
+
+/***/ 3410:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = string => {
+	if (typeof string !== 'string') {
+		throw new TypeError(`Expected a string, got ${typeof string}`);
+	}
+
+	// Catches EFBBBF (UTF-8 BOM) because the buffer-to-string
+	// conversion translates it to FEFF (UTF-16 BOM)
+	if (string.charCodeAt(0) === 0xFEFF) {
+		return string.slice(1);
+	}
+
+	return string;
+};
+
+
+/***/ }),
+
+/***/ 6642:
+/***/ ((module) => {
+
+"use strict";
+
+const singleComment = Symbol('singleComment');
+const multiComment = Symbol('multiComment');
+const stripWithoutWhitespace = () => '';
+const stripWithWhitespace = (string, start, end) => string.slice(start, end).replace(/\S/g, ' ');
+
+const isEscaped = (jsonString, quotePosition) => {
+	let index = quotePosition - 1;
+	let backslashCount = 0;
+
+	while (jsonString[index] === '\\') {
+		index -= 1;
+		backslashCount += 1;
+	}
+
+	return Boolean(backslashCount % 2);
+};
+
+module.exports = (jsonString, options = {}) => {
+	if (typeof jsonString !== 'string') {
+		throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof jsonString}\``);
+	}
+
+	const strip = options.whitespace === false ? stripWithoutWhitespace : stripWithWhitespace;
+
+	let insideString = false;
+	let insideComment = false;
+	let offset = 0;
+	let result = '';
+
+	for (let i = 0; i < jsonString.length; i++) {
+		const currentCharacter = jsonString[i];
+		const nextCharacter = jsonString[i + 1];
+
+		if (!insideComment && currentCharacter === '"') {
+			const escaped = isEscaped(jsonString, i);
+			if (!escaped) {
+				insideString = !insideString;
+			}
+		}
+
+		if (insideString) {
+			continue;
+		}
+
+		if (!insideComment && currentCharacter + nextCharacter === '//') {
+			result += jsonString.slice(offset, i);
+			offset = i;
+			insideComment = singleComment;
+			i++;
+		} else if (insideComment === singleComment && currentCharacter + nextCharacter === '\r\n') {
+			i++;
+			insideComment = false;
+			result += strip(jsonString, offset, i);
+			offset = i;
+			continue;
+		} else if (insideComment === singleComment && currentCharacter === '\n') {
+			insideComment = false;
+			result += strip(jsonString, offset, i);
+			offset = i;
+		} else if (!insideComment && currentCharacter + nextCharacter === '/*') {
+			result += jsonString.slice(offset, i);
+			offset = i;
+			insideComment = multiComment;
+			i++;
+			continue;
+		} else if (insideComment === multiComment && currentCharacter + nextCharacter === '*/') {
+			i++;
+			insideComment = false;
+			result += strip(jsonString, offset, i + 1);
+			offset = i + 1;
+			continue;
+		}
+	}
+
+	return result + (insideComment ? strip(jsonString.slice(offset)) : jsonString.slice(offset));
+};
 
 
 /***/ }),
@@ -8054,6 +10903,14 @@ module.exports = require("buffer");
 
 /***/ }),
 
+/***/ 2057:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("constants");
+
+/***/ }),
+
 /***/ 6113:
 /***/ ((module) => {
 
@@ -8131,6 +10988,14 @@ module.exports = require("os");
 
 "use strict";
 module.exports = require("path");
+
+/***/ }),
+
+/***/ 2781:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("stream");
 
 /***/ }),
 

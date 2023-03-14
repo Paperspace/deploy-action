@@ -1,5 +1,7 @@
 import fs from 'fs';
 import YAML from 'yaml'
+import TOML from 'toml';
+import { jsonc as JSONC } from 'jsonc';
 import path from 'path';
 import dayjs from 'dayjs';
 import hash from 'object-hash';
@@ -13,27 +15,54 @@ import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndNa
 const TIMEOUT_IN_MINUTES = 5;
 const BAD_INSTANCE_STATES = ['errored', 'failed'];
 
+const defaultConfigPaths = [
+  "paperspace.yaml",
+  "paperspace.yml",
+  "paperspace.json",
+  "paperspace.jsonc",
+  "paperspace.toml",
+  ".paperspace/app.yaml",
+  ".paperspace/app.yml",
+  ".paperspace/app.json",
+  ".paperspace/app.jsonc",
+  ".paperspace/app.toml",
+];
+
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
 const projectId = core.getInput('projectId', { required: true });
 const optionalImage = core.getInput('image', { required: true });
 
-function getFilePath() {
+function ensureAndGetConfigPath(): string {
   const relativeFilePath = core.getInput('configPath');
   const workspacePath = process.env.GITHUB_WORKSPACE ?? '';
 
   if (relativeFilePath) {
-    core.info(`Using configPath input: ${relativeFilePath}`);
+    core.info(`Found configPath input: ${relativeFilePath}. Ensuring file exists...`);
 
-    return path.join(workspacePath, relativeFilePath);
-  } else {
-    core.warning('No filePath input provided. Defaulting to .paperspace/app.yaml.');
+    const relPath = path.join(workspacePath, relativeFilePath);
 
-    return path.join(workspacePath, '.paperspace', 'app.yaml');
+    if (!fs.existsSync(relPath)) {
+      throw new Error(`File not found at path: ${relPath}`);
+    }
+
+    return relPath;
   }
-}
 
-const filePath = getFilePath();
+  core.warning('No configPath input provided. Searching for default...');
+
+  for (const fileName of defaultConfigPaths) {
+    const pathToTry = path.join(workspacePath, fileName);
+
+    core.info(`Trying for path: ${pathToTry}...`)
+
+    if (fs.existsSync(pathToTry)) {
+      return pathToTry;
+    }
+  }
+
+  throw new Error(`No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(', ')}`);
+}
 
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 
@@ -42,14 +71,6 @@ function validateParams() {
 
   if (!paperspaceApiKey) {
     throw new Error('Neither env.API_KEY or inputs.apiKey exists');
-  }
-}
-
-function ensureFile() {
-  core.info(`Checking for Paperspace spec file at path: ${filePath}...`)
-
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Paperspace spec file does not exist at path: ${filePath}`);
   }
 }
 
@@ -130,11 +151,27 @@ async function syncDeployment(projectId: string, yaml: any) {
   }
 }
 
+const parseByExt = (filePath: string) => {
+  const ext = path.extname(filePath);
+  const content = fs.readFileSync(filePath, 'utf8');
+
+  switch (ext) {
+    case '.yaml':
+      return YAML.parse(content);
+    case '.jsonc':
+      return JSONC.parse(content);
+    case '.json':
+      return JSON.parse(content);
+    default:
+      throw new Error(`Unsupported file extension: ${ext}`);
+  }
+}
+
 async function maybeSyncDeployment() {
   core.info(`Starting deployment update...`)
 
-  const file = fs.readFileSync(filePath, 'utf8');
-  const parsed = YAML.parse(file);
+  const filePath = ensureAndGetConfigPath();
+  const parsed = parseByExt(filePath);
 
   const deployment = await getDeploymentByProjectAndName(projectId, parsed.name);
 
@@ -179,7 +216,6 @@ async function maybeSyncDeployment() {
 async function run(): Promise<void> {
   try {
     validateParams();
-    ensureFile();
 
     await maybeSyncDeployment();
   } catch (error) {
