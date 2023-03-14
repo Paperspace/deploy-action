@@ -1,8 +1,9 @@
-import fetch, { Headers, Request, Response } from 'node-fetch'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import fetch, { Headers, Request, Response } from "node-fetch";
 
 if (!globalThis.fetch) {
-    globalThis.fetch = fetch as any
-    globalThis.Headers = Headers as any
-    globalThis.Request = Request as any
-    globalThis.Response = Response as any
+  globalThis.fetch = fetch as any;
+  globalThis.Headers = Headers as any;
+  globalThis.Request = Request as any;
+  globalThis.Response = Response as any;
 }

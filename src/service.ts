@@ -51,16 +51,20 @@ export async function upsertDeployment(config: Config) {
     const { deploymentId } = deployment;
 
     return deploymentId;
-  } catch(e) {
+  } catch (e) {
     // check which operation threw the exception
     if (e instanceof upsertDeploymentFetcher.Error) {
-      const { data } = e.getActualType()
+      const { data } = e.getActualType();
 
       if ("issues" in data) {
-        throw new Error(`Error upserting deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`)
+        throw new Error(
+          `Error upserting deployment: ${
+            data.message
+          }. Issues: ${JSON.stringify(data.issues)}`
+        );
       }
 
-      throw new Error(`Error upserting deployment: ${data.message}.`)
+      throw new Error(`Error upserting deployment: ${data.message}.`);
     }
   }
 }
