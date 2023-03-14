@@ -160,6 +160,8 @@ const parseByExt = (filePath: string) => {
   switch (ext) {
     case '.yaml':
       return YAML.parse(content);
+    case '.toml':
+      return TOML.parse(content);
     case '.jsonc':
       return JSONC.parse(content);
     case '.json':
