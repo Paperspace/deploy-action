@@ -170,11 +170,11 @@ export type external = Record<string, never>;
 
 export interface operations {
 
+  /**
+   * Get the current session 
+   * @description Get the current session. If a user is not logged in, this will be null. Otherwise, it will contain the current team and user.
+   */
   "query.auth.session": {
-    /**
-     * Get the current session 
-     * @description Get the current session. If a user is not logged in, this will be null. Otherwise, it will contain the current team and user.
-     */
     responses: {
       /** @description Successful response */
       200: {
@@ -204,14 +204,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Get a deployment 
+   * @description Fetches a single deployment by deployment ID.
+   */
   "query.deployments.get": {
-    /**
-     * Get a deployment 
-     * @description Fetches a single deployment by deployment ID.
-     */
     parameters: {
-        /** @description The ID of the deployment to fetch */
       path: {
+        /** @description The ID of the deployment to fetch */
         id: string;
       };
     };
@@ -475,14 +475,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Delete a deployment 
+   * @description Deletes a deployment by deployment ID.
+   */
   "mutation.deployments.delete": {
-    /**
-     * Delete a deployment 
-     * @description Deletes a deployment by deployment ID.
-     */
     parameters: {
-        /** @description The ID of the deployment to delete */
       path: {
+        /** @description The ID of the deployment to delete */
         id: string;
       };
     };
@@ -499,20 +499,20 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List deployments 
+   * @description Fetches a list of deployments for a logged in user.
+   */
   "query.deployments.list": {
-    /**
-     * List deployments 
-     * @description Fetches a list of deployments for a logged in user.
-     */
     parameters: {
-        /** @description Fetch the next page of results after this cursor. */
-        /** @description The number of items to fetch after this page. */
-        /** @description Order results by one of these fields. */
-        /** @description The order to sort the results by. */
       query: {
+        /** @description Fetch the next page of results after this cursor. */
         after?: string;
+        /** @description The number of items to fetch after this page. */
         limit?: number;
+        /** @description Order results by one of these fields. */
         orderBy?: "dtCreated";
+        /** @description The order to sort the results by. */
         order?: "asc" | "desc";
       };
     };
@@ -783,11 +783,11 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Upsert a deployment 
+   * @description Submit a new deployment configuration. If a deployment does not exist, one is created. Otherwise, a deployment is updated with new configuration.
+   */
   "mutation.deployments.upsert": {
-    /**
-     * Upsert a deployment 
-     * @description Submit a new deployment configuration. If a deployment does not exist, one is created. Otherwise, a deployment is updated with new configuration.
-     */
     requestBody: {
       content: {
         "application/json": {
@@ -1014,18 +1014,18 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List deployment runs 
+   * @description Lists the active deployment runs for a deployment.
+   */
   "query.deploymentRunsrouter.get": {
-    /**
-     * List deployment runs 
-     * @description Lists the active deployment runs for a deployment.
-     */
     parameters: {
-        /** @description The latest n number of deployment runs to return */
       query: {
+        /** @description The latest n number of deployment runs to return */
         limit?: number;
       };
-        /** @description The ID of the deployment to fetch */
       path: {
+        /** @description The ID of the deployment to fetch */
         id: string;
       };
     };
@@ -1096,21 +1096,21 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List projects 
+   * @description 
+   *         List projects. This endpoint supports pagination and sorting.
+   */
   "query.projects.list": {
-    /**
-     * List projects 
-     * @description 
-     *         List projects. This endpoint supports pagination and sorting.
-     */
     parameters: {
-        /** @description Fetch the next page of results after this cursor. */
-        /** @description The number of items to fetch after this page. */
-        /** @description Order results by one of these fields. */
-        /** @description The order to sort the results by. */
       query: {
+        /** @description Fetch the next page of results after this cursor. */
         after?: string;
+        /** @description The number of items to fetch after this page. */
         limit?: number;
+        /** @description Order results by one of these fields. */
         orderBy?: "dtCreated";
+        /** @description The order to sort the results by. */
         order?: "asc" | "desc";
       };
     };
@@ -1167,11 +1167,11 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Create a project 
+   * @description Create a project
+   */
   "mutation.projects.create": {
-    /**
-     * Create a project 
-     * @description Create a project
-     */
     requestBody: {
       content: {
         "application/json": {
@@ -1226,14 +1226,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Get a project by its ID 
+   * @description Get a project by its ID.
+   */
   "query.projects.get": {
-    /**
-     * Get a project by its ID 
-     * @description Get a project by its ID.
-     */
     parameters: {
-        /** @description The ID of the project to get */
       path: {
+        /** @description The ID of the project to get */
         handle: string;
       };
     };
@@ -1283,14 +1283,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Update a project 
+   * @description Update a project
+   */
   "mutation.projects.update": {
-    /**
-     * Update a project 
-     * @description Update a project
-     */
     parameters: {
-        /** @description The ID of the project to update */
       path: {
+        /** @description The ID of the project to update */
         handle: string;
       };
     };
@@ -1348,17 +1348,26 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List a project's deployments 
+   * @description Fetches a list of deployments for a project.
+   */
   "query.projectsDeployments.list": {
-    /**
-     * List a project's deployments 
-     * @description Fetches a list of deployments for a project.
-     */
     parameters: {
       query: {
+        /** @description Fetch the next page of results after this cursor. */
+        after?: string;
+        /** @description The number of items to fetch after this page. */
+        limit?: number;
+        /** @description Order results by one of these fields. */
+        orderBy?: "dtCreated";
+        /** @description The order to sort the results by. */
+        order?: "asc" | "desc";
+        /** @description The name of the deployment to filter by */
         name?: string;
       };
+      path: {
         /** @description The ID of the project to fetch deployments for */
-      path: {
         handle: string;
       };
     };
@@ -1366,280 +1375,287 @@ export interface operations {
       /** @description Successful response */
       200: {
         content: {
-          "application/json": ({
-              /** @description The name of the deployment */
-              name: string;
-              /** @description The ID of the deployment */
-              id: string;
-              /** @description The ID of the project the deployment belongs to */
-              projectId: string;
-              /** @description The ID of the team the deployment belongs to */
-              teamId: string;
-              /** @description The unique endpoint for the deployment */
-              endpoint: string;
-              /**
-               * @description The last version hash for the deployment 
-               * @default null
-               */
-              latestSpecHash?: string | null;
-              /**
-               * Format: date-time 
-               * @description The date the deployment was created
-               */
-              dtCreated: string;
-              /**
-               * @description The latest deployment configuration. If invalid, null is returned. 
-               * @default null
-               */
-              latestSpec?: ({
-                /** @description The ID of the deployment spec */
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage: string | null;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The name of the deployment */
+                name: string;
+                /** @description The ID of the deployment */
                 id: string;
-                /** @description The data for the deployment spec */
-                data?: (({
-                  apiVersion: "v0alpha0" | "latest";
-                  name: string;
-                  region?: string;
-                  command?: (string)[];
-                  /** Format: uuid */
-                  containerRegistry?: string;
-                  env?: ({
-                      name: string;
-                      value: string;
-                    })[];
-                  /** @default true */
-                  enabled?: boolean;
-                  healthChecks?: {
-                    liveness?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
-                          name: string;
-                          value: string;
-                        })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
-                      };
-                    };
-                    readiness?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
-                          name: string;
-                          value: string;
-                        })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
-                      };
-                    };
-                    startup?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
-                          name: string;
-                          value: string;
-                        })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
-                      };
-                    };
-                  };
-                  image: string;
-                  repositories?: {
-                    mountPath?: string;
-                    dataset: string;
-                    repositories: ({
-                        url: string;
-                        ref?: string;
+                /** @description The ID of the project the deployment belongs to */
+                projectId: string;
+                /** @description The ID of the team the deployment belongs to */
+                teamId: string;
+                /** @description The unique endpoint for the deployment */
+                endpoint: string;
+                /**
+                 * @description The last version hash for the deployment 
+                 * @default null
+                 */
+                latestSpecHash?: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment was created
+                 */
+                dtCreated: string;
+                /**
+                 * @description The latest deployment configuration. If invalid, null is returned. 
+                 * @default null
+                 */
+                latestSpec?: ({
+                  /** @description The ID of the deployment spec */
+                  id: string;
+                  /** @description The data for the deployment spec */
+                  data?: (({
+                    apiVersion: "v0alpha0" | "latest";
+                    name: string;
+                    region?: string;
+                    command?: (string)[];
+                    /** Format: uuid */
+                    containerRegistry?: string;
+                    env?: ({
                         name: string;
-                        username?: string;
-                        password?: string;
+                        value: string;
                       })[];
-                  };
-                  resources: {
-                    instanceType: string;
-                    /** @default 1 */
-                    replicas?: number;
-                    autoscaling?: {
-                      maxReplicas: number;
-                      enabled?: boolean;
-                      metrics: ({
-                          /** @enum {string} */
-                          metric: "requestDuration";
-                          /** @enum {string} */
-                          summary: "average";
-                          value: number;
-                        } | ({
-                          /** @enum {string} */
-                          metric: "cpu" | "memory";
-                          /** @enum {string} */
-                          summary: "average";
-                          value: number;
-                        }))[];
-                    };
-                  };
-                  models?: ({
-                      id: string;
-                      path?: string;
-                    })[];
-                  /** @default 80 */
-                  port?: number;
-                }) | ({
-                  /** @enum {string} */
-                  apiVersion: "v0alpha1";
-                  name: string;
-                  region?: string;
-                  command: (string)[];
-                  /** Format: uuid */
-                  containerRegistry?: string;
-                  env?: ({
-                      name: string;
-                      value: string;
-                    })[];
-                  /** @default true */
-                  enabled?: boolean;
-                  healthchecks?: {
-                    liveness?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
-                          name: string;
-                          value: string;
-                        })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
+                    /** @default true */
+                    enabled?: boolean;
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
                       };
                     };
-                    readiness?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
+                    image: string;
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
                           name: string;
-                          value: string;
+                          username?: string;
+                          password?: string;
                         })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
+                    };
+                    resources: {
+                      instanceType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
                       };
                     };
-                    startup?: {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      path: string;
-                      host?: string;
-                      port?: number;
-                      headers?: ({
-                          name: string;
-                          value: string;
-                        })[];
-                    } | {
-                      timeoutSeconds?: number;
-                      initialDelaySeconds?: number;
-                      periodSeconds?: number;
-                      failureThreshold?: number;
-                      exec: {
-                        command: (string)[];
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                    /** @default 80 */
+                    port?: number;
+                  }) | ({
+                    /** @enum {string} */
+                    apiVersion: "v0alpha1";
+                    name: string;
+                    region?: string;
+                    command: (string)[];
+                    /** Format: uuid */
+                    containerRegistry?: string;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    /** @default true */
+                    enabled?: boolean;
+                    healthchecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
                       };
                     };
-                  };
-                  image: string;
-                })) | null;
-                /** @description The ID of the deployment the spec belongs to */
-                deploymentId: string;
-                /**
-                 * Format: date-time 
-                 * @description The date the deployment configuration was applied to the cluster 
-                 * @default null
-                 */
-                externalApplied?: string | null;
-                /**
-                 * Format: date-time 
-                 * @description The date the deployment was marked "healthy" 
-                 * @default null
-                 */
-                dtHealthy?: string | null;
-                /** @description The ID of the user the deployment belongs to */
-                userId: number;
-                /**
-                 * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
-                 * @default null
-                 */
-                error?: string | null;
-              }) | null;
-            })[];
+                    image: string;
+                  })) | null;
+                  /** @description The ID of the deployment the spec belongs to */
+                  deploymentId: string;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment configuration was applied to the cluster 
+                   * @default null
+                   */
+                  externalApplied?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment was marked "healthy" 
+                   * @default null
+                   */
+                  dtHealthy?: string | null;
+                  /** @description The ID of the user the deployment belongs to */
+                  userId: number;
+                  /**
+                   * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                   * @default null
+                   */
+                  error?: string | null;
+                }) | null;
+              })[];
+          };
         };
       };
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List a project's secrets 
+   * @description Fetches a list of secrets for a project.
+   */
   "query.projectSecrets.list": {
-    /**
-     * List a project's secrets 
-     * @description Fetches a list of secrets for a project.
-     */
     parameters: {
-        /** @description Fetch the next page of results after this cursor. */
-        /** @description The number of items to fetch after this page. */
-        /** @description Order results by one of these fields. */
-        /** @description The order to sort the results by. */
       query: {
+        /** @description Fetch the next page of results after this cursor. */
         after?: string;
+        /** @description The number of items to fetch after this page. */
         limit?: number;
+        /** @description Order results by one of these fields. */
         orderBy?: "dtCreated";
+        /** @description The order to sort the results by. */
         order?: "asc" | "desc";
       };
-        /** @description The ID of the project where the secret is stored. */
       path: {
+        /** @description The ID of the project where the secret is stored. */
         handle: string;
       };
     };
@@ -1673,14 +1689,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Create a project secret 
+   * @description Creates a new secret for a project.
+   */
   "mutation.projectSecrets.create": {
-    /**
-     * Create a project secret 
-     * @description Creates a new secret for a project.
-     */
     parameters: {
-        /** @description The ID of the project where the secret is stored. */
       path: {
+        /** @description The ID of the project where the secret is stored. */
         handle: string;
       };
     };
@@ -1717,16 +1733,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Get a project secret 
+   * @description Fetches a secret for a project.
+   */
   "query.projectSecrets.getProjectSecret": {
-    /**
-     * Get a project secret 
-     * @description Fetches a secret for a project.
-     */
     parameters: {
-        /** @description The ID of the project where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the project where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -1753,16 +1769,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Delete a project secret 
+   * @description Deletes a secret for a project.
+   */
   "mutation.projectSecrets.delete": {
-    /**
-     * Delete a project secret 
-     * @description Deletes a secret for a project.
-     */
     parameters: {
-        /** @description The ID of the project where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the project where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -1779,16 +1795,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Update a project secret 
+   * @description Update the value of a secret for a project.
+   */
   "mutation.projectSecrets.update": {
-    /**
-     * Update a project secret 
-     * @description Update the value of a secret for a project.
-     */
     parameters: {
-        /** @description The ID of the project where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the project where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -1823,24 +1839,24 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * List a team's secrets 
+   * @description Fetches a list of secrets for a team.
+   */
   "query.teamSecrets.list": {
-    /**
-     * List a team's secrets 
-     * @description Fetches a list of secrets for a team.
-     */
     parameters: {
-        /** @description Fetch the next page of results after this cursor. */
-        /** @description The number of items to fetch after this page. */
-        /** @description Order results by one of these fields. */
-        /** @description The order to sort the results by. */
       query: {
+        /** @description Fetch the next page of results after this cursor. */
         after?: string;
+        /** @description The number of items to fetch after this page. */
         limit?: number;
+        /** @description Order results by one of these fields. */
         orderBy?: "dtCreated";
+        /** @description The order to sort the results by. */
         order?: "asc" | "desc";
       };
-        /** @description The ID of the team where the secret is stored. */
       path: {
+        /** @description The ID of the team where the secret is stored. */
         handle: string;
       };
     };
@@ -1874,14 +1890,14 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Create a team secret 
+   * @description Creates a new secret for a team.
+   */
   "mutation.teamSecrets.create": {
-    /**
-     * Create a team secret 
-     * @description Creates a new secret for a team.
-     */
     parameters: {
-        /** @description The ID of the team where the secret is stored. */
       path: {
+        /** @description The ID of the team where the secret is stored. */
         handle: string;
       };
     };
@@ -1918,16 +1934,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Get a team secret 
+   * @description Fetches a secret for a team.
+   */
   "query.teamSecrets.get": {
-    /**
-     * Get a team secret 
-     * @description Fetches a secret for a team.
-     */
     parameters: {
-        /** @description The ID of the team where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the team where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -1954,16 +1970,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Delete a team secret 
+   * @description Deletes a secret for a team.
+   */
   "mutation.teamSecrets.delete": {
-    /**
-     * Delete a team secret 
-     * @description Deletes a secret for a team.
-     */
     parameters: {
-        /** @description The ID of the team where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the team where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -1980,16 +1996,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Update a team secret 
+   * @description Update the value of a secret for a team.
+   */
   "mutation.teamSecrets.update": {
-    /**
-     * Update a team secret 
-     * @description Update the value of a secret for a team.
-     */
     parameters: {
-        /** @description The ID of the team where the secret is stored. */
-        /** @description The name of the secret, e.g. "DB_PASSWORD". */
       path: {
+        /** @description The ID of the team where the secret is stored. */
         handle: string;
+        /** @description The name of the secret, e.g. "DB_PASSWORD". */
         name: string;
       };
     };
@@ -2024,11 +2040,11 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
+  /**
+   * Health check 
+   * @description Check if the API is healthy.
+   */
   "query.health": {
-    /**
-     * Health check 
-     * @description Check if the API is healthy.
-     */
     responses: {
       /** @description Successful response */
       200: {

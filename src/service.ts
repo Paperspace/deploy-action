@@ -1,12 +1,12 @@
-import * as core from '@actions/core'
-import { Fetcher } from 'openapi-typescript-fetch'
+import * as core from "@actions/core";
+import { Fetcher } from "openapi-typescript-fetch";
 
-import { paths, operations } from './api';
+import { paths, operations } from "./api";
 
-const BASE_API_URL = 'https://api.paperspace.com/v1';
-const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
+const BASE_API_URL = "https://api.paperspace.com/v1";
+const paperspaceApiKey = process.env.API_KEY || core.getInput("apiKey");
 
-const fetcher = Fetcher.for<paths>()
+const fetcher = Fetcher.for<paths>();
 
 // global configuration
 fetcher.configure({
@@ -16,17 +16,32 @@ fetcher.configure({
       Authorization: `Bearer ${paperspaceApiKey}`,
     },
   },
-})
+});
 
 // create fetch operations
-const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create()
-const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create()
-const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create()
-const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create()
+const getSingleDeployment = fetcher
+  .path("/deployments/{id}")
+  .method("get")
+  .create();
+const getDeploymentWithRuns = fetcher
+  .path("/deployments/{id}/runs")
+  .method("get")
+  .create();
+const upsertDeploymentFetcher = fetcher
+  .path("/deployments")
+  .method("post")
+  .create();
+const getDeploymentByProjectFetcher = fetcher
+  .path("/projects/{handle}/deployments")
+  .method("get")
+  .create();
 
-export type Config = operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
-export type Deployment = operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
-export type LatestRuns = operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
+export type Config =
+  operations["mutation.deployments.upsert"]["requestBody"]["content"]["application/json"];
+export type Deployment =
+  operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
+export type LatestRuns =
+  operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
 export async function upsertDeployment(config: Config) {
   const { data: deployment } = await upsertDeploymentFetcher(config);
@@ -36,11 +51,16 @@ export async function upsertDeployment(config: Config) {
   return deploymentId;
 }
 
-export async function getDeploymentByProjectAndName(handle: string, name: string) {
-  const { data: deployments } = await getDeploymentByProjectFetcher({
+export async function getDeploymentByProjectAndName(
+  handle: string,
+  name: string
+) {
+  const { data } = await getDeploymentByProjectFetcher({
     handle,
     name,
-  })
+  });
+
+  const deployments = data.items;
 
   if (!deployments) {
     throw new Error(`Deployments matching name and project not found.`);
@@ -72,4 +92,3 @@ export async function getDeploymentWithDetails(id: string) {
     deployment,
   };
 }
-
