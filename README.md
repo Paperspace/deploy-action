@@ -7,7 +7,7 @@ GitHub action for deploying updates to a Paperspace container deployment.
 | --- | --- | --- | --- | ---
 | `apiKey` | Your Paperspace API key | true | string |
 | `projectId` | The ID of the project the deployment lives under | true | string |
-| `configPath` | The relative file path of the configuration file. Example: ./src/deploy/app.yaml | false | string | `.paperspace/app.yaml`
+| `configPath` | The relative file path of the configuration file. | false | string | see default paths below
 | `image` | Container image to be used in the configuration | false | string |
 
 ## Usage
@@ -128,4 +128,39 @@ jobs:
 
 ```
 
+### Config paths
 
+You can supply an optional relative path for your paperspace config like so:
+
+```yaml
+- uses: paperspace/deploy-action@main
+  name: Deploy action
+  id: deploy
+  env:
+    API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  with:
+    projectId: p28rlnvnw51
+    configPath: ./random/paperspace.jsonc
+    image: paperspace/deployment-fixture
+```
+
+By default, the action looks for a config file by order of precedence:
+
+```js
+[
+  "paperspace.yaml",
+  "paperspace.yml",
+  "paperspace.json",
+  "paperspace.jsonc",
+  "paperspace.toml",
+  ".paperspace/app.yaml",
+  ".paperspace/app.yml",
+  ".paperspace/app.json",
+  ".paperspace/app.jsonc",
+  ".paperspace/app.toml",
+]
+```
+
+### File extensions
+
+`.json`, `.jsonc`, `.toml`, `.yaml` are all supported.
