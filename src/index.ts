@@ -1,19 +1,23 @@
-import fs from 'fs';
-import YAML from 'yaml'
-import TOML from 'toml';
-import { jsonc as JSONC } from 'jsonc';
-import path from 'path';
-import dayjs from 'dayjs';
-import hash from 'object-hash';
-import * as core from '@actions/core'
+import fs from "fs";
+import YAML from "yaml";
+import TOML from "toml";
+import { jsonc as JSONC } from "jsonc";
+import path from "path";
+import dayjs from "dayjs";
+import hash from "object-hash";
+import * as core from "@actions/core";
 
-import './fetch-polyfill';
+import "./fetch-polyfill";
 
-import type { LatestRuns, Deployment } from './service';
-import { getDeploymentWithDetails, upsertDeployment, getDeploymentByProjectAndName } from './service';
+import type { LatestRuns, Deployment } from "./service";
+import {
+  getDeploymentWithDetails,
+  upsertDeployment,
+  getDeploymentByProjectAndName,
+} from "./service";
 
 const TIMEOUT_IN_MINUTES = 5;
-const BAD_INSTANCE_STATES = ['errored', 'failed'];
+const BAD_INSTANCE_STATES = ["errored", "failed"];
 
 const defaultConfigPaths = [
   "paperspace.yaml",
@@ -29,16 +33,19 @@ const defaultConfigPaths = [
 ];
 
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
-const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
-const projectId = core.getInput('projectId', { required: true });
-const optionalImage = core.getInput('image', { required: true });
+const paperspaceApiKey =
+  process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
+const projectId = core.getInput("projectId", { required: true });
+const optionalImage = core.getInput("image", { required: true });
 
 function ensureAndGetConfigPath(): string {
-  const relativeFilePath = core.getInput('configPath');
-  const workspacePath = process.env.GITHUB_WORKSPACE ?? '';
+  const relativeFilePath = core.getInput("configPath");
+  const workspacePath = process.env.GITHUB_WORKSPACE ?? "";
 
   if (relativeFilePath) {
-    core.info(`Found configPath input: ${relativeFilePath}. Ensuring file exists...`);
+    core.info(
+      `Found configPath input: ${relativeFilePath}. Ensuring file exists...`
+    );
 
     const relPath = path.join(workspacePath, relativeFilePath);
 
@@ -49,58 +56,79 @@ function ensureAndGetConfigPath(): string {
     return relPath;
   }
 
-  core.warning('No configPath input provided. Searching for default...');
+  core.warning("No configPath input provided. Searching for default...");
 
   for (const fileName of defaultConfigPaths) {
     const pathToTry = path.join(workspacePath, fileName);
 
-    core.info(`Trying for path: ${pathToTry}...`)
+    core.info(`Trying for path: ${pathToTry}...`);
 
     if (fs.existsSync(pathToTry)) {
-      core.info(`Path found: ${pathToTry}`)
+      core.info(`Path found: ${pathToTry}`);
 
       return pathToTry;
     }
   }
 
-  throw new Error(`No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(', ')}`);
+  throw new Error(
+    `No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(
+      ", "
+    )}`
+  );
 }
 
-const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
+const sleep = (time = 1000) =>
+  new Promise((resolve) => setTimeout(resolve, time));
 
 function validateParams() {
-  core.info(`Validating input paramters...`)
+  core.info(`Validating input paramters...`);
 
   if (!paperspaceApiKey) {
-    throw new Error('Neither env.API_KEY or inputs.apiKey exists');
+    throw new Error("Neither env.PAPERSPACE_API_KEY or inputs.apiKey exists");
   }
 }
 
-function isDeploymentDisabled(runs: LatestRuns, deployment: Deployment): boolean {
-  if (deployment?.latestSpec?.data && "resources" in deployment?.latestSpec?.data) {
-    return !runs.length && (deployment.latestSpec?.data.enabled === false || !deployment.latestSpec.data.resources.replicas);
+function isDeploymentDisabled(
+  runs: LatestRuns,
+  deployment: Deployment
+): boolean {
+  if (
+    deployment?.latestSpec?.data &&
+    "resources" in deployment?.latestSpec?.data
+  ) {
+    return (
+      !runs.length &&
+      (deployment.latestSpec?.data.enabled === false ||
+        !deployment.latestSpec.data.resources.replicas)
+    );
   }
 
   return false;
 }
 
 function throwBadDeployError(runs: LatestRuns) {
-  const badRun = runs.find(run => {
-    const badInstance = run.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+  const badRun = runs.find((run) => {
+    const badInstance = run.instances.find((instance) =>
+      BAD_INSTANCE_STATES.includes(instance.state)
+    );
 
     return badInstance;
-  })
+  });
 
   if (badRun) {
-    const badInstance = badRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+    const badInstance = badRun.instances.find((instance) =>
+      BAD_INSTANCE_STATES.includes(instance.state)
+    );
 
     throw new Error(`
       Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
+      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ""}
     `);
   }
 
-  throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
+  throw new Error(
+    `Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`
+  );
 }
 
 function isDeploymentStable(deployment: Deployment): boolean {
@@ -116,7 +144,7 @@ async function syncDeployment(projectId: string, yaml: any) {
   });
 
   if (!deploymentId) {
-    throw new Error('Deployment upsert failed');
+    throw new Error("Deployment upsert failed");
   }
 
   const start = dayjs();
@@ -124,26 +152,26 @@ async function syncDeployment(projectId: string, yaml: any) {
   let isDeploymentUpdated = false;
 
   while (!isDeploymentUpdated) {
-    core.info('Waiting for deployment to complete...');
+    core.info("Waiting for deployment to complete...");
 
     const { runs, deployment } = await getDeploymentWithDetails(deploymentId);
 
     // only look at deployments that were applied to the target cluster
     if (deployment.latestSpec?.externalApplied) {
-      if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+      if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, "minutes"))) {
         throwBadDeployError(runs);
       }
 
       if (isDeploymentDisabled(runs, deployment)) {
-        core.info('Deployment successfully disabled.');
+        core.info("Deployment successfully disabled.");
 
         isDeploymentUpdated = true;
         return;
       }
 
       if (isDeploymentStable(deployment)) {
-        core.info('Deployment update complete.');
-  
+        core.info("Deployment update complete.");
+
         isDeploymentUpdated = true;
         return;
       }
@@ -155,44 +183,51 @@ async function syncDeployment(projectId: string, yaml: any) {
 
 const parseByExt = (filePath: string) => {
   const ext = path.extname(filePath);
-  const content = fs.readFileSync(filePath, 'utf8');
+  const content = fs.readFileSync(filePath, "utf8");
 
   switch (ext) {
-    case '.yaml':
+    case ".yaml":
       return YAML.parse(content);
-    case '.toml':
+    case ".toml":
       return TOML.parse(content);
-    case '.jsonc':
+    case ".jsonc":
       return JSONC.parse(content);
-    case '.json':
+    case ".json":
       return JSON.parse(content);
     default:
       throw new Error(`Unsupported file extension: ${ext}`);
   }
-}
+};
 
 async function maybeSyncDeployment() {
-  core.info(`Starting deployment update...`)
+  core.info(`Starting deployment update...`);
 
   const filePath = ensureAndGetConfigPath();
   const parsed = parseByExt(filePath);
 
-  const deployment = await getDeploymentByProjectAndName(projectId, parsed.name);
+  const deployment = await getDeploymentByProjectAndName(
+    projectId,
+    parsed.name
+  );
 
   // latest api version unless specified otherwise.
   // this allows for backwards compat.
   // ensure this happens before hash comparison.
   if (!parsed.apiVersion) {
-    parsed.apiVersion = 'latest';
+    parsed.apiVersion = "latest";
   }
 
   // image is always on top level of spec, regardless of version.
   if (optionalImage) {
-    if (parsed.image !== ':image') {
-      core.warning('Optional image was specified but config.image is not set to `:image`. This can lead to confusion and is not recommended.');
+    if (parsed.image !== ":image") {
+      core.warning(
+        "Optional image was specified but config.image is not set to `:image`. This can lead to confusion and is not recommended."
+      );
     }
 
-    core.info(`Overriding config.image with optional image input: ${optionalImage}`)
+    core.info(
+      `Overriding config.image with optional image input: ${optionalImage}`
+    );
 
     // replace the image in the spec with the one provided
     parsed.image = optionalImage;
@@ -200,19 +235,21 @@ async function maybeSyncDeployment() {
 
   if (deployment) {
     const specHash = hash(parsed, {
-      algorithm: 'md5',
-    })
-  
-    core.info(`Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`);
-  
+      algorithm: "md5",
+    });
+
+    core.info(
+      `Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`
+    );
+
     if (specHash === deployment.latestSpecHash) {
       core.info(`No spec changes detected. Skipping deployment update.`);
-  
+
       return;
     }
   }
 
-  core.info('Upserting deployment...');
+  core.info("Upserting deployment...");
 
   await syncDeployment(projectId, parsed);
 }
@@ -223,11 +260,11 @@ async function run(): Promise<void> {
 
     await maybeSyncDeployment();
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message);
   }
 }
 
 /**
  * Main entry point
  */
-run()
+run();

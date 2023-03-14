@@ -4,19 +4,19 @@
 
 ## Inputs
 
-| Input        | Type     | Required? | Description                                                                |
-| ------------ | -------- | --------- | -------------------------------------------------------------------------- |
-| `apiKey`     | `string` | Yes       | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys) |
-| `projectId`  | `string` | Yes       | The ID of the project the deployment lives under                           |
-| `configPath` | `string` | No        | The relative file path of the configuration file.                          |
-| `image`      | `string` | No        | Container image to be used in the configuration                            |
+| Input        | Type     | Required? | Description                                                                                                                                           |
+| ------------ | -------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `projectId`  | `string` | Yes       | The ID of the project the deployment lives under                                                                                                      |
+| `apiKey`     | `string` | No        | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys). This may also be set using the `PAPERSPACE_API_KEY` environment variable. |
+| `configPath` | `string` | No        | The relative file path of the configuration file.                                                                                                     |
+| `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |
 
 ## Usage
 
 ```yaml
 uses: paperspace/deploy@v1.0
 env:
-  API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
   projectId: p28rlnvnw51
 ```
@@ -47,7 +47,7 @@ resources:
 ```yaml
 uses: paperspace/deploy@v1.0
 env:
-  API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
   image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }})
   projectId: p28rlnvnw51
@@ -73,7 +73,7 @@ jobs:
         name: Deploy Staging
         id: deploy
         env:
-          API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+          PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
         with:
           projectId: p28rlnvnw51
           image: nginx:latest
@@ -122,7 +122,7 @@ jobs:
         name: Deploy to Paperspace
         id: deploy
         env:
-          API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+          PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
         with:
           projectId: ptzm6ujwqwa
           image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
@@ -138,7 +138,7 @@ You can supply an optional relative path for your paperspace config like so:
   name: Deploy action
   id: deploy
   env:
-    API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+    PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
   with:
     projectId: p28rlnvnw51
     configPath: ./random/paperspace.jsonc

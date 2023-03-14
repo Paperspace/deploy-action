@@ -93,7 +93,7 @@ const core = __importStar(__nccwpck_require__(7733));
 __nccwpck_require__(4250);
 const service_1 = __nccwpck_require__(1209);
 const TIMEOUT_IN_MINUTES = 5;
-const BAD_INSTANCE_STATES = ['errored', 'failed'];
+const BAD_INSTANCE_STATES = ["errored", "failed"];
 const defaultConfigPaths = [
     "paperspace.yaml",
     "paperspace.yml",
@@ -107,13 +107,13 @@ const defaultConfigPaths = [
     ".paperspace/app.toml",
 ];
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
-const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
-const projectId = core.getInput('projectId', { required: true });
-const optionalImage = core.getInput('image', { required: true });
+const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
+const projectId = core.getInput("projectId", { required: true });
+const optionalImage = core.getInput("image", { required: true });
 function ensureAndGetConfigPath() {
     var _a;
-    const relativeFilePath = core.getInput('configPath');
-    const workspacePath = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : '';
+    const relativeFilePath = core.getInput("configPath");
+    const workspacePath = (_a = process.env.GITHUB_WORKSPACE) !== null && _a !== void 0 ? _a : "";
     if (relativeFilePath) {
         core.info(`Found configPath input: ${relativeFilePath}. Ensuring file exists...`);
         const relPath = path_1.default.join(workspacePath, relativeFilePath);
@@ -122,7 +122,7 @@ function ensureAndGetConfigPath() {
         }
         return relPath;
     }
-    core.warning('No configPath input provided. Searching for default...');
+    core.warning("No configPath input provided. Searching for default...");
     for (const fileName of defaultConfigPaths) {
         const pathToTry = path_1.default.join(workspacePath, fileName);
         core.info(`Trying for path: ${pathToTry}...`);
@@ -131,32 +131,35 @@ function ensureAndGetConfigPath() {
             return pathToTry;
         }
     }
-    throw new Error(`No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(', ')}`);
+    throw new Error(`No Paperspace spec file found at any of the following paths: ${defaultConfigPaths.join(", ")}`);
 }
 const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 function validateParams() {
     core.info(`Validating input paramters...`);
     if (!paperspaceApiKey) {
-        throw new Error('Neither env.API_KEY or inputs.apiKey exists');
+        throw new Error("Neither env.PAPERSPACE_API_KEY or inputs.apiKey exists");
     }
 }
 function isDeploymentDisabled(runs, deployment) {
     var _a, _b, _c;
-    if (((_a = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.data) && "resources" in ((_b = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.data)) {
-        return !runs.length && (((_c = deployment.latestSpec) === null || _c === void 0 ? void 0 : _c.data.enabled) === false || !deployment.latestSpec.data.resources.replicas);
+    if (((_a = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.data) &&
+        "resources" in ((_b = deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.data)) {
+        return (!runs.length &&
+            (((_c = deployment.latestSpec) === null || _c === void 0 ? void 0 : _c.data.enabled) === false ||
+                !deployment.latestSpec.data.resources.replicas));
     }
     return false;
 }
 function throwBadDeployError(runs) {
-    const badRun = runs.find(run => {
-        const badInstance = run.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+    const badRun = runs.find((run) => {
+        const badInstance = run.instances.find((instance) => BAD_INSTANCE_STATES.includes(instance.state));
         return badInstance;
     });
     if (badRun) {
-        const badInstance = badRun.instances.find(instance => BAD_INSTANCE_STATES.includes(instance.state));
+        const badInstance = badRun.instances.find((instance) => BAD_INSTANCE_STATES.includes(instance.state));
         throw new Error(`
       Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.
-      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ''}
+      ${badInstance ? `Last instance message: ${badInstance.stateMessage}` : ""}
     `);
     }
     throw new Error(`Deployment update timed out after ${TIMEOUT_IN_MINUTES} minutes.`);
@@ -173,25 +176,25 @@ function syncDeployment(projectId, yaml) {
             projectId,
         });
         if (!deploymentId) {
-            throw new Error('Deployment upsert failed');
+            throw new Error("Deployment upsert failed");
         }
         const start = (0, dayjs_1.default)();
         let isDeploymentUpdated = false;
         while (!isDeploymentUpdated) {
-            core.info('Waiting for deployment to complete...');
+            core.info("Waiting for deployment to complete...");
             const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             // only look at deployments that were applied to the target cluster
             if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
-                if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, 'minutes'))) {
+                if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, "minutes"))) {
                     throwBadDeployError(runs);
                 }
                 if (isDeploymentDisabled(runs, deployment)) {
-                    core.info('Deployment successfully disabled.');
+                    core.info("Deployment successfully disabled.");
                     isDeploymentUpdated = true;
                     return;
                 }
                 if (isDeploymentStable(deployment)) {
-                    core.info('Deployment update complete.');
+                    core.info("Deployment update complete.");
                     isDeploymentUpdated = true;
                     return;
                 }
@@ -202,15 +205,15 @@ function syncDeployment(projectId, yaml) {
 }
 const parseByExt = (filePath) => {
     const ext = path_1.default.extname(filePath);
-    const content = fs_1.default.readFileSync(filePath, 'utf8');
+    const content = fs_1.default.readFileSync(filePath, "utf8");
     switch (ext) {
-        case '.yaml':
+        case ".yaml":
             return yaml_1.default.parse(content);
-        case '.toml':
+        case ".toml":
             return toml_1.default.parse(content);
-        case '.jsonc':
+        case ".jsonc":
             return jsonc_1.jsonc.parse(content);
-        case '.json':
+        case ".json":
             return JSON.parse(content);
         default:
             throw new Error(`Unsupported file extension: ${ext}`);
@@ -226,12 +229,12 @@ function maybeSyncDeployment() {
         // this allows for backwards compat.
         // ensure this happens before hash comparison.
         if (!parsed.apiVersion) {
-            parsed.apiVersion = 'latest';
+            parsed.apiVersion = "latest";
         }
         // image is always on top level of spec, regardless of version.
         if (optionalImage) {
-            if (parsed.image !== ':image') {
-                core.warning('Optional image was specified but config.image is not set to `:image`. This can lead to confusion and is not recommended.');
+            if (parsed.image !== ":image") {
+                core.warning("Optional image was specified but config.image is not set to `:image`. This can lead to confusion and is not recommended.");
             }
             core.info(`Overriding config.image with optional image input: ${optionalImage}`);
             // replace the image in the spec with the one provided
@@ -239,7 +242,7 @@ function maybeSyncDeployment() {
         }
         if (deployment) {
             const specHash = (0, object_hash_1.default)(parsed, {
-                algorithm: 'md5',
+                algorithm: "md5",
             });
             core.info(`Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`);
             if (specHash === deployment.latestSpecHash) {
@@ -247,7 +250,7 @@ function maybeSyncDeployment() {
                 return;
             }
         }
-        core.info('Upserting deployment...');
+        core.info("Upserting deployment...");
         yield syncDeployment(projectId, parsed);
     });
 }
@@ -312,8 +315,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getDeploymentWithDetails = exports.getDeploymentByProjectAndName = exports.upsertDeployment = void 0;
 const core = __importStar(__nccwpck_require__(7733));
 const openapi_typescript_fetch_1 = __nccwpck_require__(799);
-const BASE_API_URL = 'https://api.paperspace.com/v1';
-const paperspaceApiKey = process.env.API_KEY || core.getInput('apiKey');
+const BASE_API_URL = "https://api.paperspace.com/v1";
+const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
 const fetcher = openapi_typescript_fetch_1.Fetcher.for();
 // global configuration
 fetcher.configure({
@@ -325,10 +328,22 @@ fetcher.configure({
     },
 });
 // create fetch operations
-const getSingleDeployment = fetcher.path('/deployments/{id}').method('get').create();
-const getDeploymentWithRuns = fetcher.path('/deployments/{id}/runs').method('get').create();
-const upsertDeploymentFetcher = fetcher.path('/deployments').method('post').create();
-const getDeploymentByProjectFetcher = fetcher.path('/projects/{handle}/deployments').method('get').create();
+const getSingleDeployment = fetcher
+    .path("/deployments/{id}")
+    .method("get")
+    .create();
+const getDeploymentWithRuns = fetcher
+    .path("/deployments/{id}/runs")
+    .method("get")
+    .create();
+const upsertDeploymentFetcher = fetcher
+    .path("/deployments")
+    .method("post")
+    .create();
+const getDeploymentByProjectFetcher = fetcher
+    .path("/projects/{handle}/deployments")
+    .method("get")
+    .create();
 function upsertDeployment(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data: deployment } = yield upsertDeploymentFetcher(config);
@@ -339,10 +354,11 @@ function upsertDeployment(config) {
 exports.upsertDeployment = upsertDeployment;
 function getDeploymentByProjectAndName(handle, name) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { data: deployments } = yield getDeploymentByProjectFetcher({
+        const { data } = yield getDeploymentByProjectFetcher({
             handle,
             name,
         });
+        const deployments = data.items;
         if (!deployments) {
             throw new Error(`Deployments matching name and project not found.`);
         }
