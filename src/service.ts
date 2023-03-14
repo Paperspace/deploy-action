@@ -45,11 +45,24 @@ export type LatestRuns =
   operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
 
 export async function upsertDeployment(config: Config) {
-  const { data: deployment } = await upsertDeploymentFetcher(config);
+  try {
+    const { data: deployment } = await upsertDeploymentFetcher(config);
 
-  const { deploymentId } = deployment;
+    const { deploymentId } = deployment;
 
-  return deploymentId;
+    return deploymentId;
+  } catch(e) {
+    // check which operation threw the exception
+    if (e instanceof upsertDeploymentFetcher.Error) {
+      const { data } = e.getActualType()
+
+      if ("issues" in data) {
+        throw new Error(`Error upserting deployment: ${data.message}. Issues: ${JSON.stringify(data.issues)}`)
+      }
+
+      throw new Error(`Error upserting deployment: ${data.message}.`)
+    }
+  }
 }
 
 export async function getDeploymentByProjectAndName(
