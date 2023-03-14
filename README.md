@@ -30,9 +30,10 @@ with:
   projectId: p28rlnvnw51
 ```
 
-### Passing an image as an input:
+### Providing an image as an input
 
 Mark the image as replacable using `:image` within your `.paperspace/app.yaml`.
+
 ```yaml
 enabled: true
 name: Demo
@@ -53,7 +54,7 @@ with:
   projectId: p28rlnvnw51
 ```
 
-### Full workflow
+### Example of a complete workflow
 
 ```yaml
 name: test-pr
@@ -79,7 +80,7 @@ jobs:
           image: nginx:latest
 ```
 
-### Full build + deploy
+### Example of a complete build and deploy
 
 An example of building a custom image and syncing the deployment to Paperspace after pushing to a container registry.
 
@@ -129,9 +130,9 @@ jobs:
 
 ```
 
-### Config paths
+### Configuration paths
 
-You can supply an optional relative path for your paperspace config like so:
+You may supply an optional relative path to a Paperspace config as follows:
 
 ```yaml
 - uses: paperspace/deploy-action@main
@@ -145,23 +146,19 @@ You can supply an optional relative path for your paperspace config like so:
     image: paperspace/deployment-fixture
 ```
 
-By default, the action looks for a config file by order of precedence:
+By default, the action looks for a config file in order of precedence:
 
-```js
-[
-  "paperspace.yaml",
-  "paperspace.yml",
-  "paperspace.json",
-  "paperspace.jsonc",
-  "paperspace.toml",
-  ".paperspace/app.yaml",
-  ".paperspace/app.yml",
-  ".paperspace/app.json",
-  ".paperspace/app.jsonc",
-  ".paperspace/app.toml",
-]
-```
+- `paperspace.yaml`
+- `paperspace.yml`
+- `paperspace.json`
+- `paperspace.jsonc`
+- `paperspace.toml`
+- `.paperspace/app.yaml`
+- `.paperspace/app.yml`
+- `.paperspace/app.json`
+- `.paperspace/app.jsonc`
+- `.paperspace/app.toml`
 
 ### File extensions
 
-`.json`, `.jsonc`, `.toml`, `.yaml` are all supported.
+`.json`, `.jsonc`, `.toml`, `.yaml`, `.yml` are all supported.
