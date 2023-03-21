@@ -174,4 +174,4 @@ apiVersion: v0alpha1
 ...
 ```
 
-These versions are not required. If a version is not supplied to the config file used by this GitHub Action, `latest` will be used implicitly.
+These versions are not required. If a version is not supplied in the deployment config file used by this GitHub Action, `latest` will be used implicitly.
