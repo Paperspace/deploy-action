@@ -162,3 +162,16 @@ By default, the action looks for a config file in order of precedence:
 ### File extensions
 
 `.json`, `.jsonc`, `.toml`, `.yaml`, `.yml` are all supported.
+
+### Default apiVersion
+
+Deployments now allow for versioned deployment specs. Example:
+
+```yaml
+enabled: true,
+name: Demo
+apiVersion: v0alpha1
+...
+```
+
+These versions are not required. If a version is not supplied to the config file used by this GitHub Action, `latest` will be used implicitly.
