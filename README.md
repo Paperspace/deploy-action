@@ -165,7 +165,7 @@ By default, the action looks for a config file in order of precedence:
 
 ### Default apiVersion
 
-Deployments now allow for versioned deployment specs. Example:
+Deployments allow for versioned deployment specs. Example:
 
 ```yaml
 enabled: true,
