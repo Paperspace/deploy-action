@@ -13,9 +13,6 @@ inputs:
   image:
     description: 'Optional container image to use for the deployment.'
     required: false
-  force:
-    description: 'Whether or not to force the deployment.'
-    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

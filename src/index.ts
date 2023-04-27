@@ -37,7 +37,6 @@ const paperspaceApiKey =
   process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
 const projectId = core.getInput("projectId", { required: true });
 const optionalImage = core.getInput("image", { required: true });
-const shouldForce = Boolean(core.getInput("force", { required: false }));
 
 function ensureAndGetConfigPath(): string {
   const relativeFilePath = core.getInput("configPath");
@@ -214,7 +213,6 @@ async function maybeSyncDeployment() {
 
   // latest api version unless specified otherwise.
   // this allows for backwards compat.
-  // ensure this happens before hash comparison.
   if (!parsed.apiVersion) {
     parsed.apiVersion = "latest";
   }
@@ -233,28 +231,6 @@ async function maybeSyncDeployment() {
 
     // replace the image in the spec with the one provided
     parsed.image = optionalImage;
-  }
-
-  if (deployment) {
-    console.log('should force?', shouldForce);
-
-    if (!shouldForce) {
-      const specHash = hash(parsed, {
-        algorithm: "md5",
-      });
-  
-      core.info(
-        `Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`
-      );
-  
-      if (specHash === deployment.latestSpecHash) {
-        core.info(`No spec changes detected. Skipping deployment update.`);
-  
-        return;
-      }
-    } else {
-      core.info(`Force flag passed. Bypassing hash check.`);
-    }
   }
 
   core.info("Upserting deployment...");
