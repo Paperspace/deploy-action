@@ -236,6 +236,8 @@ async function maybeSyncDeployment() {
   }
 
   if (deployment) {
+    console.log('should force?', shouldForce);
+
     if (!shouldForce) {
       const specHash = hash(parsed, {
         algorithm: "md5",
