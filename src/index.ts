@@ -4,7 +4,6 @@ import TOML from "toml";
 import { jsonc as JSONC } from "jsonc";
 import path from "path";
 import dayjs from "dayjs";
-import hash from "object-hash";
 import * as core from "@actions/core";
 
 import "./fetch-polyfill";
@@ -206,14 +205,13 @@ async function maybeSyncDeployment() {
   const filePath = ensureAndGetConfigPath();
   const parsed = parseByExt(filePath);
 
-  const deployment = await getDeploymentByProjectAndName(
+  await getDeploymentByProjectAndName(
     projectId,
     parsed.name
   );
 
   // latest api version unless specified otherwise.
   // this allows for backwards compat.
-  // ensure this happens before hash comparison.
   if (!parsed.apiVersion) {
     parsed.apiVersion = "latest";
   }
@@ -232,22 +230,6 @@ async function maybeSyncDeployment() {
 
     // replace the image in the spec with the one provided
     parsed.image = optionalImage;
-  }
-
-  if (deployment) {
-    const specHash = hash(parsed, {
-      algorithm: "md5",
-    });
-
-    core.info(
-      `Deployment Found. Comparing hashes: ${specHash} - ${deployment.latestSpecHash}`
-    );
-
-    if (specHash === deployment.latestSpecHash) {
-      core.info(`No spec changes detected. Skipping deployment update.`);
-
-      return;
-    }
   }
 
   core.info("Upserting deployment...");

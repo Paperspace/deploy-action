@@ -9,7 +9,7 @@
 | `projectId`  | `string` | Yes       | The ID of the project the deployment lives under                                                                                                      |
 | `apiKey`     | `string` | No        | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys). This may also be set using the `PAPERSPACE_API_KEY` environment variable. |
 | `configPath` | `string` | No        | The relative file path of the configuration file.                                                                                                     |
-| `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |
+| `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |                                              
 
 ## Usage
 
@@ -175,3 +175,4 @@ apiVersion: v0alpha1
 ```
 
 These versions are not required. If a version is not supplied in the deployment config file used by this GitHub Action, `latest` will be used implicitly.
+
