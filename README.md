@@ -10,6 +10,7 @@
 | `apiKey`     | `string` | No        | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys). This may also be set using the `PAPERSPACE_API_KEY` environment variable. |
 | `configPath` | `string` | No        | The relative file path of the configuration file.                                                                                                     |
 | `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |
+| `force`      | `boolean` | No        | Whether or not to force a deployment. Default is to compare config hash. Useful for deployments using latest or other static tags.                                                                                                       |
 
 ## Usage
 
@@ -175,3 +176,26 @@ apiVersion: v0alpha1
 ```
 
 These versions are not required. If a version is not supplied in the deployment config file used by this GitHub Action, `latest` will be used implicitly.
+
+### Force deploy
+
+In some cases, you might be using a static image tag like `:latest` or `:main`.
+
+The default functionality of the action is to compare the hash of the config file to what is currently deployed on the cluster.
+
+If you are using a `latest` tag, then your image won't change, subsequently bypassing the deployment update.
+
+To get around this, you can use the `force: true` flag.
+
+```yaml
+- uses: paperspace/deploy-action@v1.0
+  name: Deploy action
+  id: deploy
+  env:
+    PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
+  with:
+    projectId: p28rlnvnw51
+    configPath: ./random/paperspace.jsonc
+    image: paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
+    force: true
+```
