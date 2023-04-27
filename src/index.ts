@@ -4,7 +4,6 @@ import TOML from "toml";
 import { jsonc as JSONC } from "jsonc";
 import path from "path";
 import dayjs from "dayjs";
-import hash from "object-hash";
 import * as core from "@actions/core";
 
 import "./fetch-polyfill";
@@ -206,7 +205,7 @@ async function maybeSyncDeployment() {
   const filePath = ensureAndGetConfigPath();
   const parsed = parseByExt(filePath);
 
-  const deployment = await getDeploymentByProjectAndName(
+  await getDeploymentByProjectAndName(
     projectId,
     parsed.name
   );

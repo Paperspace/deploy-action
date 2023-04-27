@@ -225,7 +225,7 @@ function maybeSyncDeployment() {
         core.info(`Starting deployment update...`);
         const filePath = ensureAndGetConfigPath();
         const parsed = parseByExt(filePath);
-        const deployment = yield (0, service_1.getDeploymentByProjectAndName)(projectId, parsed.name);
+        yield (0, service_1.getDeploymentByProjectAndName)(projectId, parsed.name);
         // latest api version unless specified otherwise.
         // this allows for backwards compat.
         if (!parsed.apiVersion) {
