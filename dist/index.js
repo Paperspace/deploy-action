@@ -331,7 +331,7 @@ fetcher.configure({
             "x-git-owner": github.context.repo.owner,
             "x-git-repo": github.context.repo.repo,
             "x-git-ref": getRef(),
-            "x-git-sha": github.context.sha,
+            "x-git-sha": getSha(),
         },
     },
 });
@@ -410,11 +410,22 @@ function getDeploymentWithDetails(id) {
 }
 exports.getDeploymentWithDetails = getDeploymentWithDetails;
 function getRef() {
+    var _a, _b;
     let ref = github.context.ref;
+    if (ref.startsWith("refs/pull/")) {
+        ref = (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.ref) !== null && _b !== void 0 ? _b : "";
+    }
     if (ref.startsWith("refs/heads/")) {
         ref = ref.replace("refs/heads/", "");
     }
     return ref;
+}
+function getSha() {
+    var _a, _b;
+    if (github.context.eventName === "pull_request") {
+        return (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.sha) !== null && _b !== void 0 ? _b : "";
+    }
+    return github.context.sha;
 }
 
 

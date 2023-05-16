@@ -36,7 +36,7 @@ fetcher.configure({
       "x-git-owner": github.context.repo.owner,
       "x-git-repo": github.context.repo.repo,
       "x-git-ref": getRef(),
-      "x-git-sha": github.context.sha,
+      "x-git-sha": getSha(),
     },
   },
 });
@@ -136,9 +136,21 @@ export async function getDeploymentWithDetails(id: string) {
 function getRef() {
   let ref = github.context.ref;
 
+  if (ref.startsWith("refs/pull/")) {
+    ref = github.context.payload.pull_request?.head.ref ?? "";
+  }
+
   if (ref.startsWith("refs/heads/")) {
     ref = ref.replace("refs/heads/", "");
   }
 
   return ref;
+}
+
+function getSha() {
+  if (github.context.eventName === "pull_request") {
+    return github.context.payload.pull_request?.head.sha ?? "";
+  }
+
+  return github.context.sha;
 }
