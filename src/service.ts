@@ -12,10 +12,12 @@ const fetcher = Fetcher.for<paths>();
 
 const Logger: Middleware = async (url, init, next) => {
   if (process.env.DEBUG) {
-    console.log("URL", url);
-    console.log("Method", init.method);
-    console.log("Body", init.body);
-    console.log("Headers", Object.fromEntries(init.headers.entries()));
+    core.debug("URL: " + url);
+    core.debug("Method: " + init.method);
+    core.debug(
+      "Headers:\n" +
+        JSON.stringify(Object.fromEntries(init.headers.entries()), null, 2)
+    );
   }
 
   const response = await next(url, init);
