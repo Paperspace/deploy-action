@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { Fetcher } from "openapi-typescript-fetch";
+import { Fetcher, Middleware } from "openapi-typescript-fetch";
 
 import { paths, operations } from "./api";
 
@@ -10,9 +10,22 @@ const paperspaceApiKey =
 
 const fetcher = Fetcher.for<paths>();
 
+const Logger: Middleware = async (url, init, next) => {
+  if (process.env.DEBUG) {
+    console.log("URL", url);
+    console.log("Method", init.method);
+    console.log("Body", init.body);
+    console.log("Headers", Object.fromEntries(init.headers.entries()));
+  }
+
+  const response = await next(url, init);
+  return response;
+};
+
 // global configuration
 fetcher.configure({
   baseUrl: BASE_API_URL,
+  use: [Logger],
   init: {
     headers: {
       Authorization: `Bearer ${paperspaceApiKey}`,
