@@ -9,12 +9,12 @@
 | `projectId`  | `string` | Yes       | The ID of the project the deployment lives under                                                                                                      |
 | `apiKey`     | `string` | No        | Your [Paperspace API key](https://console.paperspace.com/settings/apikeys). This may also be set using the `PAPERSPACE_API_KEY` environment variable. |
 | `configPath` | `string` | No        | The relative file path of the configuration file.                                                                                                     |
-| `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |                                              
+| `image`      | `string` | No        | Container image to be used in the configuration                                                                                                       |
 
 ## Usage
 
 ```yaml
-uses: paperspace/deploy-action@v1.0
+uses: paperspace/deploy-action@v1.2
 env:
   PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
@@ -24,7 +24,7 @@ with:
 You can also pass the api key as an input.
 
 ```yaml
-uses: paperspace/deploy-action@v1.0
+uses: paperspace/deploy-action@v1.2
 with:
   apiKey: ${{ secrets.PAPERSPACE_API_KEY }}
   projectId: p28rlnvnw51
@@ -46,7 +46,7 @@ resources:
 
 
 ```yaml
-uses: paperspace/deploy-action@v1.0
+uses: paperspace/deploy-action@v1.2
 env:
   PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: paperspace/deploy-action@v1.0
+      - uses: paperspace/deploy-action@v1.2
         name: Deploy Staging
         id: deploy
         env:
@@ -119,7 +119,7 @@ jobs:
           tags: |
             paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
 
-      - uses: paperspace/deploy-action@v1.0
+      - uses: paperspace/deploy-action@v1.2
         name: Deploy to Paperspace
         id: deploy
         env:
@@ -135,7 +135,7 @@ jobs:
 You may supply an optional relative path to a Paperspace config as follows:
 
 ```yaml
-- uses: paperspace/deploy-action@v1.0
+- uses: paperspace/deploy-action@v1.2
   name: Deploy action
   id: deploy
   env:
