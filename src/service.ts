@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
-import { Fetcher } from "openapi-typescript-fetch";
+import * as github from "@actions/github";
+import { Fetcher, Middleware } from "openapi-typescript-fetch";
 
 import { paths, operations } from "./api";
 
@@ -9,12 +10,33 @@ const paperspaceApiKey =
 
 const fetcher = Fetcher.for<paths>();
 
+const Logger: Middleware = async (url, init, next) => {
+  if (process.env.DEBUG) {
+    core.info("URL: " + url);
+    core.info("Method: " + init.method);
+    core.info(
+      "Headers:\n" +
+        JSON.stringify(Object.fromEntries(init.headers.entries()), null, 2)
+    );
+  }
+
+  const response = await next(url, init);
+  return response;
+};
+
 // global configuration
 fetcher.configure({
   baseUrl: BASE_API_URL,
+  use: [Logger],
   init: {
     headers: {
       Authorization: `Bearer ${paperspaceApiKey}`,
+      "x-git-host": "github",
+      "x-git-actor": github.context.actor,
+      "x-git-owner": github.context.repo.owner,
+      "x-git-repo": github.context.repo.repo,
+      "x-git-ref": getRef(),
+      "x-git-sha": getSha(),
     },
   },
 });
@@ -109,4 +131,26 @@ export async function getDeploymentWithDetails(id: string) {
     runs,
     deployment,
   };
+}
+
+function getRef() {
+  let ref = github.context.ref;
+
+  if (ref.startsWith("refs/pull/")) {
+    ref = github.context.payload.pull_request?.head.ref ?? "";
+  }
+
+  if (ref.startsWith("refs/heads/")) {
+    ref = ref.replace("refs/heads/", "");
+  }
+
+  return ref;
+}
+
+function getSha() {
+  if (github.context.eventName === "pull_request") {
+    return github.context.payload.pull_request?.head.sha ?? "";
+  }
+
+  return github.context.sha;
 }
