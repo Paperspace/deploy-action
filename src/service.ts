@@ -12,9 +12,9 @@ const fetcher = Fetcher.for<paths>();
 
 const Logger: Middleware = async (url, init, next) => {
   if (process.env.DEBUG) {
-    core.debug("URL: " + url);
-    core.debug("Method: " + init.method);
-    core.debug(
+    core.info("URL: " + url);
+    core.info("Method: " + init.method);
+    core.info(
       "Headers:\n" +
         JSON.stringify(Object.fromEntries(init.headers.entries()), null, 2)
     );
