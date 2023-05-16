@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import { Fetcher } from "openapi-typescript-fetch";
 
 import { paths, operations } from "./api";
@@ -15,6 +16,12 @@ fetcher.configure({
   init: {
     headers: {
       Authorization: `Bearer ${paperspaceApiKey}`,
+      "x-git-host": "github",
+      "x-git-actor": github.context.actor,
+      "x-git-owner": github.context.repo.owner,
+      "x-git-repo": github.context.repo.repo,
+      "x-git-ref": getRef(),
+      "x-git-sha": github.context.sha,
     },
   },
 });
@@ -109,4 +116,14 @@ export async function getDeploymentWithDetails(id: string) {
     runs,
     deployment,
   };
+}
+
+function getRef() {
+  let ref = github.context.ref;
+
+  if (ref.startsWith("refs/heads/")) {
+    ref = ref.replace("refs/heads/", "");
+  }
+
+  return ref;
 }
