@@ -3,138 +3,633 @@
  * Do not make direct changes to the file.
  */
 
+
 export interface paths {
+  "/apps": {
+    /**
+     * Create an app 
+     * @description Create an app.
+     */
+    post: operations["mutation.apps.create"];
+  };
+  "/apps/{id}/enable": {
+    /**
+     * Enable an app 
+     * @description Enables an app that has been previously disabled. This will start the app and make it available to users.
+     */
+    patch: operations["mutation.apps.enable"];
+  };
+  "/apps/{id}/disable": {
+    /**
+     * Disable an app 
+     * @description Disables an app that is currently enabled. This will stop the app's deployments and make it unavailable to users.
+     */
+    patch: operations["mutation.apps.disable"];
+  };
+  "/apps/{id}/name": {
+    /**
+     * Update an app's name 
+     * @description Change the name of an app
+     */
+    patch: operations["mutation.apps.updateName"];
+  };
+  "/apps/{id}": {
+    /**
+     * Delete an app 
+     * @description Deletes an app. This will delete all resources associated with the app.
+     */
+    delete: operations["mutation.apps.delete"];
+  };
   "/auth/session": {
     /**
-     * Get the current session
+     * Get the current session 
      * @description Get the current session. If a user is not logged in, this will be null. Otherwise, it will contain the current team and user.
      */
     get: operations["query.auth.session"];
   };
+  "/autoscaling-groups/{id}": {
+    /**
+     * Get an autoscaling group 
+     * @description Fetches a single autoscaling group by id.
+     */
+    get: operations["query.autoscalingGroups.get"];
+    /**
+     * Update an autoscaling group 
+     * @description Update an autoscaling group.
+     */
+    put: operations["mutation.autoscalingGroups.update"];
+    /**
+     * Delete an autoscaling group 
+     * @description Delete an autoscaling group.
+     */
+    delete: operations["mutation.autoscalingGroups.delete"];
+  };
+  "/autoscaling-groups": {
+    /**
+     * List autoscaling groups 
+     * @description List autoscaling groups and filter by machine type.
+     */
+    get: operations["query.autoscalingGroups.list"];
+    /**
+     * Create an autoscaling group 
+     * @description Create an autoscaling group.
+     */
+    post: operations["mutation.autoscalingGroups.create"];
+  };
+  "/billing/account-standing": {
+    /**
+     * Get account standing 
+     * @description Check whether the current team account is in good standing. If not, send back a message explaining why.
+     */
+    get: operations["query.billingAccountStanding.get"];
+  };
+  "/container-registries": {
+    /**
+     * List container registries 
+     * @description Lists container registries for the current team.
+     */
+    get: operations["query.containerRegistries.list"];
+    /**
+     * Create a container registry 
+     * @description Creates a container registry for the current team.
+     */
+    post: operations["mutation.containerRegistries.create"];
+  };
+  "/container-registries/{id}": {
+    /**
+     * List container registries 
+     * @description Lists container registries for the current team.
+     */
+    get: operations["query.containerRegistries.get"];
+    /**
+     * Update a container registry 
+     * @description Updates a container registry for the current team.
+     */
+    put: operations["mutation.containerRegistries.update"];
+    /**
+     * Delete a container registry 
+     * @description Deletes a container registry for the current team.
+     */
+    delete: operations["mutation.containerRegistries.delete"];
+  };
+  "/container-registries/{id}/test-connection": {
+    /**
+     * Test a container registry connection 
+     * @description Validate that a container registry can be connected to using the provided credentials.
+     */
+    get: operations["mutation.containerRegistries.testConnection"];
+  };
+  "/machine-events/{id}": {
+    /**
+     * Get a machine event 
+     * @description Fetches a single machine event by ID.
+     */
+    get: operations["query.machineEvents.get"];
+  };
+  "/machine-events": {
+    /**
+     * List machine events 
+     * @description Fetches a list of machine events.
+     */
+    get: operations["query.machineEvents.list"];
+  };
   "/deployments/{id}": {
     /**
-     * Get a deployment
+     * Get a deployment 
      * @description Fetches a single deployment by deployment ID.
      */
     get: operations["query.deployments.get"];
     /**
-     * Delete a deployment
+     * Delete a deployment 
      * @description Deletes a deployment by deployment ID.
      */
     delete: operations["mutation.deployments.delete"];
   };
   "/deployments": {
     /**
-     * List deployments
+     * List deployments 
      * @description Fetches a list of deployments for a logged in user.
      */
     get: operations["query.deployments.list"];
     /**
-     * Upsert a deployment
+     * Upsert a deployment 
      * @description Submit a new deployment configuration. If a deployment does not exist, one is created. Otherwise, a deployment is updated with new configuration.
      */
     post: operations["mutation.deployments.upsert"];
   };
   "/deployments/{id}/runs": {
     /**
-     * List deployment runs
+     * List deployment runs 
      * @description Lists the active deployment runs for a deployment.
      */
-    get: operations["query.deploymentRunsrouter.get"];
+    get: operations["query.deploymentRuns.get"];
+  };
+  "/deployments/{id}/metrics": {
+    /**
+     * List app metrics 
+     * @description Lists metrics for a given app.
+     */
+    get: operations["query.deploymentMetrics.get"];
+  };
+  "/deployments/{id}/logs": {
+    /**
+     * List app logs 
+     * @description Lists logs for a given app.
+     */
+    get: operations["query.deploymentLogs.list"];
+  };
+  "/deployments/{id}/history": {
+    /**
+     * List app history 
+     * @description Lists history for a given app.
+     */
+    get: operations["query.deploymentHistory.list"];
+  };
+  "/machines": {
+    /**
+     * List machines 
+     * @description Fetches a list of machines.
+     */
+    get: operations["query.machines.list"];
+    /**
+     * Create a machine 
+     * @description Creates a new machine.
+     */
+    post: operations["mutation.machines.create"];
+  };
+  "/machines/{id}": {
+    /**
+     * Get a machine 
+     * @description Fetches a single machine by ID.
+     */
+    get: operations["query.machines.get"];
+    /**
+     * Update a machine 
+     * @description Updates a machine.
+     */
+    put: operations["mutation.machines.update"];
+    /**
+     * Delete a machine 
+     * @description Deletes a single machine by ID.
+     */
+    delete: operations["mutation.machines.delete"];
+  };
+  "/machines/{id}/restart": {
+    /**
+     * Restart a machine 
+     * @description Restarts a machine.
+     */
+    patch: operations["mutation.machines.restart"];
+  };
+  "/machines/{id}/start": {
+    /**
+     * Start a machine 
+     * @description Starts a machine.
+     */
+    patch: operations["mutation.machines.start"];
+  };
+  "/machines/{id}/stop": {
+    /**
+     * Stop a machine 
+     * @description Stops a machine.
+     */
+    patch: operations["mutation.machines.stop"];
+  };
+  "/machines/{id}/accessors": {
+    /**
+     * List accessors 
+     * @description Lists the team members that can explicitly access a machine.
+     */
+    get: operations["query.machines.listAccessors"];
+    /**
+     * Add an accessor 
+     * @description Adds an accessor to a machine.
+     */
+    post: operations["mutation.machines.addAccessor"];
+  };
+  "/machines/{id}/accessors/{userId}": {
+    /**
+     * Get an accessor 
+     * @description Get an accessor for a machine.
+     */
+    get: operations["query.machines.getAccessor"];
+    /**
+     * Delete an accessor 
+     * @description Deletes an accessor from a machine.
+     */
+    delete: operations["mutation.machines.removeAccessor"];
+  };
+  "/machines/{id}/desktop": {
+    /**
+     * Get desktop settings 
+     * @description Gets the machine settings that are used to configure desktop streaming.
+     */
+    get: operations["query.machines.getDesktop"];
+  };
+  "/notebooks": {
+    /**
+     * List notebooks 
+     * @description Lists the notebooks you have access to in the current team
+     */
+    get: operations["query.notebooks.list"];
+  };
+  "/private-networks/{id}": {
+    /**
+     * Get a private network 
+     * @description Fetches a single private network by ID.
+     */
+    get: operations["query.privateNetworks.get"];
+    /**
+     * Update a private network 
+     * @description Updates a single private network by ID.
+     */
+    put: operations["mutation.privateNetworks.update"];
+    /**
+     * Delete a private network 
+     * @description Deletes a single private network by ID.
+     */
+    delete: operations["mutation.privateNetworks.delete"];
+  };
+  "/private-networks": {
+    /**
+     * List private networks 
+     * @description Fetches a list of private networks.
+     */
+    get: operations["query.privateNetworks.list"];
+    /**
+     * Create a private network 
+     * @description Creates a new private network.
+     */
+    post: operations["mutation.privateNetworks.create"];
   };
   "/projects": {
     /**
-     * List projects
-     * @description
+     * List projects 
+     * @description 
      *         List projects. This endpoint supports pagination and sorting.
      */
     get: operations["query.projects.list"];
     /**
-     * Create a project
+     * Create a project 
      * @description Create a project
      */
     post: operations["mutation.projects.create"];
   };
-  "/projects/{handle}": {
+  "/projects/{id}": {
     /**
-     * Get a project by its ID
+     * Get a project by its ID 
      * @description Get a project by its ID.
      */
     get: operations["query.projects.get"];
     /**
-     * Update a project
+     * Update a project 
      * @description Update a project
      */
     put: operations["mutation.projects.update"];
-  };
-  "/projects/{handle}/deployments": {
     /**
-     * List a project's deployments
+     * Delete a project 
+     * @description Delete a project
+     */
+    delete: operations["mutation.projects.delete"];
+  };
+  "/projects/{id}/activity": {
+    /**
+     * List a project's activity 
+     * @description Fetches a list of activity items for a given project.
+     */
+    get: operations["query.projectActivity.list"];
+  };
+  "/projects/{id}/collaborators": {
+    /**
+     * List a project's collaborators 
+     * @description Fetches a list of collaborators for a project.
+     */
+    get: operations["query.projectCollaborators.list"];
+    /**
+     * Create a project collaborator 
+     * @description Adds a new collaborator to a project.
+     */
+    post: operations["mutation.projectCollaborators.create"];
+  };
+  "/projects/{id}/collaborators/{userId}": {
+    /**
+     * Delete a project collaborator 
+     * @description Removes a collaborator from a project.
+     */
+    delete: operations["mutation.projectCollaborators.delete"];
+  };
+  "/projects/{id}/deployments": {
+    /**
+     * List a project's deployments 
      * @description Fetches a list of deployments for a project.
      */
     get: operations["query.projectsDeployments.list"];
   };
-  "/projects/{handle}/secrets": {
+  "/projects/{id}/secrets": {
     /**
-     * List a project's secrets
+     * List a project's secrets 
      * @description Fetches a list of secrets for a project.
      */
     get: operations["query.projectSecrets.list"];
     /**
-     * Create a project secret
+     * Create a project secret 
      * @description Creates a new secret for a project.
      */
     post: operations["mutation.projectSecrets.create"];
   };
-  "/projects/{handle}/secrets/{name}": {
+  "/projects/{id}/secrets/{name}": {
     /**
-     * Get a project secret
+     * Get a project secret 
      * @description Fetches a secret for a project.
      */
     get: operations["query.projectSecrets.getProjectSecret"];
     /**
-     * Delete a project secret
+     * Delete a project secret 
      * @description Deletes a secret for a project.
      */
     delete: operations["mutation.projectSecrets.delete"];
     /**
-     * Update a project secret
+     * Update a project secret 
      * @description Update the value of a secret for a project.
      */
     patch: operations["mutation.projectSecrets.update"];
   };
-  "/teams/{handle}/secrets": {
+  "/public-ips": {
     /**
-     * List a team's secrets
+     * List public IPs 
+     * @description Fetches a list of public IPs.
+     */
+    get: operations["query.publicIps.list"];
+    /**
+     * Claim a public IP 
+     * @description Claims a public IP.
+     */
+    post: operations["mutation.publicIps.claim"];
+  };
+  "/public-ips/{ip}": {
+    /**
+     * Assign a public IP 
+     * @description Assigns a public IP to a machine.
+     */
+    put: operations["mutation.publicIps.assign"];
+    /**
+     * Release a public IP 
+     * @description Releases a public IP.
+     */
+    delete: operations["mutation.publicIps.release"];
+  };
+  "/shared-drives/{id}": {
+    /**
+     * Get a shared drive 
+     * @description Fetches a single shared drive by ID.
+     */
+    get: operations["query.sharedDrives.get"];
+    /**
+     * Update a shared drive 
+     * @description Updates a single shared drive by ID.
+     */
+    put: operations["mutation.sharedDrives.update"];
+    /**
+     * Delete a shared drive 
+     * @description Deletes a single shared drive by ID.
+     */
+    delete: operations["mutation.sharedDrives.delete"];
+  };
+  "/shared-drives": {
+    /**
+     * List shared drives 
+     * @description Fetches a list of shared drives.
+     */
+    get: operations["query.sharedDrives.list"];
+    /**
+     * Create a shared drive 
+     * @description Creates a new shared drive for use in a private network.
+     */
+    post: operations["mutation.sharedDrives.create"];
+  };
+  "/snapshots/{id}": {
+    /**
+     * Get a snapshot 
+     * @description Fetches a single snapshot by ID.
+     */
+    get: operations["query.snapshots.get"];
+    /**
+     * Update a snapshot 
+     * @description Updates a single snapshot by ID.
+     */
+    put: operations["mutation.snapshots.update"];
+    /**
+     * Delete snapshot 
+     * @description Delete a snapshot for a machine.
+     */
+    delete: operations["mutation.snapshots.delete"];
+  };
+  "/snapshots": {
+    /**
+     * List snapshots 
+     * @description List snapshots and filter by machine.
+     */
+    get: operations["query.snapshots.list"];
+    /**
+     * Create snapshot 
+     * @description Create a snapshot for a machine.
+     */
+    post: operations["mutation.snapshots.create"];
+  };
+  "/snapshots/{id}/restore": {
+    /**
+     * Restore snapshot 
+     * @description Restore a snapshot for a machine.
+     */
+    post: operations["mutation.snapshots.restore"];
+  };
+  "/startup-scripts/{id}": {
+    /**
+     * Get a startup script 
+     * @description Fetches a single startup script by ID.
+     */
+    get: operations["query.startupScripts.get"];
+    /**
+     * Update startup script 
+     * @description Update a startup script.
+     */
+    put: operations["mutation.startupScripts.update"];
+    /**
+     * Delete startup script 
+     * @description Delete a startup script.
+     */
+    delete: operations["mutation.startupScripts.delete"];
+  };
+  "/startup-scripts": {
+    /**
+     * List startup scripts 
+     * @description Fetches a list of startup scripts.
+     */
+    get: operations["query.startupScripts.list"];
+    /**
+     * Create startup script 
+     * @description Create a startup script.
+     */
+    post: operations["mutation.startupScripts.create"];
+  };
+  "/startup-scripts/{id}/assign": {
+    /**
+     * Assign startup script to machine 
+     * @description Assign a startup script to a machine.
+     */
+    post: operations["mutation.startupScripts.assign"];
+  };
+  "/startup-scripts/{id}/unassign": {
+    /**
+     * Unassign startup script from machine 
+     * @description Unassign a startup script from a machine.
+     */
+    post: operations["mutation.startupScripts.unassign"];
+  };
+  "/storage": {
+    /**
+     * List storage providers 
+     * @description List storage providers
+     */
+    get: operations["query.storageProviders.list"];
+    /**
+     * Create a storage provider 
+     * @description Create a storage provider
+     */
+    post: operations["mutation.storageProviders.create"];
+  };
+  "/storage/{id}": {
+    /**
+     * Get a storage provider 
+     * @description Get a storage provider
+     */
+    get: operations["query.storageProviders.get"];
+    /**
+     * Update a storage provider 
+     * @description Update a storage provider
+     */
+    put: operations["mutation.storageProviders.update"];
+    /**
+     * Delete a storage provider 
+     * @description Delete a storage provider
+     */
+    delete: operations["mutation.storageProviders.delete"];
+  };
+  "/storage/utilization": {
+    /**
+     * Get storage utilization 
+     * @description Get a breakdown of how storage is being used by your team
+     */
+    get: operations["query.storageUtilization.getPublic"];
+  };
+  "/teams/{id}/secrets": {
+    /**
+     * List a team's secrets 
      * @description Fetches a list of secrets for a team.
      */
     get: operations["query.teamSecrets.list"];
     /**
-     * Create a team secret
+     * Create a team secret 
      * @description Creates a new secret for a team.
      */
     post: operations["mutation.teamSecrets.create"];
   };
-  "/teams/{handle}/secrets/{name}": {
+  "/teams/{id}/secrets/{name}": {
     /**
-     * Get a team secret
+     * Get a team secret 
      * @description Fetches a secret for a team.
      */
     get: operations["query.teamSecrets.get"];
     /**
-     * Delete a team secret
+     * Delete a team secret 
      * @description Deletes a secret for a team.
      */
     delete: operations["mutation.teamSecrets.delete"];
     /**
-     * Update a team secret
+     * Update a team secret 
      * @description Update the value of a secret for a team.
      */
     patch: operations["mutation.teamSecrets.update"];
   };
+  "/templates/{id}": {
+    /**
+     * Get a template 
+     * @description Fetches a single template by ID.
+     */
+    get: operations["query.templates.get"];
+    /**
+     * Update a template 
+     * @description Updates a single template by ID.
+     */
+    put: operations["mutation.templates.update"];
+    /**
+     * Delete template 
+     * @description Delete a template.
+     */
+    delete: operations["mutation.templates.delete"];
+  };
+  "/templates": {
+    /**
+     * List templates 
+     * @description Fetches a list of templates.
+     */
+    get: operations["query.templates.list"];
+    /**
+     * Create template 
+     * @description Create a template for a machine.
+     */
+    post: operations["mutation.templates.create"];
+  };
+  "/workflows/{id}/runs/{runId}/logs": {
+    /**
+     * List workflow run logs 
+     * @description Lists logs for a given workflow run.
+     */
+    get: operations["query.workflowRunLogs.list"];
+  };
   "/health": {
     /**
-     * Health check
+     * Health check 
      * @description Check if the API is healthy.
      */
     get: operations["query.health"];
@@ -152,9 +647,9 @@ export interface components {
         "application/json": {
           message: string;
           code: string;
-          issues?: {
-            message: string;
-          }[];
+          issues?: ({
+              message: string;
+            })[];
         };
       };
     };
@@ -168,48 +663,2530 @@ export interface components {
 export type external = Record<string, never>;
 
 export interface operations {
-  /**
-   * Get the current session
-   * @description Get the current session. If a user is not logged in, this will be null. Otherwise, it will contain the current team and user.
-   */
-  "query.auth.session": {
+
+  "mutation.apps.create": {
+    /**
+     * Create an app 
+     * @description Create an app.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The new deployment configuration. */
+          config: (({
+            apiVersion: "v0alpha0" | "latest";
+            command?: (string)[];
+            containerRegistry?: string;
+            /** @default true */
+            enabled?: boolean;
+            env?: ({
+                name: string;
+                value: string;
+              })[];
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+            name: string;
+            /** @default 80 */
+            port?: number;
+            region?: string;
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            resources: {
+              instanceType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+            };
+          }) | ({
+            /** @enum {string} */
+            apiVersion: "v0alpha1";
+            containerRegistry?: string;
+            env?: ({
+                name: string;
+                value: string;
+              })[];
+            healthchecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            integrations?: ({
+                /** @enum {string} */
+                type: "volume";
+                name: string;
+              } | {
+                name: string;
+                /** @enum {string} */
+                type: "git-lfs";
+                /** Format: uri */
+                url: string;
+              })[];
+            name: string;
+            region?: string;
+            command?: (string)[];
+            /** @default true */
+            enabled?: boolean;
+            resources: {
+              machineType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+              ports: (number)[];
+            };
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+          })) | ({
+            apiVersion: "v1" | "latest";
+            containerRegistry?: string;
+            env?: ({
+                name: string;
+                value: string;
+              })[];
+            healthchecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            integrations?: ({
+                /** @enum {string} */
+                type: "volume";
+                name: string;
+              } | {
+                name: string;
+                /** @enum {string} */
+                type: "git-lfs";
+                /** Format: uri */
+                url: string;
+              })[];
+            name: string;
+            region?: string;
+            command?: (string)[];
+            /** @default true */
+            enabled?: boolean;
+            resources: {
+              machineType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+              ports: (number)[];
+            };
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+          });
+        };
+      };
+    };
     responses: {
       /** @description Successful response */
       200: {
         content: {
           "application/json": {
-            /** @description The current user in the session */
-            user: {
-              /** @description A numeric ID for the user */
-              id: number;
-              /** @description A unique handle for the user */
-              handle: string;
-              /** @description The user's email address */
-              email: string;
-            };
-            /** @description The current team in the session */
-            team: {
-              /** @description A numeric ID for the team */
-              id: number;
-              /** @description A unique handle for the team */
-              handle: string;
-              /** @description The namespace for the team */
-              namespace: string;
-            };
-          } | null;
+            /** @description The ID of the app */
+            id: string;
+          };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Get a deployment
-   * @description Fetches a single deployment by deployment ID.
-   */
-  "query.deployments.get": {
+  "mutation.apps.enable": {
+    /**
+     * Enable an app 
+     * @description Enables an app that has been previously disabled. This will start the app and make it available to users.
+     */
     parameters: {
+        /** @description The ID of the app to enable */
       path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the app */
+            id: string;
+            /** @description The new deployment configuration. */
+            config: (({
+              apiVersion: "v0alpha0" | "latest";
+              command?: (string)[];
+              containerRegistry?: string;
+              /** @default true */
+              enabled?: boolean;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+              name: string;
+              /** @default 80 */
+              port?: number;
+              region?: string;
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              resources: {
+                instanceType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+              };
+            }) | ({
+              /** @enum {string} */
+              apiVersion: "v0alpha1";
+              containerRegistry?: string;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthchecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              integrations?: ({
+                  /** @enum {string} */
+                  type: "volume";
+                  name: string;
+                } | {
+                  name: string;
+                  /** @enum {string} */
+                  type: "git-lfs";
+                  /** Format: uri */
+                  url: string;
+                })[];
+              name: string;
+              region?: string;
+              command?: (string)[];
+              /** @default true */
+              enabled?: boolean;
+              resources: {
+                machineType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+                ports: (number)[];
+              };
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+            })) | ({
+              apiVersion: "v1" | "latest";
+              containerRegistry?: string;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthchecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              integrations?: ({
+                  /** @enum {string} */
+                  type: "volume";
+                  name: string;
+                } | {
+                  name: string;
+                  /** @enum {string} */
+                  type: "git-lfs";
+                  /** Format: uri */
+                  url: string;
+                })[];
+              name: string;
+              region?: string;
+              command?: (string)[];
+              /** @default true */
+              enabled?: boolean;
+              resources: {
+                machineType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+                ports: (number)[];
+              };
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+            });
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.apps.disable": {
+    /**
+     * Disable an app 
+     * @description Disables an app that is currently enabled. This will stop the app's deployments and make it unavailable to users.
+     */
+    parameters: {
+        /** @description The ID of the app to disable */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the app */
+            id: string;
+            /** @description The new deployment configuration. */
+            config: (({
+              apiVersion: "v0alpha0" | "latest";
+              command?: (string)[];
+              containerRegistry?: string;
+              /** @default true */
+              enabled?: boolean;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+              name: string;
+              /** @default 80 */
+              port?: number;
+              region?: string;
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              resources: {
+                instanceType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+              };
+            }) | ({
+              /** @enum {string} */
+              apiVersion: "v0alpha1";
+              containerRegistry?: string;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthchecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              integrations?: ({
+                  /** @enum {string} */
+                  type: "volume";
+                  name: string;
+                } | {
+                  name: string;
+                  /** @enum {string} */
+                  type: "git-lfs";
+                  /** Format: uri */
+                  url: string;
+                })[];
+              name: string;
+              region?: string;
+              command?: (string)[];
+              /** @default true */
+              enabled?: boolean;
+              resources: {
+                machineType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+                ports: (number)[];
+              };
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+            })) | ({
+              apiVersion: "v1" | "latest";
+              containerRegistry?: string;
+              env?: ({
+                  name: string;
+                  value: string;
+                })[];
+              healthchecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              image: string;
+              integrations?: ({
+                  /** @enum {string} */
+                  type: "volume";
+                  name: string;
+                } | {
+                  name: string;
+                  /** @enum {string} */
+                  type: "git-lfs";
+                  /** Format: uri */
+                  url: string;
+                })[];
+              name: string;
+              region?: string;
+              command?: (string)[];
+              /** @default true */
+              enabled?: boolean;
+              resources: {
+                machineType: string;
+                /** @default 1 */
+                replicas?: number;
+                autoscaling?: {
+                  maxReplicas: number;
+                  enabled?: boolean;
+                  metrics: ({
+                      /** @enum {string} */
+                      metric: "requestDuration";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    } | ({
+                      /** @enum {string} */
+                      metric: "cpu" | "memory";
+                      /** @enum {string} */
+                      summary: "average";
+                      value: number;
+                    }))[];
+                };
+                ports: (number)[];
+              };
+              healthChecks?: {
+                liveness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                readiness?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+                startup?: {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  path: string;
+                  host?: string;
+                  port?: number;
+                  headers?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                } | {
+                  timeoutSeconds?: number;
+                  initialDelaySeconds?: number;
+                  periodSeconds?: number;
+                  failureThreshold?: number;
+                  exec: {
+                    command: (string)[];
+                  };
+                };
+              };
+              repositories?: {
+                mountPath?: string;
+                dataset: string;
+                repositories: ({
+                    url: string;
+                    ref?: string;
+                    name: string;
+                    username?: string;
+                    password?: string;
+                  })[];
+              };
+              models?: ({
+                  id: string;
+                  path?: string;
+                })[];
+            });
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.apps.updateName": {
+    /**
+     * Update an app's name 
+     * @description Change the name of an app
+     */
+    parameters: {
+        /** @description The ID of the app to update */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The new name of the app */
+          name: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the app */
+            id: string;
+            /** @description The name of the app */
+            name: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.apps.delete": {
+    /**
+     * Delete an app 
+     * @description Deletes an app. This will delete all resources associated with the app.
+     */
+    parameters: {
+        /** @description The ID of the app to delete */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the app that was deleted */
+            id: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.auth.session": {
+    /**
+     * Get the current session 
+     * @description Get the current session. If a user is not logged in, this will be null. Otherwise, it will contain the current team and user.
+     */
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": ({
+            user: {
+              /** @description The user's first name */
+              firstName: string | null;
+              /** @description The user's last name */
+              lastName: string | null;
+              /** @description The user's email address */
+              email: string;
+              /**
+               * Format: date-time 
+               * @description The date the user was created
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the account was confirmed
+               */
+              dtConfirmed: string | null;
+              /** @description The teams this user is a member of */
+              teamMemberships: ({
+                  /** @description The team the user is a member of */
+                  team: {
+                    /** @description The name of the team */
+                    name: string;
+                    /** @description The ID of the team */
+                    id: string;
+                    /** @description The namespace of the team */
+                    namespace: string;
+                    /**
+                     * @description The URL of the team's profile image. 
+                     * @default null
+                     */
+                    publicProfileImageUrl?: string | null;
+                    /** @description Whether the team is the user's team */
+                    isUserTeam: boolean;
+                    /**
+                     * Format: date-time 
+                     * @description The date the team was created
+                     */
+                    dtCreated: string;
+                  };
+                  /** @description Whether the user is the owner of the team */
+                  isOwner: boolean;
+                  /** @description Whether the user is an admin of the team */
+                  isAdmin: boolean;
+                })[];
+              /** @description Whether the user's phone number has been verified */
+              isPhoneVerified: boolean;
+              /** @description Whether the user has a password set */
+              isPasswordAuthEnabled: boolean;
+              /** @description Whether the user has a QR code based MFA enabled */
+              isQrCodeBasedMfaEnabled: boolean;
+              /** @description Whether the user has a QR code based MFA confirmed */
+              isQrCodeBasedMfaConfirmed: boolean;
+              /** @description A unique ID for the user */
+              id: string;
+              /** @description An internal, numeric ID for the user */
+              analyticsId: number;
+              /** @description Metadata about the user */
+              metadata: {
+                /**
+                 * @description Tags for the user 
+                 * @default null
+                 */
+                tags?: string | null;
+                /**
+                 * @description Core survey question-answer pairs 
+                 * @default null
+                 */
+                coreSurvey?: ({
+                  [key: string]: string | undefined;
+                }) | null;
+                /**
+                 * @description Gradient survey question-answer pairs 
+                 * @default null
+                 */
+                gradientSurvey?: ({
+                  [key: string]: string | undefined;
+                }) | null;
+                /**
+                 * @description Whether the user has accepted the Graphcore terms of service 
+                 * @default false
+                 */
+                graphcoreTermsAccepted?: boolean;
+              };
+            };
+            team: {
+              /** @description The namespace for the team */
+              namespace: string;
+              /** @description Whether the team is private or not */
+              isPrivate: boolean;
+              /** @description The maximum number of machines */
+              maxMachines: number;
+              /** @description A unique ID for the team */
+              id: string;
+              /** @description An internal, numeric ID for the team */
+              analyticsId: number;
+            };
+          }) | null;
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.autoscalingGroups.get": {
+    /**
+     * Get an autoscaling group 
+     * @description Fetches a single autoscaling group by id.
+     */
+    parameters: {
+        /** @description The ID of the autoscaling group to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the autoscaling group. */
+            id: string;
+            /** @description The name of the autoscaling group. */
+            name: string;
+            /** @description The ID of the cluster the autoscaling group is for. */
+            clusterId: string;
+            /** @description The machine type used by machines in the autoscaling group. */
+            machineType: string;
+            /** @description The ID of the template used by machines in the autoscaling group. */
+            templateId: string;
+            /** @description The ID of the network used by machines in the autoscaling group. */
+            networkId: string;
+            /** @description The ID of the startup script used by machines in the autoscaling group. */
+            startupScriptId: string | null;
+            /** @description The maximum number of machines in the autoscaling group. */
+            max: number;
+            /** @description The minimum number of machines in the autoscaling group. */
+            min: number;
+            /** @description The current number of machines in the autoscaling group. */
+            current: number;
+            /** @description The timeout for provisioning machines in the autoscaling group, in minutes. */
+            provisioningTimeout: number | null;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was last modified.
+             */
+            dtModified: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was deleted.
+             */
+            dtDeleted: string | null;
+            /** @description The ID of the user who last edited the autoscaling group. */
+            lastEditedByUserId: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.autoscalingGroups.update": {
+    /**
+     * Update an autoscaling group 
+     * @description Update an autoscaling group.
+     */
+    parameters: {
+        /** @description The id of the autoscaling group. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the autoscaling group. */
+          name?: string;
+          /** @description The cluster the autoscaling group is for. */
+          clusterId?: string;
+          /** @description The machine type used for machines in the autoscaling group. */
+          machineType?: string;
+          /** @description The template used for machines in the autoscaling group. */
+          templateId?: string;
+          /** @description The network the autoscaling group is in. */
+          networkId?: string;
+          /** @description The startup script used for machines in the autoscaling group. */
+          startupScriptId?: string;
+          /** @description The maximum number of machines in the autoscaling group. */
+          max?: number;
+          /** @description The minimum number of machines in the autoscaling group. */
+          min?: number;
+          /** @description The target number of machines in the autoscaling group. */
+          current?: number;
+          /** @description The timeout for provisioning machines in the autoscaling group. */
+          provisioningTimeout?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the autoscaling group. */
+            id: string;
+            /** @description The name of the autoscaling group. */
+            name: string;
+            /** @description The ID of the cluster the autoscaling group is for. */
+            clusterId: string;
+            /** @description The machine type used by machines in the autoscaling group. */
+            machineType: string;
+            /** @description The ID of the template used by machines in the autoscaling group. */
+            templateId: string;
+            /** @description The ID of the network used by machines in the autoscaling group. */
+            networkId: string;
+            /** @description The ID of the startup script used by machines in the autoscaling group. */
+            startupScriptId: string | null;
+            /** @description The maximum number of machines in the autoscaling group. */
+            max: number;
+            /** @description The minimum number of machines in the autoscaling group. */
+            min: number;
+            /** @description The current number of machines in the autoscaling group. */
+            current: number;
+            /** @description The timeout for provisioning machines in the autoscaling group, in minutes. */
+            provisioningTimeout: number | null;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was last modified.
+             */
+            dtModified: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was deleted.
+             */
+            dtDeleted: string | null;
+            /** @description The ID of the user who last edited the autoscaling group. */
+            lastEditedByUserId: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.autoscalingGroups.delete": {
+    /**
+     * Delete an autoscaling group 
+     * @description Delete an autoscaling group.
+     */
+    parameters: {
+        /** @description The id of the autoscaling group. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The id of the autoscaling group. */
+            id: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.autoscalingGroups.list": {
+    /**
+     * List autoscaling groups 
+     * @description List autoscaling groups and filter by machine type.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+        /** @description Cluster the autoscaling group is for. */
+        /** @description Machine type used for machiens in the autoscaling group. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        clusterId?: string;
+        machineType?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the autoscaling group. */
+                id: string;
+                /** @description The name of the autoscaling group. */
+                name: string;
+                /** @description The ID of the cluster the autoscaling group is for. */
+                clusterId: string;
+                /** @description The machine type used by machines in the autoscaling group. */
+                machineType: string;
+                /** @description The ID of the template used by machines in the autoscaling group. */
+                templateId: string;
+                /** @description The ID of the network used by machines in the autoscaling group. */
+                networkId: string;
+                /** @description The ID of the startup script used by machines in the autoscaling group. */
+                startupScriptId: string | null;
+                /** @description The maximum number of machines in the autoscaling group. */
+                max: number;
+                /** @description The minimum number of machines in the autoscaling group. */
+                min: number;
+                /** @description The current number of machines in the autoscaling group. */
+                current: number;
+                /** @description The timeout for provisioning machines in the autoscaling group, in minutes. */
+                provisioningTimeout: number | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the autoscaling group was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the autoscaling group was last modified.
+                 */
+                dtModified: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the autoscaling group was deleted.
+                 */
+                dtDeleted: string | null;
+                /** @description The ID of the user who last edited the autoscaling group. */
+                lastEditedByUserId: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.autoscalingGroups.create": {
+    /**
+     * Create an autoscaling group 
+     * @description Create an autoscaling group.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the autoscaling group. */
+          name: string;
+          /** @description The cluster the autoscaling group is for. */
+          clusterId: string;
+          /** @description The machine type used for machines in the autoscaling group. */
+          machineType: string;
+          /** @description The template used for machines in the autoscaling group. */
+          templateId: string;
+          /** @description The network the autoscaling group is in. */
+          networkId: string;
+          /** @description The startup script used for machines in the autoscaling group. */
+          startupScriptId?: string;
+          /** @description The maximum number of machines in the autoscaling group. */
+          max: number;
+          /** @description The minimum number of machines in the autoscaling group. */
+          min: number;
+          /** @description The timeout for provisioning machines in the autoscaling group. */
+          provisioningTimeout?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the autoscaling group. */
+            id: string;
+            /** @description The name of the autoscaling group. */
+            name: string;
+            /** @description The ID of the cluster the autoscaling group is for. */
+            clusterId: string;
+            /** @description The machine type used by machines in the autoscaling group. */
+            machineType: string;
+            /** @description The ID of the template used by machines in the autoscaling group. */
+            templateId: string;
+            /** @description The ID of the network used by machines in the autoscaling group. */
+            networkId: string;
+            /** @description The ID of the startup script used by machines in the autoscaling group. */
+            startupScriptId: string | null;
+            /** @description The maximum number of machines in the autoscaling group. */
+            max: number;
+            /** @description The minimum number of machines in the autoscaling group. */
+            min: number;
+            /** @description The current number of machines in the autoscaling group. */
+            current: number;
+            /** @description The timeout for provisioning machines in the autoscaling group, in minutes. */
+            provisioningTimeout: number | null;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was last modified.
+             */
+            dtModified: string;
+            /**
+             * Format: date-time 
+             * @description The date the autoscaling group was deleted.
+             */
+            dtDeleted: string | null;
+            /** @description The ID of the user who last edited the autoscaling group. */
+            lastEditedByUserId: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.billingAccountStanding.get": {
+    /**
+     * Get account standing 
+     * @description Check whether the current team account is in good standing. If not, send back a message explaining why.
+     */
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether the account is in good standing */
+            isInGoodStanding: boolean;
+            /** @description If the account is not in good standing, these are messages explaining why. */
+            messages: (string)[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.containerRegistries.list": {
+    /**
+     * List container registries 
+     * @description Lists container registries for the current team.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The id of the container registry */
+                id: string;
+                /** @description The name of the container registry */
+                name: string;
+                /** @description The URL of the container registry */
+                url: string;
+                /** @description The namespace of the container registry */
+                namespace: string;
+                /** @description A username for the container registry */
+                username: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the container registry was created
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the container registry was last modified
+                 */
+                dtModified: string;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.containerRegistries.create": {
+    /**
+     * Create a container registry 
+     * @description Creates a container registry for the current team.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the container registry */
+          name: string;
+          /** @description The namespace of the container registry */
+          namespace: string;
+          /**
+           * Format: uri 
+           * @description The URL of the container registry
+           */
+          url: string;
+          /** @description A username for the container registry */
+          username: string;
+          /** @description The password for the registry */
+          password: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The id of the container registry */
+            id: string;
+            /** @description The name of the container registry */
+            name: string;
+            /** @description The URL of the container registry */
+            url: string;
+            /** @description The namespace of the container registry */
+            namespace: string;
+            /** @description A username for the container registry */
+            username: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was created
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was last modified
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.containerRegistries.get": {
+    /**
+     * List container registries 
+     * @description Lists container registries for the current team.
+     */
+    parameters: {
+        /** @description The id of the container registry */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The id of the container registry */
+            id: string;
+            /** @description The name of the container registry */
+            name: string;
+            /** @description The URL of the container registry */
+            url: string;
+            /** @description The namespace of the container registry */
+            namespace: string;
+            /** @description A username for the container registry */
+            username: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was created
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was last modified
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.containerRegistries.update": {
+    /**
+     * Update a container registry 
+     * @description Updates a container registry for the current team.
+     */
+    parameters: {
+        /** @description The id of the container registry */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the container registry */
+          name?: string;
+          /** @description The namespace of the container registry */
+          namespace?: string;
+          /**
+           * Format: uri 
+           * @description The URL of the container registry
+           */
+          url?: string;
+          /** @description A username for the container registry */
+          username?: string;
+          /** @description An updated password for the registry */
+          password?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The id of the container registry */
+            id: string;
+            /** @description The name of the container registry */
+            name: string;
+            /** @description The URL of the container registry */
+            url: string;
+            /** @description The namespace of the container registry */
+            namespace: string;
+            /** @description A username for the container registry */
+            username: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was created
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was last modified
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.containerRegistries.delete": {
+    /**
+     * Delete a container registry 
+     * @description Deletes a container registry for the current team.
+     */
+    parameters: {
+        /** @description The id of the container registry */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The id of the container registry */
+            id: string;
+            /** @description The name of the container registry */
+            name: string;
+            /** @description The URL of the container registry */
+            url: string;
+            /** @description The namespace of the container registry */
+            namespace: string;
+            /** @description A username for the container registry */
+            username: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was created
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the container registry was last modified
+             */
+            dtModified: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.containerRegistries.testConnection": {
+    /**
+     * Test a container registry connection 
+     * @description Validate that a container registry can be connected to using the provided credentials.
+     */
+    parameters: {
+        /** @description The id of the container registry */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether the connection was successful */
+            success: boolean;
+            /** @description The error message, if any */
+            error?: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machineEvents.get": {
+    /**
+     * Get a machine event 
+     * @description Fetches a single machine event by ID.
+     */
+    parameters: {
+        /** @description The ID of the machine event to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the event. */
+            id: string;
+            /**
+             * @description The name of the event, e.g. "create". 
+             * @enum {string}
+             */
+            name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+            /**
+             * @description The state of the event, e.g. "done". 
+             * @enum {string}
+             */
+            state: "new" | "in progress" | "done" | "error" | "cancelled";
+            /** @description The ID of the machine the event is for. */
+            machineId: string | null;
+            /**
+             * Format: date-time 
+             * @description The date the event was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the event was started.
+             */
+            dtStarted: string | null;
+            /**
+             * Format: date-time 
+             * @description The date the event was finished.
+             */
+            dtFinished: string | null;
+            /** @description The error message of the event, if any. */
+            error: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machineEvents.list": {
+    /**
+     * List machine events 
+     * @description Fetches a list of machine events.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+        machineId?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the event. */
+                id: string;
+                /**
+                 * @description The name of the event, e.g. "create". 
+                 * @enum {string}
+                 */
+                name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+                /**
+                 * @description The state of the event, e.g. "done". 
+                 * @enum {string}
+                 */
+                state: "new" | "in progress" | "done" | "error" | "cancelled";
+                /** @description The ID of the machine the event is for. */
+                machineId: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the event was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the event was started.
+                 */
+                dtStarted: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the event was finished.
+                 */
+                dtFinished: string | null;
+                /** @description The error message of the event, if any. */
+                error: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.deployments.get": {
+    /**
+     * Get a deployment 
+     * @description Fetches a single deployment by deployment ID.
+     */
+    parameters: {
         /** @description The ID of the deployment to fetch */
+      path: {
         id: string;
       };
     };
@@ -229,278 +3206,576 @@ export interface operations {
             /** @description The unique endpoint for the deployment */
             endpoint: string;
             /**
-             * @description The last version hash for the deployment
+             * @description The last version hash for the deployment 
              * @default null
              */
             latestSpecHash?: string | null;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the deployment was created
              */
             dtCreated: string;
             /**
-             * @description The latest deployment configuration. If invalid, null is returned.
+             * @description The latest deployment configuration. If invalid, null is returned. 
              * @default null
              */
-            latestSpec?: {
+            latestSpec?: ({
               /** @description The ID of the deployment spec */
               id: string;
               /** @description The data for the deployment spec */
-              data?:
-                | (
-                    | {
-                        apiVersion: "v0alpha0" | "latest";
+              data?: ((({
+                apiVersion: "v0alpha0" | "latest";
+                command?: (string)[];
+                containerRegistry?: string;
+                /** @default true */
+                enabled?: boolean;
+                env?: ({
+                    name: string;
+                    value: string;
+                  })[];
+                healthChecks?: {
+                  liveness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
                         name: string;
-                        region?: string;
-                        command?: string[];
-                        /** Format: uuid */
-                        containerRegistry?: string;
-                        env?: {
-                          name: string;
-                          value: string;
-                        }[];
-                        /** @default true */
-                        enabled?: boolean;
-                        healthChecks?: {
-                          liveness?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                          readiness?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                          startup?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                        };
-                        image: string;
-                        repositories?: {
-                          mountPath?: string;
-                          dataset: string;
-                          repositories: {
-                            url: string;
-                            ref?: string;
-                            name: string;
-                            username?: string;
-                            password?: string;
-                          }[];
-                        };
-                        resources: {
-                          instanceType: string;
-                          /** @default 1 */
-                          replicas?: number;
-                          autoscaling?: {
-                            maxReplicas: number;
-                            enabled?: boolean;
-                            metrics: (
-                              | {
-                                  /** @enum {string} */
-                                  metric: "requestDuration";
-                                  /** @enum {string} */
-                                  summary: "average";
-                                  value: number;
-                                }
-                              | {
-                                  /** @enum {string} */
-                                  metric: "cpu" | "memory";
-                                  /** @enum {string} */
-                                  summary: "average";
-                                  value: number;
-                                }
-                            )[];
-                          };
-                        };
-                        models?: {
-                          id: string;
-                          path?: string;
-                        }[];
-                        /** @default 80 */
-                        port?: number;
-                      }
-                    | {
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  readiness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  startup?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                };
+                image: string;
+                models?: ({
+                    id: string;
+                    path?: string;
+                  })[];
+                name: string;
+                /** @default 80 */
+                port?: number;
+                region?: string;
+                repositories?: {
+                  mountPath?: string;
+                  dataset: string;
+                  repositories: ({
+                      url: string;
+                      ref?: string;
+                      name: string;
+                      username?: string;
+                      password?: string;
+                    })[];
+                };
+                resources: {
+                  instanceType: string;
+                  /** @default 1 */
+                  replicas?: number;
+                  autoscaling?: {
+                    maxReplicas: number;
+                    enabled?: boolean;
+                    metrics: ({
                         /** @enum {string} */
-                        apiVersion: "v0alpha1";
+                        metric: "requestDuration";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      } | ({
+                        /** @enum {string} */
+                        metric: "cpu" | "memory";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      }))[];
+                  };
+                };
+              }) | ({
+                /** @enum {string} */
+                apiVersion: "v0alpha1";
+                containerRegistry?: string;
+                env?: ({
+                    name: string;
+                    value: string;
+                  })[];
+                healthchecks?: {
+                  liveness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
                         name: string;
-                        region?: string;
-                        command: string[];
-                        /** Format: uuid */
-                        containerRegistry?: string;
-                        env?: {
-                          name: string;
-                          value: string;
-                        }[];
-                        /** @default true */
-                        enabled?: boolean;
-                        healthchecks?: {
-                          liveness?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                          readiness?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                          startup?:
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                path: string;
-                                host?: string;
-                                port?: number;
-                                headers?: {
-                                  name: string;
-                                  value: string;
-                                }[];
-                              }
-                            | {
-                                timeoutSeconds?: number;
-                                initialDelaySeconds?: number;
-                                periodSeconds?: number;
-                                failureThreshold?: number;
-                                exec: {
-                                  command: string[];
-                                };
-                              };
-                        };
-                        image: string;
-                      }
-                  )
-                | null;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  readiness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  startup?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                };
+                image: string;
+                integrations?: ({
+                    /** @enum {string} */
+                    type: "volume";
+                    name: string;
+                  } | {
+                    name: string;
+                    /** @enum {string} */
+                    type: "git-lfs";
+                    /** Format: uri */
+                    url: string;
+                  })[];
+                name: string;
+                region?: string;
+                command?: (string)[];
+                /** @default true */
+                enabled?: boolean;
+                resources: {
+                  machineType: string;
+                  /** @default 1 */
+                  replicas?: number;
+                  autoscaling?: {
+                    maxReplicas: number;
+                    enabled?: boolean;
+                    metrics: ({
+                        /** @enum {string} */
+                        metric: "requestDuration";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      } | ({
+                        /** @enum {string} */
+                        metric: "cpu" | "memory";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      }))[];
+                  };
+                  ports: (number)[];
+                };
+                healthChecks?: {
+                  liveness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  readiness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  startup?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                };
+                repositories?: {
+                  mountPath?: string;
+                  dataset: string;
+                  repositories: ({
+                      url: string;
+                      ref?: string;
+                      name: string;
+                      username?: string;
+                      password?: string;
+                    })[];
+                };
+                models?: ({
+                    id: string;
+                    path?: string;
+                  })[];
+              })) | ({
+                apiVersion: "v1" | "latest";
+                containerRegistry?: string;
+                env?: ({
+                    name: string;
+                    value: string;
+                  })[];
+                healthchecks?: {
+                  liveness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  readiness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  startup?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                };
+                image: string;
+                integrations?: ({
+                    /** @enum {string} */
+                    type: "volume";
+                    name: string;
+                  } | {
+                    name: string;
+                    /** @enum {string} */
+                    type: "git-lfs";
+                    /** Format: uri */
+                    url: string;
+                  })[];
+                name: string;
+                region?: string;
+                command?: (string)[];
+                /** @default true */
+                enabled?: boolean;
+                resources: {
+                  machineType: string;
+                  /** @default 1 */
+                  replicas?: number;
+                  autoscaling?: {
+                    maxReplicas: number;
+                    enabled?: boolean;
+                    metrics: ({
+                        /** @enum {string} */
+                        metric: "requestDuration";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      } | ({
+                        /** @enum {string} */
+                        metric: "cpu" | "memory";
+                        /** @enum {string} */
+                        summary: "average";
+                        value: number;
+                      }))[];
+                  };
+                  ports: (number)[];
+                };
+                healthChecks?: {
+                  liveness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  readiness?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                  startup?: {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    path: string;
+                    host?: string;
+                    port?: number;
+                    headers?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                  } | {
+                    timeoutSeconds?: number;
+                    initialDelaySeconds?: number;
+                    periodSeconds?: number;
+                    failureThreshold?: number;
+                    exec: {
+                      command: (string)[];
+                    };
+                  };
+                };
+                repositories?: {
+                  mountPath?: string;
+                  dataset: string;
+                  repositories: ({
+                      url: string;
+                      ref?: string;
+                      name: string;
+                      username?: string;
+                      password?: string;
+                    })[];
+                };
+                models?: ({
+                    id: string;
+                    path?: string;
+                  })[];
+              })) | null;
               /** @description The ID of the deployment the spec belongs to */
               deploymentId: string;
               /**
-               * Format: date-time
-               * @description The date the deployment configuration was applied to the cluster
+               * Format: date-time 
+               * @description The date the deployment configuration was applied to the cluster 
                * @default null
                */
               externalApplied?: string | null;
               /**
-               * Format: date-time
-               * @description The date the deployment was marked "healthy"
+               * Format: date-time 
+               * @description The date the deployment was marked "healthy" 
                * @default null
                */
               dtHealthy?: string | null;
               /** @description The ID of the user the deployment belongs to */
-              userId: number;
+              userId: string;
               /**
-               * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error.
+               * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
                * @default null
                */
               error?: string | null;
-            } | null;
+              /**
+               * @description Metadata about the source of the configuration 
+               * @default null
+               */
+              metadata?: ({
+                gitHeaders?: {
+                  "x-git-host": "github" | "gitlab";
+                  "x-git-actor": string;
+                  "x-git-sha": string;
+                  "x-git-ref": string;
+                  "x-git-owner": string;
+                  "x-git-repo": string;
+                };
+              }) | null;
+            }) | null;
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Delete a deployment
-   * @description Deletes a deployment by deployment ID.
-   */
   "mutation.deployments.delete": {
+    /**
+     * Delete a deployment 
+     * @description Deletes a deployment by deployment ID.
+     */
     parameters: {
-      path: {
         /** @description The ID of the deployment to delete */
+      path: {
         id: string;
       };
     };
@@ -517,20 +3792,20 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List deployments
-   * @description Fetches a list of deployments for a logged in user.
-   */
   "query.deployments.list": {
+    /**
+     * List deployments 
+     * @description Fetches a list of deployments for a logged in user.
+     */
     parameters: {
-      query: {
         /** @description Fetch the next page of results after this cursor. */
-        after?: string;
         /** @description The number of items to fetch after this page. */
-        limit?: number;
         /** @description Order results by one of these fields. */
-        orderBy?: "dtCreated";
         /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
         order?: "asc" | "desc";
       };
     };
@@ -542,517 +3817,1102 @@ export interface operations {
             /** @description Whether there are more pages of results available. */
             hasMore: boolean;
             /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
-            nextPage: string | null;
+            nextPage?: string;
             /** @description The items on this page. */
-            items: {
-              /** @description The name of the deployment */
-              name: string;
-              /** @description The ID of the deployment */
-              id: string;
-              /** @description The ID of the project the deployment belongs to */
-              projectId: string;
-              /** @description The ID of the team the deployment belongs to */
-              teamId: string;
-              /** @description The unique endpoint for the deployment */
-              endpoint: string;
-              /**
-               * @description The last version hash for the deployment
-               * @default null
-               */
-              latestSpecHash?: string | null;
-              /**
-               * Format: date-time
-               * @description The date the deployment was created
-               */
-              dtCreated: string;
-              /**
-               * @description The latest deployment configuration. If invalid, null is returned.
-               * @default null
-               */
-              latestSpec?: {
-                /** @description The ID of the deployment spec */
+            items: ({
+                /** @description The name of the deployment */
+                name: string;
+                /** @description The ID of the deployment */
                 id: string;
-                /** @description The data for the deployment spec */
-                data?:
-                  | (
-                      | {
-                          apiVersion: "v0alpha0" | "latest";
-                          name: string;
-                          region?: string;
-                          command?: string[];
-                          /** Format: uuid */
-                          containerRegistry?: string;
-                          env?: {
+                /** @description The ID of the project the deployment belongs to */
+                projectId: string;
+                /** @description The ID of the team the deployment belongs to */
+                teamId: string;
+                /** @description The unique endpoint for the deployment */
+                endpoint: string;
+                /**
+                 * @description The last version hash for the deployment 
+                 * @default null
+                 */
+                latestSpecHash?: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment was created
+                 */
+                dtCreated: string;
+                /**
+                 * @description The latest deployment configuration. If invalid, null is returned. 
+                 * @default null
+                 */
+                latestSpec?: ({
+                  /** @description The ID of the deployment spec */
+                  id: string;
+                  /** @description The data for the deployment spec */
+                  data?: ((({
+                    apiVersion: "v0alpha0" | "latest";
+                    command?: (string)[];
+                    containerRegistry?: string;
+                    /** @default true */
+                    enabled?: boolean;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
                             name: string;
                             value: string;
-                          }[];
-                          /** @default true */
-                          enabled?: boolean;
-                          healthChecks?: {
-                            liveness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            readiness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            startup?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                          };
-                          image: string;
-                          repositories?: {
-                            mountPath?: string;
-                            dataset: string;
-                            repositories: {
-                              url: string;
-                              ref?: string;
-                              name: string;
-                              username?: string;
-                              password?: string;
-                            }[];
-                          };
-                          resources: {
-                            instanceType: string;
-                            /** @default 1 */
-                            replicas?: number;
-                            autoscaling?: {
-                              maxReplicas: number;
-                              enabled?: boolean;
-                              metrics: (
-                                | {
-                                    /** @enum {string} */
-                                    metric: "requestDuration";
-                                    /** @enum {string} */
-                                    summary: "average";
-                                    value: number;
-                                  }
-                                | {
-                                    /** @enum {string} */
-                                    metric: "cpu" | "memory";
-                                    /** @enum {string} */
-                                    summary: "average";
-                                    value: number;
-                                  }
-                              )[];
-                            };
-                          };
-                          models?: {
-                            id: string;
-                            path?: string;
-                          }[];
-                          /** @default 80 */
-                          port?: number;
-                        }
-                      | {
-                          /** @enum {string} */
-                          apiVersion: "v0alpha1";
-                          name: string;
-                          region?: string;
-                          command: string[];
-                          /** Format: uuid */
-                          containerRegistry?: string;
-                          env?: {
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
                             name: string;
                             value: string;
-                          }[];
-                          /** @default true */
-                          enabled?: boolean;
-                          healthchecks?: {
-                            liveness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            readiness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            startup?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                          };
-                          image: string;
-                        }
-                    )
-                  | null;
-                /** @description The ID of the deployment the spec belongs to */
-                deploymentId: string;
-                /**
-                 * Format: date-time
-                 * @description The date the deployment configuration was applied to the cluster
-                 * @default null
-                 */
-                externalApplied?: string | null;
-                /**
-                 * Format: date-time
-                 * @description The date the deployment was marked "healthy"
-                 * @default null
-                 */
-                dtHealthy?: string | null;
-                /** @description The ID of the user the deployment belongs to */
-                userId: number;
-                /**
-                 * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error.
-                 * @default null
-                 */
-                error?: string | null;
-              } | null;
-            }[];
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                    name: string;
+                    /** @default 80 */
+                    port?: number;
+                    region?: string;
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    resources: {
+                      instanceType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                    };
+                  }) | ({
+                    /** @enum {string} */
+                    apiVersion: "v0alpha1";
+                    containerRegistry?: string;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthchecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    integrations?: ({
+                        /** @enum {string} */
+                        type: "volume";
+                        name: string;
+                      } | {
+                        name: string;
+                        /** @enum {string} */
+                        type: "git-lfs";
+                        /** Format: uri */
+                        url: string;
+                      })[];
+                    name: string;
+                    region?: string;
+                    command?: (string)[];
+                    /** @default true */
+                    enabled?: boolean;
+                    resources: {
+                      machineType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                      ports: (number)[];
+                    };
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                  })) | ({
+                    apiVersion: "v1" | "latest";
+                    containerRegistry?: string;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthchecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    integrations?: ({
+                        /** @enum {string} */
+                        type: "volume";
+                        name: string;
+                      } | {
+                        name: string;
+                        /** @enum {string} */
+                        type: "git-lfs";
+                        /** Format: uri */
+                        url: string;
+                      })[];
+                    name: string;
+                    region?: string;
+                    command?: (string)[];
+                    /** @default true */
+                    enabled?: boolean;
+                    resources: {
+                      machineType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                      ports: (number)[];
+                    };
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                  })) | null;
+                  /** @description The ID of the deployment the spec belongs to */
+                  deploymentId: string;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment configuration was applied to the cluster 
+                   * @default null
+                   */
+                  externalApplied?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment was marked "healthy" 
+                   * @default null
+                   */
+                  dtHealthy?: string | null;
+                  /** @description The ID of the user the deployment belongs to */
+                  userId: string;
+                  /**
+                   * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                   * @default null
+                   */
+                  error?: string | null;
+                  /**
+                   * @description Metadata about the source of the configuration 
+                   * @default null
+                   */
+                  metadata?: ({
+                    gitHeaders?: {
+                      "x-git-host": "github" | "gitlab";
+                      "x-git-actor": string;
+                      "x-git-sha": string;
+                      "x-git-ref": string;
+                      "x-git-owner": string;
+                      "x-git-repo": string;
+                    };
+                  }) | null;
+                }) | null;
+              })[];
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Upsert a deployment
-   * @description Submit a new deployment configuration. If a deployment does not exist, one is created. Otherwise, a deployment is updated with new configuration.
-   */
   "mutation.deployments.upsert": {
+    /**
+     * Upsert a deployment 
+     * @description Submit a new deployment configuration. If a deployment does not exist, one is created. Otherwise, a deployment is updated with new configuration.
+     */
     requestBody: {
       content: {
         "application/json": {
           /**
-           * @description The ID of the deployment to update.
+           * @description The ID of the deployment to update. 
            * @default null
            */
           deploymentId?: string | null;
           /** @description The project ID to deploy resources under. */
           projectId: string;
           /** @description The deployment configuration */
-          config:
-            | {
-                apiVersion: "v0alpha0" | "latest";
+          config: (({
+            apiVersion: "v0alpha0" | "latest";
+            command?: (string)[];
+            containerRegistry?: string;
+            /** @default true */
+            enabled?: boolean;
+            env?: ({
                 name: string;
-                region?: string;
-                command?: string[];
-                /** Format: uuid */
-                containerRegistry?: string;
-                env?: {
-                  name: string;
-                  value: string;
-                }[];
-                /** @default true */
-                enabled?: boolean;
-                healthChecks?: {
-                  liveness?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
-                  readiness?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
-                  startup?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
-                };
-                image: string;
-                repositories?: {
-                  mountPath?: string;
-                  dataset: string;
-                  repositories: {
-                    url: string;
-                    ref?: string;
-                    name: string;
-                    username?: string;
-                    password?: string;
-                  }[];
-                };
-                resources: {
-                  instanceType: string;
-                  /** @default 1 */
-                  replicas?: number;
-                  autoscaling?: {
-                    maxReplicas: number;
-                    enabled?: boolean;
-                    metrics: (
-                      | {
-                          /** @enum {string} */
-                          metric: "requestDuration";
-                          /** @enum {string} */
-                          summary: "average";
-                          value: number;
-                        }
-                      | {
-                          /** @enum {string} */
-                          metric: "cpu" | "memory";
-                          /** @enum {string} */
-                          summary: "average";
-                          value: number;
-                        }
-                    )[];
-                  };
-                };
-                models?: {
-                  id: string;
-                  path?: string;
-                }[];
-                /** @default 80 */
+                value: string;
+              })[];
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
                 port?: number;
-              }
-            | {
-                /** @enum {string} */
-                apiVersion: "v0alpha1";
-                name: string;
-                region?: string;
-                command: string[];
-                /** Format: uuid */
-                containerRegistry?: string;
-                env?: {
-                  name: string;
-                  value: string;
-                }[];
-                /** @default true */
-                enabled?: boolean;
-                healthchecks?: {
-                  liveness?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
-                  readiness?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
-                  startup?:
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        path: string;
-                        host?: string;
-                        port?: number;
-                        headers?: {
-                          name: string;
-                          value: string;
-                        }[];
-                      }
-                    | {
-                        timeoutSeconds?: number;
-                        initialDelaySeconds?: number;
-                        periodSeconds?: number;
-                        failureThreshold?: number;
-                        exec: {
-                          command: string[];
-                        };
-                      };
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
                 };
-                image: string;
               };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+            name: string;
+            /** @default 80 */
+            port?: number;
+            region?: string;
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            resources: {
+              instanceType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+            };
+          }) | ({
+            /** @enum {string} */
+            apiVersion: "v0alpha1";
+            containerRegistry?: string;
+            env?: ({
+                name: string;
+                value: string;
+              })[];
+            healthchecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            integrations?: ({
+                /** @enum {string} */
+                type: "volume";
+                name: string;
+              } | {
+                name: string;
+                /** @enum {string} */
+                type: "git-lfs";
+                /** Format: uri */
+                url: string;
+              })[];
+            name: string;
+            region?: string;
+            command?: (string)[];
+            /** @default true */
+            enabled?: boolean;
+            resources: {
+              machineType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+              ports: (number)[];
+            };
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+          })) | ({
+            apiVersion: "v1" | "latest";
+            containerRegistry?: string;
+            env?: ({
+                name: string;
+                value: string;
+              })[];
+            healthchecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            image: string;
+            integrations?: ({
+                /** @enum {string} */
+                type: "volume";
+                name: string;
+              } | {
+                name: string;
+                /** @enum {string} */
+                type: "git-lfs";
+                /** Format: uri */
+                url: string;
+              })[];
+            name: string;
+            region?: string;
+            command?: (string)[];
+            /** @default true */
+            enabled?: boolean;
+            resources: {
+              machineType: string;
+              /** @default 1 */
+              replicas?: number;
+              autoscaling?: {
+                maxReplicas: number;
+                enabled?: boolean;
+                metrics: ({
+                    /** @enum {string} */
+                    metric: "requestDuration";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  } | ({
+                    /** @enum {string} */
+                    metric: "cpu" | "memory";
+                    /** @enum {string} */
+                    summary: "average";
+                    value: number;
+                  }))[];
+              };
+              ports: (number)[];
+            };
+            healthChecks?: {
+              liveness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              readiness?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+              startup?: {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                path: string;
+                host?: string;
+                port?: number;
+                headers?: ({
+                    name: string;
+                    value: string;
+                  })[];
+              } | {
+                timeoutSeconds?: number;
+                initialDelaySeconds?: number;
+                periodSeconds?: number;
+                failureThreshold?: number;
+                exec: {
+                  command: (string)[];
+                };
+              };
+            };
+            repositories?: {
+              mountPath?: string;
+              dataset: string;
+              repositories: ({
+                  url: string;
+                  ref?: string;
+                  name: string;
+                  username?: string;
+                  password?: string;
+                })[];
+            };
+            models?: ({
+                id: string;
+                path?: string;
+              })[];
+          });
         };
       };
     };
@@ -1069,18 +4929,152 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List deployment runs
-   * @description Lists the active deployment runs for a deployment.
-   */
-  "query.deploymentRunsrouter.get": {
+  "query.deploymentRuns.get": {
+    /**
+     * List deployment runs 
+     * @description Lists the active deployment runs for a deployment.
+     */
     parameters: {
-      query: {
         /** @description The latest n number of deployment runs to return */
+      query: {
         limit?: number;
       };
-      path: {
         /** @description The ID of the deployment to fetch */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": ({
+              id: string;
+              /**
+               * @description The amount of replicas that are available but not ready 
+               * @default 0
+               */
+              availableReplicas?: number | null;
+              /**
+               * @description The amount of replicas that are ready 
+               * @default 0
+               */
+              readyReplicas?: number | null;
+              /**
+               * @description The desired amount of replicas for the deployment run 
+               * @default 0
+               */
+              replicas?: number | null;
+              /** @description The deployment run instances */
+              instances: ({
+                  /** @description The ID of the deployment instance */
+                  id: string;
+                  /**
+                   * Format: date-time 
+                   * @description The date the instance was created
+                   */
+                  dtCreated: string;
+                  /**
+                   * Format: date-time 
+                   * @description The date the instance was finished 
+                   * @default null
+                   */
+                  dtFinished?: string | null;
+                  /** @description The current state of the instance */
+                  state: string;
+                  /** @description The ID of the deployment instance */
+                  instanceId: string;
+                  /**
+                   * @description The latest state message for the instance 
+                   * @default null
+                   */
+                  stateMessage?: string | null;
+                  /** @description The time series state history of the deployment instance */
+                  history: ({
+                      /** @description The state of the instance at the point in time */
+                      state: string;
+                      /**
+                       * @description The state message from the instance at the point in time 
+                       * @default null
+                       */
+                      message?: string | null;
+                      /**
+                       * Format: date-time 
+                       * @description The timestamp of the state
+                       */
+                      timestamp: string;
+                    })[];
+                })[];
+            })[];
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.deploymentMetrics.get": {
+    /**
+     * List app metrics 
+     * @description Lists metrics for a given app.
+     */
+    parameters: {
+        /** @description The metric to fetch. */
+        /** @description The time frame for the metrics request. */
+      query: {
+        metric: ((((("requests_total" | "cpu") | "memory") | "gpu") | "requests_per_second") | "requests_duration_seconds_1m") | "requests_duration_seconds_5m";
+        timeframe?: ((("hour" | "12_hours") | "day") | "1_week") | "2_weeks";
+      };
+        /** @description The ID of the deployment to fetch */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": ({
+            /** Format: date-time */
+            timestamp: string;
+            value: string;
+          } | ({
+              gpu?: string;
+              instanceId?: string;
+              /** Format: date-time */
+              timestamp: string;
+              value: string;
+            })[]) | ({
+              instanceId: string;
+              values: ({
+                  /** Format: date-time */
+                  timestamp: string;
+                  value: string;
+                })[];
+            })[];
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.deploymentLogs.list": {
+    /**
+     * List app logs 
+     * @description Lists logs for a given app.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+        /** @description Get the logs for a particular instance ID */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+        instanceId?: string;
+      };
+        /** @description The ID of the app */
+      path: {
         id: string;
       };
     };
@@ -1089,83 +5083,2756 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            id: string;
-            /**
-             * @description The amount of replicas that are available but not ready
-             * @default 0
-             */
-            availableReplicas?: number;
-            /**
-             * @description The amount of replicas that are ready
-             * @default 0
-             */
-            readyReplicas?: number;
-            /**
-             * @description The desired amount of replicas for the deployment run
-             * @default 0
-             */
-            replicas?: number;
-            /** @description The deployment run instances */
-            instances: {
-              /** @description The ID of the deployment instance */
-              id: string;
-              /**
-               * Format: date-time
-               * @description The date the instance was created
-               */
-              dtCreated: string;
-              /**
-               * Format: date-time
-               * @description The date the instance was finished
-               * @default null
-               */
-              dtFinished?: string | null;
-              /** @description The current state of the instance */
-              state: string;
-              /** @description The ID of the deployment instance */
-              instanceId: string;
-              /**
-               * @description The latest state message for the instance
-               * @default null
-               */
-              stateMessage?: string | null;
-              /** @description The time series state history of the deployment instance */
-              history: {
-                /** @description The state of the instance at the point in time */
-                state: string;
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description ID of the log item */
+                id: string;
+                /** @description The associated job ID of the log item. */
+                jobId: string;
+                /** @description The line number of the log item. */
+                line: string;
+                /** @description The message of the log item. */
+                message: string;
                 /**
-                 * @description The state message from the instance at the point in time
+                 * @description UUID representing the log item 
                  * @default null
                  */
-                message?: string | null;
+                uuid?: string | null;
                 /**
-                 * Format: date-time
-                 * @description The timestamp of the state
+                 * Format: date-time 
+                 * @description The date the log was created.
                  */
-                timestamp: string;
-              }[];
-            }[];
-          }[];
+                dtCreated: string;
+                /**
+                 * @description The instance ID the log is associated with. 
+                 * @default null
+                 */
+                instanceId?: string | null;
+              })[];
+          };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List projects
-   * @description
-   *         List projects. This endpoint supports pagination and sorting.
-   */
-  "query.projects.list": {
+  "query.deploymentHistory.list": {
+    /**
+     * List app history 
+     * @description Lists history for a given app.
+     */
     parameters: {
-      query: {
         /** @description Fetch the next page of results after this cursor. */
-        after?: string;
         /** @description The number of items to fetch after this page. */
-        limit?: number;
         /** @description Order results by one of these fields. */
-        orderBy?: "dtCreated";
         /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+        /** @description The ID of the app */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the deployment spec */
+                id: string;
+                /** @description The data for the deployment spec */
+                data?: ((({
+                  apiVersion: "v0alpha0" | "latest";
+                  command?: (string)[];
+                  containerRegistry?: string;
+                  /** @default true */
+                  enabled?: boolean;
+                  env?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                  healthChecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  image: string;
+                  models?: ({
+                      id: string;
+                      path?: string;
+                    })[];
+                  name: string;
+                  /** @default 80 */
+                  port?: number;
+                  region?: string;
+                  repositories?: {
+                    mountPath?: string;
+                    dataset: string;
+                    repositories: ({
+                        url: string;
+                        ref?: string;
+                        name: string;
+                        username?: string;
+                        password?: string;
+                      })[];
+                  };
+                  resources: {
+                    instanceType: string;
+                    /** @default 1 */
+                    replicas?: number;
+                    autoscaling?: {
+                      maxReplicas: number;
+                      enabled?: boolean;
+                      metrics: ({
+                          /** @enum {string} */
+                          metric: "requestDuration";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        } | ({
+                          /** @enum {string} */
+                          metric: "cpu" | "memory";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        }))[];
+                    };
+                  };
+                }) | ({
+                  /** @enum {string} */
+                  apiVersion: "v0alpha1";
+                  containerRegistry?: string;
+                  env?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                  healthchecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  image: string;
+                  integrations?: ({
+                      /** @enum {string} */
+                      type: "volume";
+                      name: string;
+                    } | {
+                      name: string;
+                      /** @enum {string} */
+                      type: "git-lfs";
+                      /** Format: uri */
+                      url: string;
+                    })[];
+                  name: string;
+                  region?: string;
+                  command?: (string)[];
+                  /** @default true */
+                  enabled?: boolean;
+                  resources: {
+                    machineType: string;
+                    /** @default 1 */
+                    replicas?: number;
+                    autoscaling?: {
+                      maxReplicas: number;
+                      enabled?: boolean;
+                      metrics: ({
+                          /** @enum {string} */
+                          metric: "requestDuration";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        } | ({
+                          /** @enum {string} */
+                          metric: "cpu" | "memory";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        }))[];
+                    };
+                    ports: (number)[];
+                  };
+                  healthChecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  repositories?: {
+                    mountPath?: string;
+                    dataset: string;
+                    repositories: ({
+                        url: string;
+                        ref?: string;
+                        name: string;
+                        username?: string;
+                        password?: string;
+                      })[];
+                  };
+                  models?: ({
+                      id: string;
+                      path?: string;
+                    })[];
+                })) | ({
+                  apiVersion: "v1" | "latest";
+                  containerRegistry?: string;
+                  env?: ({
+                      name: string;
+                      value: string;
+                    })[];
+                  healthchecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  image: string;
+                  integrations?: ({
+                      /** @enum {string} */
+                      type: "volume";
+                      name: string;
+                    } | {
+                      name: string;
+                      /** @enum {string} */
+                      type: "git-lfs";
+                      /** Format: uri */
+                      url: string;
+                    })[];
+                  name: string;
+                  region?: string;
+                  command?: (string)[];
+                  /** @default true */
+                  enabled?: boolean;
+                  resources: {
+                    machineType: string;
+                    /** @default 1 */
+                    replicas?: number;
+                    autoscaling?: {
+                      maxReplicas: number;
+                      enabled?: boolean;
+                      metrics: ({
+                          /** @enum {string} */
+                          metric: "requestDuration";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        } | ({
+                          /** @enum {string} */
+                          metric: "cpu" | "memory";
+                          /** @enum {string} */
+                          summary: "average";
+                          value: number;
+                        }))[];
+                    };
+                    ports: (number)[];
+                  };
+                  healthChecks?: {
+                    liveness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    readiness?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                    startup?: {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      path: string;
+                      host?: string;
+                      port?: number;
+                      headers?: ({
+                          name: string;
+                          value: string;
+                        })[];
+                    } | {
+                      timeoutSeconds?: number;
+                      initialDelaySeconds?: number;
+                      periodSeconds?: number;
+                      failureThreshold?: number;
+                      exec: {
+                        command: (string)[];
+                      };
+                    };
+                  };
+                  repositories?: {
+                    mountPath?: string;
+                    dataset: string;
+                    repositories: ({
+                        url: string;
+                        ref?: string;
+                        name: string;
+                        username?: string;
+                        password?: string;
+                      })[];
+                  };
+                  models?: ({
+                      id: string;
+                      path?: string;
+                    })[];
+                })) | null;
+                /** @description The ID of the deployment the spec belongs to */
+                deploymentId: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment configuration was applied to the cluster 
+                 * @default null
+                 */
+                externalApplied?: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment was marked "healthy" 
+                 * @default null
+                 */
+                dtHealthy?: string | null;
+                /** @description The ID of the user the deployment belongs to */
+                userId: string;
+                /**
+                 * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                 * @default null
+                 */
+                error?: string | null;
+                /**
+                 * @description Metadata about the source of the configuration 
+                 * @default null
+                 */
+                metadata?: ({
+                  gitHeaders?: {
+                    "x-git-host": "github" | "gitlab";
+                    "x-git-actor": string;
+                    "x-git-sha": string;
+                    "x-git-ref": string;
+                    "x-git-owner": string;
+                    "x-git-repo": string;
+                  };
+                }) | null;
+                /** @default null */
+                workflowRun?: ({
+                  /**
+                   * Format: uuid 
+                   * @description The ID of the workflow run
+                   */
+                  id: string;
+                  /**
+                   * Format: uuid 
+                   * @description The ID of the workflow
+                   */
+                  workflowId: string;
+                  /**
+                   * Format: date-time 
+                   * @description When the workflow run started 
+                   * @default null
+                   */
+                  dtStarted?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description When the workflow run finished 
+                   * @default null
+                   */
+                  dtFinished?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description When the workflow run was created 
+                   * @default null
+                   */
+                  dtCreated?: string | null;
+                  /**
+                   * @description The message of the workflow run 
+                   * @default null
+                   */
+                  message?: string | null;
+                  /**
+                   * @description The phase of the workflow run 
+                   * @enum {string}
+                   */
+                  phase: "Initializing" | "Submitting" | "Pending" | "Running" | "Succeeded" | "Skipped" | "Failed" | "Error" | "Omitted" | "Canceled";
+                  workflow: {
+                    /**
+                     * Format: uuid 
+                     * @description The ID of the workflow
+                     */
+                    id: string;
+                    /** @description The name of the workflow */
+                    name: string;
+                    /**
+                     * Format: date-time 
+                     * @description When the workflow was created 
+                     * @default null
+                     */
+                    dtCreated?: string | null;
+                  };
+                }) | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machines.list": {
+    /**
+     * List machines 
+     * @description Fetches a list of machines.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name" | "state";
+        order?: "asc" | "desc";
+        name?: string;
+        region?: string;
+        agentType?: string;
+        machineType?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the machine. */
+                id: string;
+                /** @description The name of the machine. */
+                name: string;
+                /**
+                 * @description The state of the machine. 
+                 * @enum {string}
+                 */
+                state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+                /** @description The operating system of the machine. */
+                os: string;
+                /** @description The type of the machine. */
+                machineType: {
+                  /** @description The label of the machine type. */
+                  label: string;
+                  /** @description The number of CPUs. */
+                  cpus: number;
+                  /**
+                   * Format: int64 
+                   * @description The amount of RAM in bytes.
+                   */
+                  ram: number;
+                  /** @description The name of the GPU. */
+                  gpu: string | null;
+                  /** @description Metadata for the machine type. */
+                  metadata: ({
+                    [key: string]: unknown | undefined;
+                  }) | null;
+                  /** @description Whether the machine type supports NVLink. */
+                  supportsNvlink: boolean;
+                  /** @description The name of the NVLink GPU. */
+                  nvlinkGpu: string | null;
+                  /** @description The number of NVLink GPUs. */
+                  nvlinkGpuCount: number | null;
+                };
+                /** @description The agent type of the machine. */
+                agentType: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /**
+                 * Format: int64 
+                 * @description The total amount of storage.
+                 */
+                storageTotal: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of storage used.
+                 */
+                storageUsed: number;
+                /** @description The accelerators of the machine. */
+                accelerators?: ({
+                    /** @description The name of the accelerator. */
+                    name: string;
+                    /** @description The number of accelerators of this type. */
+                    count: number;
+                  })[] | null;
+                /** @description The region of the machine. */
+                region: string;
+                /** @description The private IP address of the machine. */
+                privateIp: string | null;
+                /** @description The ID of the network the machine is on. */
+                networkId: string | null;
+                /** @description The public IP address of the machine. */
+                publicIp: string | null;
+                /**
+                 * @description The public IP type. 
+                 * @enum {string}
+                 */
+                publicIpType: "static" | "dynamic" | "none";
+                /** @description Whether auto shutdown is enabled. */
+                autoShutdownEnabled: boolean;
+                /** @description The shutdown timeout of the machine in hours. */
+                autoShutdownTimeout: number | null;
+                /** @description Whether to force shutdown the machine. */
+                autoShutdownForce: boolean | null;
+                /** @description Whether auto snapshots are enabled. */
+                autoSnapshotEnabled: boolean;
+                /**
+                 * @description The frequency of auto snapshots. 
+                 * @enum {string|null}
+                 */
+                autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+                /** @description The number of auto snapshots to save. */
+                autoSnapshotSaveCount: number | null;
+                /** @description Whether updates are pending. */
+                updatesPending: boolean;
+                /** @description Whether a restore point is enabled. */
+                restorePointEnabled: boolean;
+                /**
+                 * @description The frequency of restore points. 
+                 * @enum {string|null}
+                 */
+                restorePointFrequency: "shutdown" | null;
+                /** @description The ID of the snapshot to use as a restore point. */
+                restorePointSnapshotId: string | null;
+                /** @description The usage rate of the machine. */
+                usageRate: number;
+                /** @description The storage rate of the machine. */
+                storageRate: number;
+                /**
+                 * Format: date-time 
+                 * @description The date the machine was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the machine was last modified.
+                 */
+                dtModified: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the machine was deleted.
+                 */
+                dtDeleted: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.create": {
+    /**
+     * Create a machine 
+     * @description Creates a new machine.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the new machine. */
+          name: string;
+          /** @description The machine type. */
+          machineType: string;
+          /** @description The template ID. */
+          templateId: string;
+          /** @description The network ID. */
+          networkId?: string;
+          /** @description The disk size in gigabytes. */
+          diskSize: number;
+          /** @description The region to create the machine in. */
+          region: string;
+          /**
+           * @description The public IP type. 
+           * @enum {string}
+           */
+          publicIpType?: "static" | "dynamic" | "none";
+          /** @description Whether to enable auto snapshots. */
+          autoSnapshotEnabled?: boolean;
+          /**
+           * @description The auto snapshot frequency. 
+           * @enum {string}
+           */
+          autoSnapshotFrequency?: "hourly" | "daily" | "weekly" | "monthly";
+          /** @description The number of auto snapshots to save. */
+          autoSnapshotSaveCount?: number;
+          /** @description Whether to enable auto shutdown. */
+          autoShutdownEnabled?: boolean;
+          /** @description The auto shutdown timeout in hours. */
+          autoShutdownTimeout?: number;
+          /** @description Whether to force shutdown the machine. */
+          autoShutdownForce?: boolean;
+          /** @description Whether to take an initial snapshot. */
+          takeInitialSnapshot?: boolean;
+          /** @description Whether to use initial snapshot as a restore point. */
+          restorePointEnabled?: boolean;
+          /**
+           * @description The restore point frequency. 
+           * @enum {string}
+           */
+          restorePointFrequency?: "shutdown";
+          /** @description The startup script ID. */
+          startupScriptId?: string;
+          /** @description Whether to email the password. */
+          emailPassword?: boolean;
+          /** @description Whether to start the machine on creation. */
+          startOnCreate?: boolean;
+          /** @description Whether to enable NVLink. */
+          enableNvlink?: boolean;
+          /** @description The IDs of users to grant access to the machine. */
+          accessorIds?: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machines.get": {
+    /**
+     * Get a machine 
+     * @description Fetches a single machine by ID.
+     */
+    parameters: {
+        /** @description The ID of the machine to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the machine. */
+            id: string;
+            /** @description The name of the machine. */
+            name: string;
+            /**
+             * @description The state of the machine. 
+             * @enum {string}
+             */
+            state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+            /** @description The operating system of the machine. */
+            os: string;
+            /** @description The type of the machine. */
+            machineType: {
+              /** @description The label of the machine type. */
+              label: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /** @description The name of the GPU. */
+              gpu: string | null;
+              /** @description Metadata for the machine type. */
+              metadata: ({
+                [key: string]: unknown | undefined;
+              }) | null;
+              /** @description Whether the machine type supports NVLink. */
+              supportsNvlink: boolean;
+              /** @description The name of the NVLink GPU. */
+              nvlinkGpu: string | null;
+              /** @description The number of NVLink GPUs. */
+              nvlinkGpuCount: number | null;
+            };
+            /** @description The agent type of the machine. */
+            agentType: string;
+            /** @description The number of CPUs. */
+            cpus: number;
+            /**
+             * Format: int64 
+             * @description The amount of RAM in bytes.
+             */
+            ram: number;
+            /**
+             * Format: int64 
+             * @description The total amount of storage.
+             */
+            storageTotal: number;
+            /**
+             * Format: int64 
+             * @description The amount of storage used.
+             */
+            storageUsed: number;
+            /** @description The accelerators of the machine. */
+            accelerators?: ({
+                /** @description The name of the accelerator. */
+                name: string;
+                /** @description The number of accelerators of this type. */
+                count: number;
+              })[] | null;
+            /** @description The region of the machine. */
+            region: string;
+            /** @description The private IP address of the machine. */
+            privateIp: string | null;
+            /** @description The ID of the network the machine is on. */
+            networkId: string | null;
+            /** @description The public IP address of the machine. */
+            publicIp: string | null;
+            /**
+             * @description The public IP type. 
+             * @enum {string}
+             */
+            publicIpType: "static" | "dynamic" | "none";
+            /** @description Whether auto shutdown is enabled. */
+            autoShutdownEnabled: boolean;
+            /** @description The shutdown timeout of the machine in hours. */
+            autoShutdownTimeout: number | null;
+            /** @description Whether to force shutdown the machine. */
+            autoShutdownForce: boolean | null;
+            /** @description Whether auto snapshots are enabled. */
+            autoSnapshotEnabled: boolean;
+            /**
+             * @description The frequency of auto snapshots. 
+             * @enum {string|null}
+             */
+            autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+            /** @description The number of auto snapshots to save. */
+            autoSnapshotSaveCount: number | null;
+            /** @description Whether updates are pending. */
+            updatesPending: boolean;
+            /** @description Whether a restore point is enabled. */
+            restorePointEnabled: boolean;
+            /**
+             * @description The frequency of restore points. 
+             * @enum {string|null}
+             */
+            restorePointFrequency: "shutdown" | null;
+            /** @description The ID of the snapshot to use as a restore point. */
+            restorePointSnapshotId: string | null;
+            /** @description The usage rate of the machine. */
+            usageRate: number;
+            /** @description The storage rate of the machine. */
+            storageRate: number;
+            /**
+             * Format: date-time 
+             * @description The date the machine was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the machine was last modified.
+             */
+            dtModified: string;
+            /**
+             * Format: date-time 
+             * @description The date the machine was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.update": {
+    /**
+     * Update a machine 
+     * @description Updates a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to update. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the machine. */
+          name?: string;
+          /** @description The machine type. */
+          machineType?: string;
+          /** @description The disk size in gigabytes. */
+          diskSize?: number;
+          /** @description The network ID. */
+          networkId?: string;
+          /**
+           * @description The public IP type. 
+           * @enum {string}
+           */
+          publicIpType?: "static" | "dynamic" | "none";
+          /** @description Whether to enable auto snapshots. */
+          autoSnapshotEnabled?: boolean;
+          /**
+           * @description The auto snapshot frequency. 
+           * @enum {string}
+           */
+          autoSnapshotFrequency?: "hourly" | "daily" | "weekly" | "monthly";
+          /** @description The number of auto snapshots to save. */
+          autoSnapshotSaveCount?: number;
+          /** @description Whether to enable auto shutdown. */
+          autoShutdownEnabled?: boolean;
+          /** @description The auto shutdown timeout in hours. */
+          autoShutdownTimeout?: number;
+          /** @description Whether to force shutdown the machine. */
+          autoShutdownForce?: boolean;
+          /** @description Whether to use initial snapshot as a restore point. */
+          restorePointEnabled?: boolean;
+          /**
+           * @description The restore point frequency. 
+           * @enum {string}
+           */
+          restorePointFrequency?: "shutdown";
+          /** @description The restore point snapshot ID. */
+          restorePointSnapshotId?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event?: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.delete": {
+    /**
+     * Delete a machine 
+     * @description Deletes a single machine by ID.
+     */
+    parameters: {
+        /** @description The ID of the machine to delete. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.restart": {
+    /**
+     * Restart a machine 
+     * @description Restarts a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to restart. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.start": {
+    /**
+     * Start a machine 
+     * @description Starts a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to start. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.stop": {
+    /**
+     * Stop a machine 
+     * @description Stops a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to stop. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The machine. */
+            data: {
+              /** @description The ID of the machine. */
+              id: string;
+              /** @description The name of the machine. */
+              name: string;
+              /**
+               * @description The state of the machine. 
+               * @enum {string}
+               */
+              state: "off" | "starting" | "stopping" | "restarting" | "serviceready" | "ready" | "upgrading" | "provisioning";
+              /** @description The operating system of the machine. */
+              os: string;
+              /** @description The type of the machine. */
+              machineType: {
+                /** @description The label of the machine type. */
+                label: string;
+                /** @description The number of CPUs. */
+                cpus: number;
+                /**
+                 * Format: int64 
+                 * @description The amount of RAM in bytes.
+                 */
+                ram: number;
+                /** @description The name of the GPU. */
+                gpu: string | null;
+                /** @description Metadata for the machine type. */
+                metadata: ({
+                  [key: string]: unknown | undefined;
+                }) | null;
+                /** @description Whether the machine type supports NVLink. */
+                supportsNvlink: boolean;
+                /** @description The name of the NVLink GPU. */
+                nvlinkGpu: string | null;
+                /** @description The number of NVLink GPUs. */
+                nvlinkGpuCount: number | null;
+              };
+              /** @description The agent type of the machine. */
+              agentType: string;
+              /** @description The number of CPUs. */
+              cpus: number;
+              /**
+               * Format: int64 
+               * @description The amount of RAM in bytes.
+               */
+              ram: number;
+              /**
+               * Format: int64 
+               * @description The total amount of storage.
+               */
+              storageTotal: number;
+              /**
+               * Format: int64 
+               * @description The amount of storage used.
+               */
+              storageUsed: number;
+              /** @description The accelerators of the machine. */
+              accelerators?: ({
+                  /** @description The name of the accelerator. */
+                  name: string;
+                  /** @description The number of accelerators of this type. */
+                  count: number;
+                })[] | null;
+              /** @description The region of the machine. */
+              region: string;
+              /** @description The private IP address of the machine. */
+              privateIp: string | null;
+              /** @description The ID of the network the machine is on. */
+              networkId: string | null;
+              /** @description The public IP address of the machine. */
+              publicIp: string | null;
+              /**
+               * @description The public IP type. 
+               * @enum {string}
+               */
+              publicIpType: "static" | "dynamic" | "none";
+              /** @description Whether auto shutdown is enabled. */
+              autoShutdownEnabled: boolean;
+              /** @description The shutdown timeout of the machine in hours. */
+              autoShutdownTimeout: number | null;
+              /** @description Whether to force shutdown the machine. */
+              autoShutdownForce: boolean | null;
+              /** @description Whether auto snapshots are enabled. */
+              autoSnapshotEnabled: boolean;
+              /**
+               * @description The frequency of auto snapshots. 
+               * @enum {string|null}
+               */
+              autoSnapshotFrequency: "hourly" | "daily" | "weekly" | "monthly" | null;
+              /** @description The number of auto snapshots to save. */
+              autoSnapshotSaveCount: number | null;
+              /** @description Whether updates are pending. */
+              updatesPending: boolean;
+              /** @description Whether a restore point is enabled. */
+              restorePointEnabled: boolean;
+              /**
+               * @description The frequency of restore points. 
+               * @enum {string|null}
+               */
+              restorePointFrequency: "shutdown" | null;
+              /** @description The ID of the snapshot to use as a restore point. */
+              restorePointSnapshotId: string | null;
+              /** @description The usage rate of the machine. */
+              usageRate: number;
+              /** @description The storage rate of the machine. */
+              storageRate: number;
+              /**
+               * Format: date-time 
+               * @description The date the machine was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was last modified.
+               */
+              dtModified: string;
+              /**
+               * Format: date-time 
+               * @description The date the machine was deleted.
+               */
+              dtDeleted: string | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machines.listAccessors": {
+    /**
+     * List accessors 
+     * @description Lists the team members that can explicitly access a machine.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "id";
+        order?: "asc" | "desc";
+      };
+        /** @description The ID of the machine. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The user that can access the machine */
+                user: {
+                  /** @description The ID of the user */
+                  id: string;
+                  /**
+                   * Format: email 
+                   * @description The email address of the user
+                   */
+                  email: string;
+                  /**
+                   * @description The first name of the user 
+                   * @default null
+                   */
+                  firstName?: string | null;
+                  /**
+                   * @description The last name of the user 
+                   * @default null
+                   */
+                  lastName?: string | null;
+                  /**
+                   * @description The URL of the team's profile image. 
+                   * @default null
+                   */
+                  publicProfileImageUrl?: string | null;
+                };
+                /**
+                 * Format: date-time 
+                 * @description The date the user was removed from the machine as an accessor. 
+                 * @default null
+                 */
+                dtDeleted?: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.addAccessor": {
+    /**
+     * Add an accessor 
+     * @description Adds an accessor to a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to add an accessor to. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The ID of the user to add as an accessor. */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The user that can access the machine */
+            user: {
+              /** @description The ID of the user */
+              id: string;
+              /**
+               * Format: email 
+               * @description The email address of the user
+               */
+              email: string;
+              /**
+               * @description The first name of the user 
+               * @default null
+               */
+              firstName?: string | null;
+              /**
+               * @description The last name of the user 
+               * @default null
+               */
+              lastName?: string | null;
+              /**
+               * @description The URL of the team's profile image. 
+               * @default null
+               */
+              publicProfileImageUrl?: string | null;
+            };
+            /**
+             * Format: date-time 
+             * @description The date the user was removed from the machine as an accessor. 
+             * @default null
+             */
+            dtDeleted?: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machines.getAccessor": {
+    /**
+     * Get an accessor 
+     * @description Get an accessor for a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to get an accessor for. */
+        /** @description The ID of the user to get. */
+      path: {
+        id: string;
+        userId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The user that can access the machine */
+            user: {
+              /** @description The ID of the user */
+              id: string;
+              /**
+               * Format: email 
+               * @description The email address of the user
+               */
+              email: string;
+              /**
+               * @description The first name of the user 
+               * @default null
+               */
+              firstName?: string | null;
+              /**
+               * @description The last name of the user 
+               * @default null
+               */
+              lastName?: string | null;
+              /**
+               * @description The URL of the team's profile image. 
+               * @default null
+               */
+              publicProfileImageUrl?: string | null;
+            };
+            /**
+             * Format: date-time 
+             * @description The date the user was removed from the machine as an accessor. 
+             * @default null
+             */
+            dtDeleted?: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.machines.removeAccessor": {
+    /**
+     * Delete an accessor 
+     * @description Deletes an accessor from a machine.
+     */
+    parameters: {
+        /** @description The ID of the machine to add an accessor to. */
+        /** @description The ID of the user to add as an accessor. */
+      path: {
+        id: string;
+        userId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The user that can access the machine */
+            user: {
+              /** @description The ID of the user */
+              id: string;
+              /**
+               * Format: email 
+               * @description The email address of the user
+               */
+              email: string;
+              /**
+               * @description The first name of the user 
+               * @default null
+               */
+              firstName?: string | null;
+              /**
+               * @description The last name of the user 
+               * @default null
+               */
+              lastName?: string | null;
+              /**
+               * @description The URL of the team's profile image. 
+               * @default null
+               */
+              publicProfileImageUrl?: string | null;
+            };
+            /**
+             * Format: date-time 
+             * @description The date the user was removed from the machine as an accessor. 
+             * @default null
+             */
+            dtDeleted?: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.machines.getDesktop": {
+    /**
+     * Get desktop settings 
+     * @description Gets the machine settings that are used to configure desktop streaming.
+     */
+    parameters: {
+        /** @description The ID of the machine. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Settings for Linux desktop machines. */
+            vnc?: {
+              /** @description The VNC hostname. */
+              hostname: string;
+              /** @description The port VNC is listening on. */
+              port: number;
+              /** @description The VNC password. */
+              password: string;
+            };
+            /** @description Settings for Windows desktop machines. */
+            windows?: {
+              /** @description The Windows hostname. */
+              hostname: string;
+              /** @description The port Windows is listening on. */
+              port: number;
+              /** @description The public IP of the machine. */
+              publicIp?: string;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.notebooks.list": {
+    /**
+     * List notebooks 
+     * @description Lists the notebooks you have access to in the current team
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+        /** @description Search for notebooks by their name */
+        /** @description The state of the notebook. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        name?: string;
+        state?: "Cancel" | "Cancelled" | "Error" | "Failed" | "Pending" | "Preempted" | "Provisioned" | "Running" | "Stopped";
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the notebook */
+                id: string;
+                /** @description The name of the notebook */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the notebook was last modified
+                 */
+                dtModified: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the notebook was created
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the notebook was last started
+                 */
+                dtStarted: string | null;
+                /**
+                 * @description The state of the notebook. 
+                 * @enum {string}
+                 */
+                state: "Cancel" | "Cancelled" | "Error" | "Failed" | "Pending" | "Preempted" | "Provisioned" | "Running" | "Stopped";
+                /** @description The type of the machine the notebook is running on */
+                machineType: string | null;
+                /** @description The notebook repo ID */
+                notebookRepoId: string | null;
+                /** @description The project ID */
+                projectId: string;
+                /** @description The last user to start the notebook */
+                startedByUser: {
+                  /** @description The ID of the user */
+                  id: string;
+                  /**
+                   * Format: email 
+                   * @description The email address of the user
+                   */
+                  email: string;
+                  /**
+                   * @description The first name of the user 
+                   * @default null
+                   */
+                  firstName?: string | null;
+                  /**
+                   * @description The last name of the user 
+                   * @default null
+                   */
+                  lastName?: string | null;
+                  /**
+                   * @description The URL of the team's profile image. 
+                   * @default null
+                   */
+                  publicProfileImageUrl?: string | null;
+                };
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.privateNetworks.get": {
+    /**
+     * Get a private network 
+     * @description Fetches a single private network by ID.
+     */
+    parameters: {
+        /** @description The ID of the private network to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the private network. */
+            id: string;
+            /** @description The name of the private network. */
+            name: string;
+            /** @description The region the private network is in. */
+            region: string;
+            /** @description The network prefix of the private network. */
+            network: string;
+            /** @description The subnet mask of the private network. */
+            netmask: string;
+            /**
+             * Format: date-time 
+             * @description The date the private network was created.
+             */
+            dtCreated: string;
+            /** @description The date the private network was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.privateNetworks.update": {
+    /**
+     * Update a private network 
+     * @description Updates a single private network by ID.
+     */
+    parameters: {
+        /** @description The ID of the private network to update. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the private network. */
+          name?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the private network. */
+            id: string;
+            /** @description The name of the private network. */
+            name: string;
+            /** @description The region the private network is in. */
+            region: string;
+            /** @description The network prefix of the private network. */
+            network: string;
+            /** @description The subnet mask of the private network. */
+            netmask: string;
+            /**
+             * Format: date-time 
+             * @description The date the private network was created.
+             */
+            dtCreated: string;
+            /** @description The date the private network was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.privateNetworks.delete": {
+    /**
+     * Delete a private network 
+     * @description Deletes a single private network by ID.
+     */
+    parameters: {
+        /** @description The ID of the private network to delete. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the private network to delete. */
+            id: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.privateNetworks.list": {
+    /**
+     * List private networks 
+     * @description Fetches a list of private networks.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        name?: string;
+        region?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the private network. */
+                id: string;
+                /** @description The name of the private network. */
+                name: string;
+                /** @description The region the private network is in. */
+                region: string;
+                /** @description The network prefix of the private network. */
+                network: string;
+                /** @description The subnet mask of the private network. */
+                netmask: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the private network was created.
+                 */
+                dtCreated: string;
+                /** @description The date the private network was deleted. */
+                dtDeleted?: (Record<string, never> | string) | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.privateNetworks.create": {
+    /**
+     * Create a private network 
+     * @description Creates a new private network.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the private network. */
+          name: string;
+          /** @description The region the private network is in. */
+          region: string;
+          /**
+           * @description Whether to migrate all machines not currently in a private network to the new private network. 
+           * @default false
+           */
+          migrateMachines?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the private network. */
+            id: string;
+            /** @description The name of the private network. */
+            name: string;
+            /** @description The region the private network is in. */
+            region: string;
+            /** @description The network prefix of the private network. */
+            network: string;
+            /** @description The subnet mask of the private network. */
+            netmask: string;
+            /**
+             * Format: date-time 
+             * @description The date the private network was created.
+             */
+            dtCreated: string;
+            /** @description The date the private network was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.projects.list": {
+    /**
+     * List projects 
+     * @description 
+     *         List projects. This endpoint supports pagination and sorting.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
         order?: "asc" | "desc";
       };
     };
@@ -1177,56 +7844,51 @@ export interface operations {
             /** @description Whether there are more pages of results available. */
             hasMore: boolean;
             /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
-            nextPage: string | null;
+            nextPage?: string;
             /** @description The items on this page. */
-            items: {
-              /** @description The ID of the project */
-              handle: string;
-              /** @description The name of the project */
-              name: string;
-              /**
-               * Format: date-time
-               * @description The date the project was created
-               */
-              dtCreated: string;
-              /**
-               * Format: date-time
-               * @description The date the project was deleted
-               * @default null
-               */
-              dtDeleted?: string | null;
-              /**
-               * @description The node ID of the GitHub repository if this is is a GitHub-connected project.
-               * @default null
-               */
-              repoNodeId?: string | null;
-              /**
-               * @description The name of the GitHub repository if this is is a GitHub-connected project.
-               * @default null
-               */
-              repoName?: string | null;
-              /**
-               * @description The URL of the GitHub repository if this is is a GitHub-connected project.
-               * @default null
-               */
-              repoUrl?: string | null;
-              /**
-               * @description The ID of the GitHub App installation if this is is a GitHub-connected project.
-               * @default null
-               */
-              githubAppInstallationId?: number | null;
-            }[];
+            items: ({
+                /** @description The ID of the project */
+                id: string;
+                /** @description The name of the project */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the project was created
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the project was deleted 
+                 * @default null
+                 */
+                dtDeleted?: string | null;
+                /**
+                 * @description The node ID of the GitHub repository if this is is a GitHub-connected project. 
+                 * @default null
+                 */
+                repoNodeId?: string | null;
+                /**
+                 * @description The name of the GitHub repository if this is is a GitHub-connected project. 
+                 * @default null
+                 */
+                repoName?: string | null;
+                /**
+                 * @description The URL of the GitHub repository if this is is a GitHub-connected project. 
+                 * @default null
+                 */
+                repoUrl?: string | null;
+              })[];
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Create a project
-   * @description Create a project
-   */
   "mutation.projects.create": {
+    /**
+     * Create a project 
+     * @description Create a project
+     */
     requestBody: {
       content: {
         "application/json": {
@@ -1241,55 +7903,50 @@ export interface operations {
         content: {
           "application/json": {
             /** @description The ID of the project */
-            handle: string;
+            id: string;
             /** @description The name of the project */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the project was created
              */
             dtCreated: string;
             /**
-             * Format: date-time
-             * @description The date the project was deleted
+             * Format: date-time 
+             * @description The date the project was deleted 
              * @default null
              */
             dtDeleted?: string | null;
             /**
-             * @description The node ID of the GitHub repository if this is is a GitHub-connected project.
+             * @description The node ID of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoNodeId?: string | null;
             /**
-             * @description The name of the GitHub repository if this is is a GitHub-connected project.
+             * @description The name of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoName?: string | null;
             /**
-             * @description The URL of the GitHub repository if this is is a GitHub-connected project.
+             * @description The URL of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoUrl?: string | null;
-            /**
-             * @description The ID of the GitHub App installation if this is is a GitHub-connected project.
-             * @default null
-             */
-            githubAppInstallationId?: number | null;
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Get a project by its ID
-   * @description Get a project by its ID.
-   */
   "query.projects.get": {
+    /**
+     * Get a project by its ID 
+     * @description Get a project by its ID.
+     */
     parameters: {
-      path: {
         /** @description The ID of the project to get */
-        handle: string;
+      path: {
+        id: string;
       };
     };
     responses: {
@@ -1298,55 +7955,50 @@ export interface operations {
         content: {
           "application/json": {
             /** @description The ID of the project */
-            handle: string;
+            id: string;
             /** @description The name of the project */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the project was created
              */
             dtCreated: string;
             /**
-             * Format: date-time
-             * @description The date the project was deleted
+             * Format: date-time 
+             * @description The date the project was deleted 
              * @default null
              */
             dtDeleted?: string | null;
             /**
-             * @description The node ID of the GitHub repository if this is is a GitHub-connected project.
+             * @description The node ID of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoNodeId?: string | null;
             /**
-             * @description The name of the GitHub repository if this is is a GitHub-connected project.
+             * @description The name of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoName?: string | null;
             /**
-             * @description The URL of the GitHub repository if this is is a GitHub-connected project.
+             * @description The URL of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoUrl?: string | null;
-            /**
-             * @description The ID of the GitHub App installation if this is is a GitHub-connected project.
-             * @default null
-             */
-            githubAppInstallationId?: number | null;
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Update a project
-   * @description Update a project
-   */
   "mutation.projects.update": {
+    /**
+     * Update a project 
+     * @description Update a project
+     */
     parameters: {
-      path: {
         /** @description The ID of the project to update */
-        handle: string;
+      path: {
+        id: string;
       };
     };
     requestBody: {
@@ -1363,67 +8015,116 @@ export interface operations {
         content: {
           "application/json": {
             /** @description The ID of the project */
-            handle: string;
+            id: string;
             /** @description The name of the project */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the project was created
              */
             dtCreated: string;
             /**
-             * Format: date-time
-             * @description The date the project was deleted
+             * Format: date-time 
+             * @description The date the project was deleted 
              * @default null
              */
             dtDeleted?: string | null;
             /**
-             * @description The node ID of the GitHub repository if this is is a GitHub-connected project.
+             * @description The node ID of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoNodeId?: string | null;
             /**
-             * @description The name of the GitHub repository if this is is a GitHub-connected project.
+             * @description The name of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoName?: string | null;
             /**
-             * @description The URL of the GitHub repository if this is is a GitHub-connected project.
+             * @description The URL of the GitHub repository if this is is a GitHub-connected project. 
              * @default null
              */
             repoUrl?: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projects.delete": {
+    /**
+     * Delete a project 
+     * @description Delete a project
+     */
+    parameters: {
+        /** @description The ID of the project to delete */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the project */
+            id: string;
+            /** @description The name of the project */
+            name: string;
             /**
-             * @description The ID of the GitHub App installation if this is is a GitHub-connected project.
+             * Format: date-time 
+             * @description The date the project was created
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the project was deleted 
              * @default null
              */
-            githubAppInstallationId?: number | null;
+            dtDeleted?: string | null;
+            /**
+             * @description The node ID of the GitHub repository if this is is a GitHub-connected project. 
+             * @default null
+             */
+            repoNodeId?: string | null;
+            /**
+             * @description The name of the GitHub repository if this is is a GitHub-connected project. 
+             * @default null
+             */
+            repoName?: string | null;
+            /**
+             * @description The URL of the GitHub repository if this is is a GitHub-connected project. 
+             * @default null
+             */
+            repoUrl?: string | null;
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List a project's deployments
-   * @description Fetches a list of deployments for a project.
-   */
-  "query.projectsDeployments.list": {
+  "query.projectActivity.list": {
+    /**
+     * List a project's activity 
+     * @description Fetches a list of activity items for a given project.
+     */
     parameters: {
-      query: {
         /** @description Fetch the next page of results after this cursor. */
-        after?: string;
         /** @description The number of items to fetch after this page. */
-        limit?: number;
         /** @description Order results by one of these fields. */
-        orderBy?: "dtCreated";
         /** @description The order to sort the results by. */
-        order?: "asc" | "desc";
+        /** @description Constrain results to deployment activity. */
         /** @description The name of the deployment to filter by */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+        deploymentId?: string;
         name?: string;
       };
+        /** @description The ID of the project to fetch activity items for */
       path: {
-        /** @description The ID of the project to fetch deployments for */
-        handle: string;
+        id: string;
       };
     };
     responses: {
@@ -1434,304 +8135,861 @@ export interface operations {
             /** @description Whether there are more pages of results available. */
             hasMore: boolean;
             /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
-            nextPage: string | null;
+            nextPage?: string;
             /** @description The items on this page. */
-            items: {
-              /** @description The name of the deployment */
-              name: string;
-              /** @description The ID of the deployment */
-              id: string;
-              /** @description The ID of the project the deployment belongs to */
-              projectId: string;
-              /** @description The ID of the team the deployment belongs to */
-              teamId: string;
-              /** @description The unique endpoint for the deployment */
-              endpoint: string;
-              /**
-               * @description The last version hash for the deployment
-               * @default null
-               */
-              latestSpecHash?: string | null;
-              /**
-               * Format: date-time
-               * @description The date the deployment was created
-               */
-              dtCreated: string;
-              /**
-               * @description The latest deployment configuration. If invalid, null is returned.
-               * @default null
-               */
-              latestSpec?: {
-                /** @description The ID of the deployment spec */
+            items: ({
+                /**
+                 * Format: uuid 
+                 * @description ID of the activity item
+                 */
                 id: string;
-                /** @description The data for the deployment spec */
-                data?:
-                  | (
-                      | {
-                          apiVersion: "v0alpha0" | "latest";
-                          name: string;
-                          region?: string;
-                          command?: string[];
-                          /** Format: uuid */
-                          containerRegistry?: string;
-                          env?: {
-                            name: string;
-                            value: string;
-                          }[];
-                          /** @default true */
-                          enabled?: boolean;
-                          healthChecks?: {
-                            liveness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            readiness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            startup?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                          };
-                          image: string;
-                          repositories?: {
-                            mountPath?: string;
-                            dataset: string;
-                            repositories: {
-                              url: string;
-                              ref?: string;
-                              name: string;
-                              username?: string;
-                              password?: string;
-                            }[];
-                          };
-                          resources: {
-                            instanceType: string;
-                            /** @default 1 */
-                            replicas?: number;
-                            autoscaling?: {
-                              maxReplicas: number;
-                              enabled?: boolean;
-                              metrics: (
-                                | {
-                                    /** @enum {string} */
-                                    metric: "requestDuration";
-                                    /** @enum {string} */
-                                    summary: "average";
-                                    value: number;
-                                  }
-                                | {
-                                    /** @enum {string} */
-                                    metric: "cpu" | "memory";
-                                    /** @enum {string} */
-                                    summary: "average";
-                                    value: number;
-                                  }
-                              )[];
-                            };
-                          };
-                          models?: {
-                            id: string;
-                            path?: string;
-                          }[];
-                          /** @default 80 */
-                          port?: number;
-                        }
-                      | {
-                          /** @enum {string} */
-                          apiVersion: "v0alpha1";
-                          name: string;
-                          region?: string;
-                          command: string[];
-                          /** Format: uuid */
-                          containerRegistry?: string;
-                          env?: {
-                            name: string;
-                            value: string;
-                          }[];
-                          /** @default true */
-                          enabled?: boolean;
-                          healthchecks?: {
-                            liveness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            readiness?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                            startup?:
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  path: string;
-                                  host?: string;
-                                  port?: number;
-                                  headers?: {
-                                    name: string;
-                                    value: string;
-                                  }[];
-                                }
-                              | {
-                                  timeoutSeconds?: number;
-                                  initialDelaySeconds?: number;
-                                  periodSeconds?: number;
-                                  failureThreshold?: number;
-                                  exec: {
-                                    command: string[];
-                                  };
-                                };
-                          };
-                          image: string;
-                        }
-                    )
-                  | null;
-                /** @description The ID of the deployment the spec belongs to */
-                deploymentId: string;
                 /**
-                 * Format: date-time
-                 * @description The date the deployment configuration was applied to the cluster
+                 * @description The data associated with the activity item 
                  * @default null
                  */
-                externalApplied?: string | null;
+                data?: {
+                  to: number;
+                  from: number;
+                } | null;
+                /** @description The action that was performed */
+                action: "deployment.scaled" | "deployment.created" | "deployment.deleted" | "deployment.updated" | "deployment.enabled" | "deployment.disabled" | "deployment.autoscaling.enabled" | "deployment.autoscaling.disabled";
                 /**
-                 * Format: date-time
-                 * @description The date the deployment was marked "healthy"
+                 * Format: date-time 
+                 * @description The date the activity item was created
+                 */
+                dtCreated: string;
+                /**
+                 * @description The deployment associated with the activity item 
                  * @default null
                  */
-                dtHealthy?: string | null;
-                /** @description The ID of the user the deployment belongs to */
-                userId: number;
+                deployment?: {
+                  /** @description The name of the deployment */
+                  name: string;
+                  /** @description The ID of the deployment */
+                  id: string;
+                } | null;
                 /**
-                 * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error.
+                 * @description The actor that performed the action. Either a use or system. 
                  * @default null
                  */
-                error?: string | null;
-              } | null;
-            }[];
+                actor?: ({
+                  /**
+                   * @description The avatar URL of the actor 
+                   * @default null
+                   */
+                  avatarUrl?: string | null;
+                  /**
+                   * @description The full name of the actor (e.g. "John Doe") 
+                   * @default null
+                   */
+                  fullName?: string | null;
+                  /**
+                   * @description The email of the actor 
+                   * @default null
+                   */
+                  email?: string | null;
+                }) | null;
+              })[];
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List a project's secrets
-   * @description Fetches a list of secrets for a project.
-   */
+  "query.projectCollaborators.list": {
+    /**
+     * List a project's collaborators 
+     * @description Fetches a list of collaborators for a project.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+        /** @description The ID of the project. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The user that can access the project */
+                user: {
+                  /** @description The ID of the user */
+                  id: string;
+                  /**
+                   * Format: email 
+                   * @description The email address of the user
+                   */
+                  email: string;
+                  /**
+                   * @description The first name of the user 
+                   * @default null
+                   */
+                  firstName?: string | null;
+                  /**
+                   * @description The last name of the user 
+                   * @default null
+                   */
+                  lastName?: string | null;
+                  /**
+                   * @description The URL of the team's profile image. 
+                   * @default null
+                   */
+                  publicProfileImageUrl?: string | null;
+                };
+                /**
+                 * Format: date-time 
+                 * @description The date the collaborate was added to the project
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the collaborator was removed from the project 
+                 * @default null
+                 */
+                dtDeleted?: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projectCollaborators.create": {
+    /**
+     * Create a project collaborator 
+     * @description Adds a new collaborator to a project.
+     */
+    parameters: {
+        /** @description The ID of the project. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The ID of the user to add to the project. */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The user that can access the project */
+            user: {
+              /** @description The ID of the user */
+              id: string;
+              /**
+               * Format: email 
+               * @description The email address of the user
+               */
+              email: string;
+              /**
+               * @description The first name of the user 
+               * @default null
+               */
+              firstName?: string | null;
+              /**
+               * @description The last name of the user 
+               * @default null
+               */
+              lastName?: string | null;
+              /**
+               * @description The URL of the team's profile image. 
+               * @default null
+               */
+              publicProfileImageUrl?: string | null;
+            };
+            /**
+             * Format: date-time 
+             * @description The date the collaborate was added to the project
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the collaborator was removed from the project 
+             * @default null
+             */
+            dtDeleted?: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.projectCollaborators.delete": {
+    /**
+     * Delete a project collaborator 
+     * @description Removes a collaborator from a project.
+     */
+    parameters: {
+        /** @description The ID of the project. */
+        /** @description The ID of the user to remove from the project. */
+      path: {
+        id: string;
+        userId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the user removed from the project. */
+            userId: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.projectsDeployments.list": {
+    /**
+     * List a project's deployments 
+     * @description Fetches a list of deployments for a project.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+        /** @description The name of the deployment to filter by */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+        name?: string;
+      };
+        /** @description The ID of the project to fetch deployments for */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The name of the deployment */
+                name: string;
+                /** @description The ID of the deployment */
+                id: string;
+                /** @description The ID of the project the deployment belongs to */
+                projectId: string;
+                /** @description The ID of the team the deployment belongs to */
+                teamId: string;
+                /** @description The unique endpoint for the deployment */
+                endpoint: string;
+                /**
+                 * @description The last version hash for the deployment 
+                 * @default null
+                 */
+                latestSpecHash?: string | null;
+                /**
+                 * Format: date-time 
+                 * @description The date the deployment was created
+                 */
+                dtCreated: string;
+                /**
+                 * @description The latest deployment configuration. If invalid, null is returned. 
+                 * @default null
+                 */
+                latestSpec?: ({
+                  /** @description The ID of the deployment spec */
+                  id: string;
+                  /** @description The data for the deployment spec */
+                  data?: ((({
+                    apiVersion: "v0alpha0" | "latest";
+                    command?: (string)[];
+                    containerRegistry?: string;
+                    /** @default true */
+                    enabled?: boolean;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                    name: string;
+                    /** @default 80 */
+                    port?: number;
+                    region?: string;
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    resources: {
+                      instanceType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                    };
+                  }) | ({
+                    /** @enum {string} */
+                    apiVersion: "v0alpha1";
+                    containerRegistry?: string;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthchecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    integrations?: ({
+                        /** @enum {string} */
+                        type: "volume";
+                        name: string;
+                      } | {
+                        name: string;
+                        /** @enum {string} */
+                        type: "git-lfs";
+                        /** Format: uri */
+                        url: string;
+                      })[];
+                    name: string;
+                    region?: string;
+                    command?: (string)[];
+                    /** @default true */
+                    enabled?: boolean;
+                    resources: {
+                      machineType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                      ports: (number)[];
+                    };
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                  })) | ({
+                    apiVersion: "v1" | "latest";
+                    containerRegistry?: string;
+                    env?: ({
+                        name: string;
+                        value: string;
+                      })[];
+                    healthchecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    image: string;
+                    integrations?: ({
+                        /** @enum {string} */
+                        type: "volume";
+                        name: string;
+                      } | {
+                        name: string;
+                        /** @enum {string} */
+                        type: "git-lfs";
+                        /** Format: uri */
+                        url: string;
+                      })[];
+                    name: string;
+                    region?: string;
+                    command?: (string)[];
+                    /** @default true */
+                    enabled?: boolean;
+                    resources: {
+                      machineType: string;
+                      /** @default 1 */
+                      replicas?: number;
+                      autoscaling?: {
+                        maxReplicas: number;
+                        enabled?: boolean;
+                        metrics: ({
+                            /** @enum {string} */
+                            metric: "requestDuration";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          } | ({
+                            /** @enum {string} */
+                            metric: "cpu" | "memory";
+                            /** @enum {string} */
+                            summary: "average";
+                            value: number;
+                          }))[];
+                      };
+                      ports: (number)[];
+                    };
+                    healthChecks?: {
+                      liveness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      readiness?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                      startup?: {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        path: string;
+                        host?: string;
+                        port?: number;
+                        headers?: ({
+                            name: string;
+                            value: string;
+                          })[];
+                      } | {
+                        timeoutSeconds?: number;
+                        initialDelaySeconds?: number;
+                        periodSeconds?: number;
+                        failureThreshold?: number;
+                        exec: {
+                          command: (string)[];
+                        };
+                      };
+                    };
+                    repositories?: {
+                      mountPath?: string;
+                      dataset: string;
+                      repositories: ({
+                          url: string;
+                          ref?: string;
+                          name: string;
+                          username?: string;
+                          password?: string;
+                        })[];
+                    };
+                    models?: ({
+                        id: string;
+                        path?: string;
+                      })[];
+                  })) | null;
+                  /** @description The ID of the deployment the spec belongs to */
+                  deploymentId: string;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment configuration was applied to the cluster 
+                   * @default null
+                   */
+                  externalApplied?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description The date the deployment was marked "healthy" 
+                   * @default null
+                   */
+                  dtHealthy?: string | null;
+                  /** @description The ID of the user the deployment belongs to */
+                  userId: string;
+                  /**
+                   * @description The fatal configuration error. Only present if the cluster was unable to apply the entire deployment configuration. This is not the same as an instance error. 
+                   * @default null
+                   */
+                  error?: string | null;
+                  /**
+                   * @description Metadata about the source of the configuration 
+                   * @default null
+                   */
+                  metadata?: ({
+                    gitHeaders?: {
+                      "x-git-host": "github" | "gitlab";
+                      "x-git-actor": string;
+                      "x-git-sha": string;
+                      "x-git-ref": string;
+                      "x-git-owner": string;
+                      "x-git-repo": string;
+                    };
+                  }) | null;
+                }) | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
   "query.projectSecrets.list": {
+    /**
+     * List a project's secrets 
+     * @description Fetches a list of secrets for a project.
+     */
     parameters: {
-      query: {
         /** @description Fetch the next page of results after this cursor. */
-        after?: string;
         /** @description The number of items to fetch after this page. */
-        limit?: number;
         /** @description Order results by one of these fields. */
-        orderBy?: "dtCreated";
         /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
         order?: "asc" | "desc";
       };
-      path: {
         /** @description The ID of the project where the secret is stored. */
-        handle: string;
+      path: {
+        id: string;
       };
     };
     responses: {
@@ -1742,37 +9000,37 @@ export interface operations {
             /** @description Whether there are more pages of results available. */
             hasMore: boolean;
             /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
-            nextPage: string | null;
+            nextPage?: string;
             /** @description The items on this page. */
-            items: {
-              /** @description The name of the secret, e.g. "DB_PASSWORD". */
-              name: string;
-              /**
-               * Format: date-time
-               * @description The date the secret was created.
-               */
-              dtCreated: string;
-              /**
-               * Format: date-time
-               * @description The date the secret was last modified.
-               */
-              dtModified: string;
-            }[];
+            items: ({
+                /** @description The name of the secret, e.g. "DB_PASSWORD". */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was last modified.
+                 */
+                dtModified: string;
+              })[];
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Create a project secret
-   * @description Creates a new secret for a project.
-   */
   "mutation.projectSecrets.create": {
+    /**
+     * Create a project secret 
+     * @description Creates a new secret for a project.
+     */
     parameters: {
-      path: {
         /** @description The ID of the project where the secret is stored. */
-        handle: string;
+      path: {
+        id: string;
       };
     };
     requestBody: {
@@ -1793,12 +9051,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -1808,16 +9066,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Get a project secret
-   * @description Fetches a secret for a project.
-   */
   "query.projectSecrets.getProjectSecret": {
+    /**
+     * Get a project secret 
+     * @description Fetches a secret for a project.
+     */
     parameters: {
-      path: {
         /** @description The ID of the project where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -1829,12 +9087,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -1844,16 +9102,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Delete a project secret
-   * @description Deletes a secret for a project.
-   */
   "mutation.projectSecrets.delete": {
+    /**
+     * Delete a project secret 
+     * @description Deletes a secret for a project.
+     */
     parameters: {
-      path: {
         /** @description The ID of the project where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -1870,16 +9128,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Update a project secret
-   * @description Update the value of a secret for a project.
-   */
   "mutation.projectSecrets.update": {
+    /**
+     * Update a project secret 
+     * @description Update the value of a secret for a project.
+     */
     parameters: {
-      path: {
         /** @description The ID of the project where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -1899,12 +9157,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -1914,25 +9172,22 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * List a team's secrets
-   * @description Fetches a list of secrets for a team.
-   */
-  "query.teamSecrets.list": {
+  "query.publicIps.list": {
+    /**
+     * List public IPs 
+     * @description Fetches a list of public IPs.
+     */
     parameters: {
-      query: {
         /** @description Fetch the next page of results after this cursor. */
-        after?: string;
         /** @description The number of items to fetch after this page. */
-        limit?: number;
         /** @description Order results by one of these fields. */
-        orderBy?: "dtCreated";
         /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
         order?: "asc" | "desc";
-      };
-      path: {
-        /** @description The ID of the team where the secret is stored. */
-        handle: string;
+        region?: string;
       };
     };
     responses: {
@@ -1943,37 +9198,1415 @@ export interface operations {
             /** @description Whether there are more pages of results available. */
             hasMore: boolean;
             /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
-            nextPage: string | null;
+            nextPage?: string;
             /** @description The items on this page. */
-            items: {
-              /** @description The name of the secret, e.g. "DB_PASSWORD". */
-              name: string;
-              /**
-               * Format: date-time
-               * @description The date the secret was created.
-               */
-              dtCreated: string;
-              /**
-               * Format: date-time
-               * @description The date the secret was last modified.
-               */
-              dtModified: string;
-            }[];
+            items: ({
+                /** @description The IP address of the public IP. */
+                ip: string;
+                /** @description The region of the public IP. */
+                region: string;
+                /** @description The ID of the machine the public IP is assigned to. */
+                assignedMachineId?: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the public IP was claimed.
+                 */
+                dtCreated: string;
+              })[];
           };
         };
       };
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Create a team secret
-   * @description Creates a new secret for a team.
-   */
-  "mutation.teamSecrets.create": {
+  "mutation.publicIps.claim": {
+    /**
+     * Claim a public IP 
+     * @description Claims a public IP.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The region of the public IP. */
+          region: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The IP address of the public IP. */
+            ip: string;
+            /** @description The region of the public IP. */
+            region: string;
+            /** @description The ID of the machine the public IP is assigned to. */
+            assignedMachineId?: string;
+            /**
+             * Format: date-time 
+             * @description The date the public IP was claimed.
+             */
+            dtCreated: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.publicIps.assign": {
+    /**
+     * Assign a public IP 
+     * @description Assigns a public IP to a machine.
+     */
     parameters: {
+        /** @description The IP address of the public IP. */
       path: {
+        ip: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The ID of the machine to assign the public IP to. */
+          machineId: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The IP address of the public IP. */
+            ip: string;
+            /** @description The region of the public IP. */
+            region: string;
+            /** @description The ID of the machine the public IP is assigned to. */
+            assignedMachineId?: string;
+            /**
+             * Format: date-time 
+             * @description The date the public IP was claimed.
+             */
+            dtCreated: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.publicIps.release": {
+    /**
+     * Release a public IP 
+     * @description Releases a public IP.
+     */
+    parameters: {
+        /** @description The IP address of the public IP. */
+      path: {
+        ip: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            ip: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.sharedDrives.get": {
+    /**
+     * Get a shared drive 
+     * @description Fetches a single shared drive by ID.
+     */
+    parameters: {
+        /** @description The ID of the shared drive to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the shared drive. */
+            id: string;
+            /** @description The name of the shared drive. */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the shared drive was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+            /**
+             * Format: int64 
+             * @description The size of the shared drive.
+             */
+            size: number;
+            /** @description The mount point of the shared drive. */
+            mountPoint: string;
+            /** @description The username of the shared drive. */
+            username: string;
+            /** @description The password of the shared drive. */
+            password: string;
+            /** @description The ID of the network the shared drive is in. */
+            networkId: string;
+            /** @description The region the shared drive is in. */
+            region: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.sharedDrives.update": {
+    /**
+     * Update a shared drive 
+     * @description Updates a single shared drive by ID.
+     */
+    parameters: {
+        /** @description The ID of the shared drive to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the shared drive. */
+          name?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the shared drive. */
+            id: string;
+            /** @description The name of the shared drive. */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the shared drive was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+            /**
+             * Format: int64 
+             * @description The size of the shared drive.
+             */
+            size: number;
+            /** @description The mount point of the shared drive. */
+            mountPoint: string;
+            /** @description The username of the shared drive. */
+            username: string;
+            /** @description The password of the shared drive. */
+            password: string;
+            /** @description The ID of the network the shared drive is in. */
+            networkId: string;
+            /** @description The region the shared drive is in. */
+            region: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.sharedDrives.delete": {
+    /**
+     * Delete a shared drive 
+     * @description Deletes a single shared drive by ID.
+     */
+    parameters: {
+        /** @description The ID of the shared drive to delete. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the deleted shared drive. */
+            id: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.sharedDrives.list": {
+    /**
+     * List shared drives 
+     * @description Fetches a list of shared drives.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        name?: string;
+        region?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the shared drive. */
+                id: string;
+                /** @description The name of the shared drive. */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the shared drive was created.
+                 */
+                dtCreated: string;
+                /** @description The date the shared drive was deleted. */
+                dtDeleted?: (Record<string, never> | string) | null;
+                /**
+                 * Format: int64 
+                 * @description The size of the shared drive.
+                 */
+                size: number;
+                /** @description The mount point of the shared drive. */
+                mountPoint: string;
+                /** @description The username of the shared drive. */
+                username: string;
+                /** @description The password of the shared drive. */
+                password: string;
+                /** @description The ID of the network the shared drive is in. */
+                networkId: string;
+                /** @description The region the shared drive is in. */
+                region: string;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.sharedDrives.create": {
+    /**
+     * Create a shared drive 
+     * @description Creates a new shared drive for use in a private network.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the shared drive. */
+          name: string;
+          /** @description The size of the shared drive in gigabytes. */
+          size: number;
+          /** @description The region the shared drive is in. */
+          region: string;
+          /** @description The ID of the network the shared drive is in. */
+          networkId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the shared drive. */
+            id: string;
+            /** @description The name of the shared drive. */
+            name: string;
+            /**
+             * Format: date-time 
+             * @description The date the shared drive was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+            /**
+             * Format: int64 
+             * @description The size of the shared drive.
+             */
+            size: number;
+            /** @description The mount point of the shared drive. */
+            mountPoint: string;
+            /** @description The username of the shared drive. */
+            username: string;
+            /** @description The password of the shared drive. */
+            password: string;
+            /** @description The ID of the network the shared drive is in. */
+            networkId: string;
+            /** @description The region the shared drive is in. */
+            region: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.snapshots.get": {
+    /**
+     * Get a snapshot 
+     * @description Fetches a single snapshot by ID.
+     */
+    parameters: {
+        /** @description The ID of the snapshot. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the snapshot. */
+            id: string;
+            /** @description The name of the snapshot. */
+            name: string;
+            /** @description The ID of the machine the snapshot is for. */
+            machineId: string;
+            /** @description Whether the snapshot was made automatically. */
+            isAutoSnapshot: boolean;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.snapshots.update": {
+    /**
+     * Update a snapshot 
+     * @description Updates a single snapshot by ID.
+     */
+    parameters: {
+        /** @description The ID of the snapshot. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the snapshot. */
+          name?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the snapshot. */
+            id: string;
+            /** @description The name of the snapshot. */
+            name: string;
+            /** @description The ID of the machine the snapshot is for. */
+            machineId: string;
+            /** @description Whether the snapshot was made automatically. */
+            isAutoSnapshot: boolean;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.snapshots.delete": {
+    /**
+     * Delete snapshot 
+     * @description Delete a snapshot for a machine.
+     */
+    parameters: {
+        /** @description The ID of the snapshot. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The snapshot. */
+            data: {
+              /** @description The ID of the snapshot. */
+              id: string;
+              /** @description The name of the snapshot. */
+              name: string;
+              /** @description The ID of the machine the snapshot is for. */
+              machineId: string;
+              /** @description Whether the snapshot was made automatically. */
+              isAutoSnapshot: boolean;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.snapshots.list": {
+    /**
+     * List snapshots 
+     * @description List snapshots and filter by machine.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        machineId?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the snapshot. */
+                id: string;
+                /** @description The name of the snapshot. */
+                name: string;
+                /** @description The ID of the machine the snapshot is for. */
+                machineId: string;
+                /** @description Whether the snapshot was made automatically. */
+                isAutoSnapshot: boolean;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.snapshots.create": {
+    /**
+     * Create snapshot 
+     * @description Create a snapshot for a machine.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the snapshot. */
+          name: string;
+          /** @description The ID of the machine to create a snapshot for. */
+          machineId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The snapshot. */
+            data: {
+              /** @description The ID of the snapshot. */
+              id: string;
+              /** @description The name of the snapshot. */
+              name: string;
+              /** @description The ID of the machine the snapshot is for. */
+              machineId: string;
+              /** @description Whether the snapshot was made automatically. */
+              isAutoSnapshot: boolean;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.snapshots.restore": {
+    /**
+     * Restore snapshot 
+     * @description Restore a snapshot for a machine.
+     */
+    parameters: {
+        /** @description The ID of the snapshot. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description Create a new snapshot before restoring. */
+          createSnapshotBeforeRestore?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The snapshot. */
+            data: {
+              /** @description The ID of the snapshot. */
+              id: string;
+              /** @description The name of the snapshot. */
+              name: string;
+              /** @description The ID of the machine the snapshot is for. */
+              machineId: string;
+              /** @description Whether the snapshot was made automatically. */
+              isAutoSnapshot: boolean;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.startupScripts.get": {
+    /**
+     * Get a startup script 
+     * @description Fetches a single startup script by ID.
+     */
+    parameters: {
+        /** @description The ID of the startup script to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.startupScripts.update": {
+    /**
+     * Update startup script 
+     * @description Update a startup script.
+     */
+    parameters: {
+        /** @description The id of the startup script. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the startup script. */
+          name?: string;
+          /** @description The script to run on startup. */
+          script?: string;
+          /** @description Whether the script should only run once on first boot or on every boot. */
+          isRunOnce?: boolean;
+          /** @description Whether the startup script is enabled. */
+          isEnabled?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.startupScripts.delete": {
+    /**
+     * Delete startup script 
+     * @description Delete a startup script.
+     */
+    parameters: {
+        /** @description The id of the startup script. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.startupScripts.list": {
+    /**
+     * List startup scripts 
+     * @description Fetches a list of startup scripts.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        name?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the startup script. */
+                id: string;
+                /** @description The name of the startup script. */
+                name: string;
+                /** @description The description of the startup script. */
+                description: string | null;
+                /** @description Whether the startup script is enabled. */
+                isEnabled: boolean;
+                /** @description Whether the startup script is run once on first boot or on every boot. */
+                isRunOnce: boolean;
+                /** @description The IDs of the machines the startup script is assigned to. */
+                assignedMachineIds: (string)[];
+                /**
+                 * Format: date-time 
+                 * @description The date the startup script was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the startup script was deleted.
+                 */
+                dtDeleted: string | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.startupScripts.create": {
+    /**
+     * Create startup script 
+     * @description Create a startup script.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the startup script. */
+          name: string;
+          /** @description The script to run on startup. */
+          script: string;
+          /**
+           * @description Whether the script should only run once on first boot or on every boot. 
+           * @default false
+           */
+          isRunOnce?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.startupScripts.assign": {
+    /**
+     * Assign startup script to machine 
+     * @description Assign a startup script to a machine.
+     */
+    parameters: {
+        /** @description The id of the startup script. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The id of the machine to assign the startup script to. */
+          machineId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.startupScripts.unassign": {
+    /**
+     * Unassign startup script from machine 
+     * @description Unassign a startup script from a machine.
+     */
+    parameters: {
+        /** @description The id of the startup script. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The id of the machine to unassign the startup script from. */
+          machineId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the startup script. */
+            id: string;
+            /** @description The name of the startup script. */
+            name: string;
+            /** @description The description of the startup script. */
+            description: string | null;
+            /** @description Whether the startup script is enabled. */
+            isEnabled: boolean;
+            /** @description Whether the startup script is run once on first boot or on every boot. */
+            isRunOnce: boolean;
+            /** @description The IDs of the machines the startup script is assigned to. */
+            assignedMachineIds: (string)[];
+            /**
+             * Format: date-time 
+             * @description The date the startup script was created.
+             */
+            dtCreated: string;
+            /**
+             * Format: date-time 
+             * @description The date the startup script was deleted.
+             */
+            dtDeleted: string | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.storageProviders.list": {
+    /**
+     * List storage providers 
+     * @description List storage providers
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the storage provider */
+                id: string;
+                /** @description The name of the storage provider */
+                name: string;
+                /** @description Whether the storage provider is the team's default provider */
+                isTeamDefault: boolean | null;
+                /** @description Whether the storage provider is managed by Paperspace */
+                isManaged: boolean;
+                /** @description The storage provider configuration */
+                s3Config: {
+                  /**
+                   * Format: uri 
+                   * @default null
+                   */
+                  endpoint?: string | null;
+                  bucket: string;
+                  region?: string | null;
+                  accessKey: string;
+                  secretAccessKey: string;
+                  signatureVersion?: string | null;
+                  /** @default false */
+                  retainData?: boolean | null;
+                };
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.storageProviders.create": {
+    /**
+     * Create a storage provider 
+     * @description Create a storage provider
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the storage provider */
+          name: string;
+          /**
+           * @description The type of storage provider 
+           * @enum {string}
+           */
+          storageProviderType: "s3";
+          /** @description Is team default */
+          isTeamDefault?: boolean;
+          /** @description The storage provider configuration */
+          s3Config: {
+            /**
+             * Format: uri 
+             * @default null
+             */
+            endpoint?: string | null;
+            bucket: string;
+            region?: string | null;
+            accessKey: string;
+            secretAccessKey: string;
+            signatureVersion?: string | null;
+            /** @default false */
+            retainData?: boolean | null;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the storage provider */
+            id: string;
+            /** @description The name of the storage provider */
+            name: string;
+            /** @description Whether the storage provider is the team's default provider */
+            isTeamDefault: boolean | null;
+            /** @description Whether the storage provider is managed by Paperspace */
+            isManaged: boolean;
+            /** @description The storage provider configuration */
+            s3Config: {
+              /**
+               * Format: uri 
+               * @default null
+               */
+              endpoint?: string | null;
+              bucket: string;
+              region?: string | null;
+              accessKey: string;
+              secretAccessKey: string;
+              signatureVersion?: string | null;
+              /** @default false */
+              retainData?: boolean | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.storageProviders.get": {
+    /**
+     * Get a storage provider 
+     * @description Get a storage provider
+     */
+    parameters: {
+        /** @description The ID of the storage provider */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the storage provider */
+            id: string;
+            /** @description The name of the storage provider */
+            name: string;
+            /** @description Whether the storage provider is the team's default provider */
+            isTeamDefault: boolean | null;
+            /** @description Whether the storage provider is managed by Paperspace */
+            isManaged: boolean;
+            /** @description The storage provider configuration */
+            s3Config: {
+              /**
+               * Format: uri 
+               * @default null
+               */
+              endpoint?: string | null;
+              bucket: string;
+              region?: string | null;
+              accessKey: string;
+              secretAccessKey: string;
+              signatureVersion?: string | null;
+              /** @default false */
+              retainData?: boolean | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.storageProviders.update": {
+    /**
+     * Update a storage provider 
+     * @description Update a storage provider
+     */
+    parameters: {
+        /** @description The ID of the storage provider */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the storage provider */
+          name: string;
+          /** @description Is team default */
+          isTeamDefault: boolean;
+          /** @description The storage provider configuration */
+          s3Config: {
+            /**
+             * Format: uri 
+             * @default null
+             */
+            endpoint?: string | null;
+            bucket: string;
+            region?: string | null;
+            accessKey: string;
+            secretAccessKey: string;
+            signatureVersion?: string | null;
+            /** @default false */
+            retainData?: boolean | null;
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the storage provider */
+            id: string;
+            /** @description The name of the storage provider */
+            name: string;
+            /** @description Whether the storage provider is the team's default provider */
+            isTeamDefault: boolean | null;
+            /** @description Whether the storage provider is managed by Paperspace */
+            isManaged: boolean;
+            /** @description The storage provider configuration */
+            s3Config: {
+              /**
+               * Format: uri 
+               * @default null
+               */
+              endpoint?: string | null;
+              bucket: string;
+              region?: string | null;
+              accessKey: string;
+              secretAccessKey: string;
+              signatureVersion?: string | null;
+              /** @default false */
+              retainData?: boolean | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.storageProviders.delete": {
+    /**
+     * Delete a storage provider 
+     * @description Delete a storage provider
+     */
+    parameters: {
+        /** @description The ID of the storage provider */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the storage provider */
+            id: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.storageUtilization.getPublic": {
+    /**
+     * Get storage utilization 
+     * @description Get a breakdown of how storage is being used by your team
+     */
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The amount of free storage that comes with your current plan in bytes */
+            totalFreeStorage: string;
+            /** @description The amount of free storage left before you reach your plan's limit in bytes */
+            remainingFreeStorage: string;
+            /** @description Total storage used by your team in bytes */
+            totalUsage: string;
+            /** @description Storage used by models in bytes */
+            modelUsage: string;
+            /** @description Storage used by datasets in bytes */
+            datasetUsage: string;
+            /** @description Persistent storage used by the notebook shared storage directory in bytes */
+            sharedStorageUsage: string;
+            /** @description Storage used by notebooks files in bytes */
+            notebookWorkspaceUsage: string;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.teamSecrets.list": {
+    /**
+     * List a team's secrets 
+     * @description Fetches a list of secrets for a team.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated";
+        order?: "asc" | "desc";
+      };
         /** @description The ID of the team where the secret is stored. */
-        handle: string;
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The name of the secret, e.g. "DB_PASSWORD". */
+                name: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was created.
+                 */
+                dtCreated: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the secret was last modified.
+                 */
+                dtModified: string;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.teamSecrets.create": {
+    /**
+     * Create a team secret 
+     * @description Creates a new secret for a team.
+     */
+    parameters: {
+        /** @description The ID of the team where the secret is stored. */
+      path: {
+        id: string;
       };
     };
     requestBody: {
@@ -1994,12 +10627,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -2009,16 +10642,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Get a team secret
-   * @description Fetches a secret for a team.
-   */
   "query.teamSecrets.get": {
+    /**
+     * Get a team secret 
+     * @description Fetches a secret for a team.
+     */
     parameters: {
-      path: {
         /** @description The ID of the team where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -2030,12 +10663,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -2045,16 +10678,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Delete a team secret
-   * @description Deletes a secret for a team.
-   */
   "mutation.teamSecrets.delete": {
+    /**
+     * Delete a team secret 
+     * @description Deletes a secret for a team.
+     */
     parameters: {
-      path: {
         /** @description The ID of the team where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -2071,16 +10704,16 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Update a team secret
-   * @description Update the value of a secret for a team.
-   */
   "mutation.teamSecrets.update": {
+    /**
+     * Update a team secret 
+     * @description Update the value of a secret for a team.
+     */
     parameters: {
-      path: {
         /** @description The ID of the team where the secret is stored. */
-        handle: string;
         /** @description The name of the secret, e.g. "DB_PASSWORD". */
+      path: {
+        id: string;
         name: string;
       };
     };
@@ -2100,12 +10733,12 @@ export interface operations {
             /** @description The name of the secret, e.g. "DB_PASSWORD". */
             name: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was created.
              */
             dtCreated: string;
             /**
-             * Format: date-time
+             * Format: date-time 
              * @description The date the secret was last modified.
              */
             dtModified: string;
@@ -2115,11 +10748,436 @@ export interface operations {
       default: components["responses"]["error"];
     };
   };
-  /**
-   * Health check
-   * @description Check if the API is healthy.
-   */
+  "query.templates.get": {
+    /**
+     * Get a template 
+     * @description Fetches a single template by ID.
+     */
+    parameters: {
+        /** @description The ID of the template to fetch. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the template. */
+            id: string;
+            /** @description The name of the template. */
+            name: string;
+            /**
+             * @description Whether the template is public. 
+             * @default false
+             */
+            isPublic?: boolean;
+            /** @description The type of agent installed on the template. */
+            agentType: string;
+            /** @description The operating system installed on the template. */
+            operatingSystemLabel: string;
+            /** @description The region the template is in. Public templates are in all regions. */
+            region: string;
+            /** @description The default size of the template in gigabytes. */
+            defaultSizeGb: number;
+            /** @description The machine types the template is available on. */
+            availableMachineTypes: ({
+                /** @description The label of the machine type. */
+                machineTypeLabel: string;
+                /** @description Whether the template is available on this machine type. */
+                isAvailable: boolean;
+              })[];
+            /** @description The ID of the parent machine. */
+            parentMachineId: string;
+            /**
+             * Format: date-time 
+             * @description The date the template was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.templates.update": {
+    /**
+     * Update a template 
+     * @description Updates a single template by ID.
+     */
+    parameters: {
+        /** @description The ID of the template to update. */
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the template. */
+          name: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the template. */
+            id: string;
+            /** @description The name of the template. */
+            name: string;
+            /**
+             * @description Whether the template is public. 
+             * @default false
+             */
+            isPublic?: boolean;
+            /** @description The type of agent installed on the template. */
+            agentType: string;
+            /** @description The operating system installed on the template. */
+            operatingSystemLabel: string;
+            /** @description The region the template is in. Public templates are in all regions. */
+            region: string;
+            /** @description The default size of the template in gigabytes. */
+            defaultSizeGb: number;
+            /** @description The machine types the template is available on. */
+            availableMachineTypes: ({
+                /** @description The label of the machine type. */
+                machineTypeLabel: string;
+                /** @description Whether the template is available on this machine type. */
+                isAvailable: boolean;
+              })[];
+            /** @description The ID of the parent machine. */
+            parentMachineId: string;
+            /**
+             * Format: date-time 
+             * @description The date the template was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.templates.delete": {
+    /**
+     * Delete template 
+     * @description Delete a template.
+     */
+    parameters: {
+        /** @description The ID of the template to delete. */
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The ID of the template. */
+            id: string;
+            /** @description The name of the template. */
+            name: string;
+            /**
+             * @description Whether the template is public. 
+             * @default false
+             */
+            isPublic?: boolean;
+            /** @description The type of agent installed on the template. */
+            agentType: string;
+            /** @description The operating system installed on the template. */
+            operatingSystemLabel: string;
+            /** @description The region the template is in. Public templates are in all regions. */
+            region: string;
+            /** @description The default size of the template in gigabytes. */
+            defaultSizeGb: number;
+            /** @description The machine types the template is available on. */
+            availableMachineTypes: ({
+                /** @description The label of the machine type. */
+                machineTypeLabel: string;
+                /** @description Whether the template is available on this machine type. */
+                isAvailable: boolean;
+              })[];
+            /** @description The ID of the parent machine. */
+            parentMachineId: string;
+            /**
+             * Format: date-time 
+             * @description The date the template was created.
+             */
+            dtCreated: string;
+            /** @description The date the shared drive was deleted. */
+            dtDeleted?: (Record<string, never> | string) | null;
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.templates.list": {
+    /**
+     * List templates 
+     * @description Fetches a list of templates.
+     */
+    parameters: {
+        /** @description Fetch the next page of results after this cursor. */
+        /** @description The number of items to fetch after this page. */
+        /** @description Order results by one of these fields. */
+        /** @description The order to sort the results by. */
+      query: {
+        after?: string;
+        limit?: number;
+        orderBy?: "dtCreated" | "name";
+        order?: "asc" | "desc";
+        name?: string;
+        machineId?: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description Whether there are more pages of results available. */
+            hasMore: boolean;
+            /** @description The cursor required to fetch the next page of results. i.e. `?after=nextPage`. This is `null` when there is no next page. */
+            nextPage?: string;
+            /** @description The items on this page. */
+            items: ({
+                /** @description The ID of the template. */
+                id: string;
+                /** @description The name of the template. */
+                name: string;
+                /**
+                 * @description Whether the template is public. 
+                 * @default false
+                 */
+                isPublic?: boolean;
+                /** @description The type of agent installed on the template. */
+                agentType: string;
+                /** @description The operating system installed on the template. */
+                operatingSystemLabel: string;
+                /** @description The region the template is in. Public templates are in all regions. */
+                region: string;
+                /** @description The default size of the template in gigabytes. */
+                defaultSizeGb: number;
+                /** @description The machine types the template is available on. */
+                availableMachineTypes: ({
+                    /** @description The label of the machine type. */
+                    machineTypeLabel: string;
+                    /** @description Whether the template is available on this machine type. */
+                    isAvailable: boolean;
+                  })[];
+                /** @description The ID of the parent machine. */
+                parentMachineId: string;
+                /**
+                 * Format: date-time 
+                 * @description The date the template was created.
+                 */
+                dtCreated: string;
+                /** @description The date the shared drive was deleted. */
+                dtDeleted?: (Record<string, never> | string) | null;
+              })[];
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "mutation.templates.create": {
+    /**
+     * Create template 
+     * @description Create a template for a machine.
+     */
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the template. */
+          name: string;
+          /** @description The ID of the machine to create a template from. */
+          machineId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": {
+            /** @description The machine event to poll for the async operation. */
+            event: {
+              /** @description The ID of the event. */
+              id: string;
+              /**
+               * @description The name of the event, e.g. "create". 
+               * @enum {string}
+               */
+              name: "bill-sessions" | "bill-upgrade" | "create" | "deactivate" | "restart" | "snapshot-create" | "snapshot-delete" | "snapshot-restore" | "start" | "stop" | "template-create" | "template-delete" | "template-distribute" | "template-import" | "vm-migrate" | "vm-shutdown-force" | "vm-upgrade";
+              /**
+               * @description The state of the event, e.g. "done". 
+               * @enum {string}
+               */
+              state: "new" | "in progress" | "done" | "error" | "cancelled";
+              /** @description The ID of the machine the event is for. */
+              machineId: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was created.
+               */
+              dtCreated: string;
+              /**
+               * Format: date-time 
+               * @description The date the event was started.
+               */
+              dtStarted: string | null;
+              /**
+               * Format: date-time 
+               * @description The date the event was finished.
+               */
+              dtFinished: string | null;
+              /** @description The error message of the event, if any. */
+              error: string | null;
+            };
+            /** @description The template. */
+            data: {
+              /** @description The ID of the template. */
+              id: string;
+              /** @description The name of the template. */
+              name: string;
+              /**
+               * @description Whether the template is public. 
+               * @default false
+               */
+              isPublic?: boolean;
+              /** @description The type of agent installed on the template. */
+              agentType: string;
+              /** @description The operating system installed on the template. */
+              operatingSystemLabel: string;
+              /** @description The region the template is in. Public templates are in all regions. */
+              region: string;
+              /** @description The default size of the template in gigabytes. */
+              defaultSizeGb: number;
+              /** @description The machine types the template is available on. */
+              availableMachineTypes: ({
+                  /** @description The label of the machine type. */
+                  machineTypeLabel: string;
+                  /** @description Whether the template is available on this machine type. */
+                  isAvailable: boolean;
+                })[];
+              /** @description The ID of the parent machine. */
+              parentMachineId: string;
+              /**
+               * Format: date-time 
+               * @description The date the template was created.
+               */
+              dtCreated: string;
+              /** @description The date the shared drive was deleted. */
+              dtDeleted?: (Record<string, never> | string) | null;
+            };
+          };
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
+  "query.workflowRunLogs.list": {
+    /**
+     * List workflow run logs 
+     * @description Lists logs for a given workflow run.
+     */
+    parameters: {
+        /** @description The ID of the workflow */
+        /** @description The ID of the workflow run */
+      path: {
+        id: string;
+        runId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response */
+      200: {
+        content: {
+          "application/json": ({
+              /**
+               * Format: uuid 
+               * @description The ID of the workflow run job
+               */
+              id: string;
+              /**
+               * Format: uuid 
+               * @description The ID of the workflow run
+               */
+              workflowRunId: string;
+              /** @description The name of the workflow run job */
+              name: string;
+              /** @description The phase of the workflow run job */
+              phase: string;
+              /**
+               * Format: date-time 
+               * @description When the workflow run job started 
+               * @default null
+               */
+              dtStarted?: string | null;
+              /**
+               * Format: date-time 
+               * @description When the workflow run job finished 
+               * @default null
+               */
+              dtFinished?: string | null;
+              /**
+               * @description The message of the workflow run job 
+               * @default null
+               */
+              message?: string | null;
+              /**
+               * Format: date-time 
+               * @description When the workflow run job was created
+               */
+              dtCreated: string;
+              /** @description The logs for the workflow run jobs */
+              logs: ({
+                  /** @description ID of the log item */
+                  id: string;
+                  /** @description The associated job ID of the log item. */
+                  jobId: string;
+                  /** @description The line number of the log item. */
+                  line: string;
+                  /** @description The message of the log item. */
+                  message: string;
+                  /**
+                   * @description UUID representing the log item 
+                   * @default null
+                   */
+                  uuid?: string | null;
+                  /**
+                   * Format: date-time 
+                   * @description The date the log was created.
+                   */
+                  dtCreated: string;
+                  /**
+                   * @description The instance ID the log is associated with. 
+                   * @default null
+                   */
+                  instanceId?: string | null;
+                })[];
+            })[];
+        };
+      };
+      default: components["responses"]["error"];
+    };
+  };
   "query.health": {
+    /**
+     * Health check 
+     * @description Check if the API is healthy.
+     */
     responses: {
       /** @description Successful response */
       200: {

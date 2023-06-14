@@ -15,7 +15,11 @@ import {
   getDeploymentByProjectAndName,
 } from "./service";
 
-const TIMEOUT_IN_MINUTES = 5;
+/**
+ * Now that we have more robust container build processes, we should monitor...
+ * whether this timeout needs to be increased.
+ */
+const TIMEOUT_IN_MINUTES = 15;
 const BAD_INSTANCE_STATES = ["errored", "failed"];
 
 const defaultConfigPaths = [
@@ -136,6 +140,12 @@ function isDeploymentStable(deployment: Deployment): boolean {
   return !!latestSpec?.dtHealthy;
 }
 
+function maybeCheckDeploymentError(deployment: Deployment): string | null | undefined {
+  const { latestSpec } = deployment;
+
+  return latestSpec?.error;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function syncDeployment(projectId: string, yaml: any) {
   const deploymentId = await upsertDeployment({
@@ -164,6 +174,15 @@ async function syncDeployment(projectId: string, yaml: any) {
 
       if (isDeploymentDisabled(runs, deployment)) {
         core.info("Deployment successfully disabled.");
+
+        isDeploymentUpdated = true;
+        return;
+      }
+
+      const error = maybeCheckDeploymentError(deployment);
+
+      if (error) {
+        core.error(`Deployment upsert failed. ${error}`);
 
         isDeploymentUpdated = true;
         return;
