@@ -204,7 +204,7 @@ function syncDeployment(projectId, yaml) {
                     return;
                 }
                 const error = maybeCheckDeploymentError(deployment);
-                console.log('ERROR:', error);
+                console.log('ERROR:', error, deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec);
                 if (error === null || error === void 0 ? void 0 : error.length) {
                     core.error(`Deployment upsert failed. ${error}`);
                     isDeploymentUpdated = true;

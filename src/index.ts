@@ -183,7 +183,7 @@ async function syncDeployment(projectId: string, yaml: any) {
 
       const error = maybeCheckDeploymentError(deployment);
 
-      console.log('ERROR:', error)
+      console.log('ERROR:', error, deployment?.latestSpec)
 
       if (error?.length) {
         core.error(`Deployment upsert failed. ${error}`);
