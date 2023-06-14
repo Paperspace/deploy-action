@@ -172,7 +172,6 @@ async function syncDeployment(projectId: string, yaml: any) {
     if (!deployment.latestSpec?.externalApplied && error) {
       const fatalError = `Deployment upsert failed. ${error}`;
 
-      core.error(fatalError);
       throw new Error(fatalError);
     }
 
