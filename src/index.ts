@@ -35,6 +35,8 @@ const defaultConfigPaths = [
   ".paperspace/app.toml",
 ];
 
+core.info('STARTING...');
+
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey =
   process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
@@ -181,7 +183,9 @@ async function syncDeployment(projectId: string, yaml: any) {
 
       const error = maybeCheckDeploymentError(deployment);
 
-      if (error) {
+      console.log('ERROR:', error)
+
+      if (error?.length) {
         core.error(`Deployment upsert failed. ${error}`);
 
         isDeploymentUpdated = true;

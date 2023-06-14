@@ -110,6 +110,7 @@ const defaultConfigPaths = [
     ".paperspace/app.jsonc",
     ".paperspace/app.toml",
 ];
+core.info('STARTING...');
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
 const projectId = core.getInput("projectId", { required: true });
@@ -203,7 +204,8 @@ function syncDeployment(projectId, yaml) {
                     return;
                 }
                 const error = maybeCheckDeploymentError(deployment);
-                if (error) {
+                console.log('ERROR:', error);
+                if (error === null || error === void 0 ? void 0 : error.length) {
                     core.error(`Deployment upsert failed. ${error}`);
                     isDeploymentUpdated = true;
                     return;
