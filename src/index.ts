@@ -170,10 +170,10 @@ async function syncDeployment(projectId: string, yaml: any) {
 
     // this means our pre-build steps failed.
     if (!deployment.latestSpec?.externalApplied && error) {
-      core.error(`Deployment upsert failed. ${error}`);
+      const fatalError = `Deployment upsert failed. ${error}`;
 
-      isDeploymentUpdated = true;
-      return;
+      core.error(fatalError);
+      throw new Error(fatalError);
     }
 
     // only look at deployments that were applied to the target cluster

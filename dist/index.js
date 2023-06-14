@@ -110,7 +110,6 @@ const defaultConfigPaths = [
     ".paperspace/app.jsonc",
     ".paperspace/app.toml",
 ];
-core.info('STARTING...');
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey = process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
 const projectId = core.getInput("projectId", { required: true });
@@ -194,12 +193,11 @@ function syncDeployment(projectId, yaml) {
             core.info("Waiting for deployment to complete...");
             const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
             const error = maybeCheckDeploymentError(deployment);
-            console.log('ERROR:', error, deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec);
             // this means our pre-build steps failed.
             if (!((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) && error) {
-                core.error(`Deployment upsert failed. ${error}`);
-                isDeploymentUpdated = true;
-                return;
+                const fatalError = `Deployment upsert failed. ${error}`;
+                core.error(fatalError);
+                throw new Error(fatalError);
             }
             // only look at deployments that were applied to the target cluster
             if ((_b = deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.externalApplied) {
