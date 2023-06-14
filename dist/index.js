@@ -179,7 +179,7 @@ function maybeCheckDeploymentError(deployment) {
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function syncDeployment(projectId, yaml) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const deploymentId = yield (0, service_1.upsertDeployment)({
             config: yaml,
@@ -193,20 +193,21 @@ function syncDeployment(projectId, yaml) {
         while (!isDeploymentUpdated) {
             core.info("Waiting for deployment to complete...");
             const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
+            const error = maybeCheckDeploymentError(deployment);
+            console.log('ERROR:', error, deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec);
+            // this means our pre-build steps failed.
+            if (!((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) && error) {
+                core.error(`Deployment upsert failed. ${error}`);
+                isDeploymentUpdated = true;
+                return;
+            }
             // only look at deployments that were applied to the target cluster
-            if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
+            if ((_b = deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, "minutes"))) {
                     throwBadDeployError(runs);
                 }
                 if (isDeploymentDisabled(runs, deployment)) {
                     core.info("Deployment successfully disabled.");
-                    isDeploymentUpdated = true;
-                    return;
-                }
-                const error = maybeCheckDeploymentError(deployment);
-                console.log('ERROR:', error, deployment === null || deployment === void 0 ? void 0 : deployment.latestSpec);
-                if (error === null || error === void 0 ? void 0 : error.length) {
-                    core.error(`Deployment upsert failed. ${error}`);
                     isDeploymentUpdated = true;
                     return;
                 }

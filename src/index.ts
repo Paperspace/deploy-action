@@ -35,8 +35,6 @@ const defaultConfigPaths = [
   ".paperspace/app.toml",
 ];
 
-core.info('STARTING...');
-
 // const token = process.env.GITHUB_TOKEN || core.getInput('githubToken');
 const paperspaceApiKey =
   process.env.PAPERSPACE_API_KEY || core.getInput("apiKey");
@@ -168,6 +166,16 @@ async function syncDeployment(projectId: string, yaml: any) {
 
     const { runs, deployment } = await getDeploymentWithDetails(deploymentId);
 
+    const error = maybeCheckDeploymentError(deployment);
+
+    // this means our pre-build steps failed.
+    if (!deployment.latestSpec?.externalApplied && error) {
+      core.error(`Deployment upsert failed. ${error}`);
+
+      isDeploymentUpdated = true;
+      return;
+    }
+
     // only look at deployments that were applied to the target cluster
     if (deployment.latestSpec?.externalApplied) {
       if (start.isBefore(dayjs().subtract(TIMEOUT_IN_MINUTES, "minutes"))) {
@@ -176,17 +184,6 @@ async function syncDeployment(projectId: string, yaml: any) {
 
       if (isDeploymentDisabled(runs, deployment)) {
         core.info("Deployment successfully disabled.");
-
-        isDeploymentUpdated = true;
-        return;
-      }
-
-      const error = maybeCheckDeploymentError(deployment);
-
-      console.log('ERROR:', error, deployment?.latestSpec)
-
-      if (error?.length) {
-        core.error(`Deployment upsert failed. ${error}`);
 
         isDeploymentUpdated = true;
         return;
