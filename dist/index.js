@@ -92,7 +92,11 @@ const dayjs_1 = __importDefault(__nccwpck_require__(184));
 const core = __importStar(__nccwpck_require__(7733));
 __nccwpck_require__(4250);
 const service_1 = __nccwpck_require__(1209);
-const TIMEOUT_IN_MINUTES = 5;
+/**
+ * Now that we have more robust container build processes, we should monitor...
+ * whether this timeout needs to be increased.
+ */
+const TIMEOUT_IN_MINUTES = 15;
 const BAD_INSTANCE_STATES = ["errored", "failed"];
 const defaultConfigPaths = [
     "paperspace.yaml",
@@ -168,6 +172,10 @@ function isDeploymentStable(deployment) {
     const { latestSpec } = deployment;
     return !!(latestSpec === null || latestSpec === void 0 ? void 0 : latestSpec.dtHealthy);
 }
+function maybeCheckDeploymentError(deployment) {
+    const { latestSpec } = deployment;
+    return latestSpec === null || latestSpec === void 0 ? void 0 : latestSpec.error;
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function syncDeployment(projectId, yaml) {
     var _a;
@@ -191,6 +199,12 @@ function syncDeployment(projectId, yaml) {
                 }
                 if (isDeploymentDisabled(runs, deployment)) {
                     core.info("Deployment successfully disabled.");
+                    isDeploymentUpdated = true;
+                    return;
+                }
+                const error = maybeCheckDeploymentError(deployment);
+                if (error) {
+                    core.error(`Deployment upsert failed. ${error}`);
                     isDeploymentUpdated = true;
                     return;
                 }
@@ -349,7 +363,7 @@ const upsertDeploymentFetcher = fetcher
     .method("post")
     .create();
 const getDeploymentByProjectFetcher = fetcher
-    .path("/projects/{handle}/deployments")
+    .path("/projects/{id}/deployments")
     .method("get")
     .create();
 function upsertDeployment(config) {
@@ -372,10 +386,10 @@ function upsertDeployment(config) {
     });
 }
 exports.upsertDeployment = upsertDeployment;
-function getDeploymentByProjectAndName(handle, name) {
+function getDeploymentByProjectAndName(id, name) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data } = yield getDeploymentByProjectFetcher({
-            handle,
+            id,
             name,
         });
         const deployments = data.items;
