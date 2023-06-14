@@ -92,7 +92,11 @@ const dayjs_1 = __importDefault(__nccwpck_require__(184));
 const core = __importStar(__nccwpck_require__(7733));
 __nccwpck_require__(4250);
 const service_1 = __nccwpck_require__(1209);
-const TIMEOUT_IN_MINUTES = 5;
+/**
+ * Now that we have more robust container build processes, we should monitor...
+ * whether this timeout needs to be increased.
+ */
+const TIMEOUT_IN_MINUTES = 15;
 const BAD_INSTANCE_STATES = ["errored", "failed"];
 const defaultConfigPaths = [
     "paperspace.yaml",
@@ -168,9 +172,13 @@ function isDeploymentStable(deployment) {
     const { latestSpec } = deployment;
     return !!(latestSpec === null || latestSpec === void 0 ? void 0 : latestSpec.dtHealthy);
 }
+function maybeCheckDeploymentError(deployment) {
+    const { latestSpec } = deployment;
+    return latestSpec === null || latestSpec === void 0 ? void 0 : latestSpec.error;
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function syncDeployment(projectId, yaml) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const deploymentId = yield (0, service_1.upsertDeployment)({
             config: yaml,
@@ -184,8 +192,14 @@ function syncDeployment(projectId, yaml) {
         while (!isDeploymentUpdated) {
             core.info("Waiting for deployment to complete...");
             const { runs, deployment } = yield (0, service_1.getDeploymentWithDetails)(deploymentId);
+            const error = maybeCheckDeploymentError(deployment);
+            // this means our pre-build steps failed.
+            if (!((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) && error) {
+                const fatalError = `Deployment upsert failed. ${error}`;
+                throw new Error(fatalError);
+            }
             // only look at deployments that were applied to the target cluster
-            if ((_a = deployment.latestSpec) === null || _a === void 0 ? void 0 : _a.externalApplied) {
+            if ((_b = deployment.latestSpec) === null || _b === void 0 ? void 0 : _b.externalApplied) {
                 if (start.isBefore((0, dayjs_1.default)().subtract(TIMEOUT_IN_MINUTES, "minutes"))) {
                     throwBadDeployError(runs);
                 }
@@ -349,7 +363,7 @@ const upsertDeploymentFetcher = fetcher
     .method("post")
     .create();
 const getDeploymentByProjectFetcher = fetcher
-    .path("/projects/{handle}/deployments")
+    .path("/projects/{id}/deployments")
     .method("get")
     .create();
 function upsertDeployment(config) {
@@ -372,10 +386,10 @@ function upsertDeployment(config) {
     });
 }
 exports.upsertDeployment = upsertDeployment;
-function getDeploymentByProjectAndName(handle, name) {
+function getDeploymentByProjectAndName(id, name) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data } = yield getDeploymentByProjectFetcher({
-            handle,
+            id,
             name,
         });
         const deployments = data.items;

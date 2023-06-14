@@ -55,7 +55,7 @@ const upsertDeploymentFetcher = fetcher
   .method("post")
   .create();
 const getDeploymentByProjectFetcher = fetcher
-  .path("/projects/{handle}/deployments")
+  .path("/projects/{id}/deployments")
   .method("get")
   .create();
 
@@ -64,7 +64,7 @@ export type Config =
 export type Deployment =
   operations["query.deployments.get"]["responses"][200]["content"]["application/json"];
 export type LatestRuns =
-  operations["query.deploymentRunsrouter.get"]["responses"][200]["content"]["application/json"];
+  operations["query.deploymentRuns.get"]["responses"][200]["content"]["application/json"];
 
 export async function upsertDeployment(config: Config) {
   try {
@@ -92,11 +92,11 @@ export async function upsertDeployment(config: Config) {
 }
 
 export async function getDeploymentByProjectAndName(
-  handle: string,
+  id: string,
   name: string
 ) {
   const { data } = await getDeploymentByProjectFetcher({
-    handle,
+    id,
     name,
   });
 

@@ -15,7 +15,11 @@ import {
   getDeploymentByProjectAndName,
 } from "./service";
 
-const TIMEOUT_IN_MINUTES = 5;
+/**
+ * Now that we have more robust container build processes, we should monitor...
+ * whether this timeout needs to be increased.
+ */
+const TIMEOUT_IN_MINUTES = 15;
 const BAD_INSTANCE_STATES = ["errored", "failed"];
 
 const defaultConfigPaths = [
@@ -136,6 +140,12 @@ function isDeploymentStable(deployment: Deployment): boolean {
   return !!latestSpec?.dtHealthy;
 }
 
+function maybeCheckDeploymentError(deployment: Deployment): string | null | undefined {
+  const { latestSpec } = deployment;
+
+  return latestSpec?.error;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function syncDeployment(projectId: string, yaml: any) {
   const deploymentId = await upsertDeployment({
@@ -155,6 +165,15 @@ async function syncDeployment(projectId: string, yaml: any) {
     core.info("Waiting for deployment to complete...");
 
     const { runs, deployment } = await getDeploymentWithDetails(deploymentId);
+
+    const error = maybeCheckDeploymentError(deployment);
+
+    // this means our pre-build steps failed.
+    if (!deployment.latestSpec?.externalApplied && error) {
+      const fatalError = `Deployment upsert failed. ${error}`;
+
+      throw new Error(fatalError);
+    }
 
     // only look at deployments that were applied to the target cluster
     if (deployment.latestSpec?.externalApplied) {
