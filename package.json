@@ -52,6 +52,6 @@
     "object-hash": "^3.0.0",
     "openapi-typescript-fetch": "^1.1.3",
     "toml": "^3.0.0",
-    "yaml": "^2.2.1"
+    "yaml": "^2.2.2"
   }
 }
