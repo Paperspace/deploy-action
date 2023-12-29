@@ -205,6 +205,8 @@ const parseByExt = (filePath: string) => {
   const content = fs.readFileSync(filePath, "utf8");
 
   switch (ext) {
+    case ".yml":
+      return YAML.parse(content);
     case ".yaml":
       return YAML.parse(content);
     case ".toml":

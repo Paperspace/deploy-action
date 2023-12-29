@@ -14,7 +14,7 @@
 ## Usage
 
 ```yaml
-uses: paperspace/deploy-action@v1.2
+uses: paperspace/deploy-action@v1.4
 env:
   PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
@@ -24,7 +24,7 @@ with:
 You can also pass the api key as an input.
 
 ```yaml
-uses: paperspace/deploy-action@v1.2
+uses: paperspace/deploy-action@v1.4
 with:
   apiKey: ${{ secrets.PAPERSPACE_API_KEY }}
   projectId: p28rlnvnw51
@@ -46,7 +46,7 @@ resources:
 
 
 ```yaml
-uses: paperspace/deploy-action@v1.2
+uses: paperspace/deploy-action@v1.4
 env:
   PAPERSPACE_API_KEY: ${{ secrets.PAPERSPACE_API_KEY }}
 with:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: paperspace/deploy-action@v1.2
+      - uses: paperspace/deploy-action@v1.4
         name: Deploy Staging
         id: deploy
         env:
@@ -119,7 +119,7 @@ jobs:
           tags: |
             paperspace/deployment-fixture:${{ steps.docker-tag-name.outputs.DOCKER_TAG_NAME }}
 
-      - uses: paperspace/deploy-action@v1.2
+      - uses: paperspace/deploy-action@v1.4
         name: Deploy to Paperspace
         id: deploy
         env:
@@ -135,7 +135,7 @@ jobs:
 You may supply an optional relative path to a Paperspace config as follows:
 
 ```yaml
-- uses: paperspace/deploy-action@v1.2
+- uses: paperspace/deploy-action@v1.4
   name: Deploy action
   id: deploy
   env:
