@@ -53,6 +53,7 @@ function ensureAndGetConfigPath(): string {
     const relPath = path.join(workspacePath, relativeFilePath);
 
     if (!fs.existsSync(relPath)) {
+      core.error(`File not found at path: ${relPath}`);
       throw new Error(`File not found at path: ${relPath}`);
     }
 
